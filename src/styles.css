@@ -13,7 +13,12 @@
 *::before,
 *::after { box-sizing: border-box; }
 
-html { -webkit-text-size-adjust: 100%; }
+html {
+  -webkit-text-size-adjust: 100%;
+  /* Keep the scrollbar's space when a sheet locks scrolling, so the page
+     doesn't jump sideways as it opens. */
+  scrollbar-gutter: stable;
+}
 
 body {
   margin: 0;
@@ -195,6 +200,10 @@ main { overflow-x: clip; }
 .problem {
   position: relative;
   height: calc(870 * var(--u));
+  /* The character art is 475 wide from x -15, wider than the 402 frame.
+     Clip it to the frame like Figma does, so on wide screens it doesn't
+     poke out past the 402-wide top/bottom fades. */
+  overflow-x: clip;
 }
 .problem > * { position: absolute; }
 
@@ -382,94 +391,58 @@ main { overflow-x: clip; }
 }
 .rooms > * { position: absolute; }
 
-.rooms__col {
-  top: calc(32 * var(--u));
-  width: calc(108 * var(--u)); height: calc(468 * var(--u));
+.rooms__lane {
+  top: 0;
+  height: calc(500 * var(--u));
+  overflow: hidden;
+  /* Cards ease in at the top edge instead of being sliced off */
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 calc(56 * var(--u)));
+  mask-image: linear-gradient(to bottom, transparent, #000 calc(56 * var(--u)));
 }
-.rooms__col > img {
-  position: absolute;
-  left: 0;
-  width: calc(108 * var(--u)); height: calc(146 * var(--u));
-}
-.rooms__col > img:nth-child(2) { top: calc(161 * var(--u)); }
-.rooms__col > img:nth-child(3) { top: calc(322 * var(--u)); }
-.rooms__col--left { left: calc(3 * var(--u)); }
-.rooms__col--right { left: calc(290 * var(--u)); top: calc(33 * var(--u)); }
+/* Side lanes are narrower than their cards, so the outer edge stays cut
+   like the Figma frame. */
+.rooms__lane--left { left: calc(16 * var(--u)); width: calc(95 * var(--u)); }
+.rooms__lane--mid { left: calc(124 * var(--u)); width: calc(153 * var(--u)); }
+.rooms__lane--right { left: calc(290 * var(--u)); width: calc(95 * var(--u)); }
 
-.room { overflow: hidden; }
-.room img { position: absolute; }
-
-.room--fenesis {
-  position: absolute;
-  left: 0; top: calc(161 * var(--u));
-  width: calc(95 * var(--u)); height: calc(146 * var(--u));
-  border-radius: calc(8 * var(--u)) 0 0 calc(8 * var(--u));
-}
-.room--fenesis img { left: -8.36%; top: 0.08%; width: 117.89%; height: 100.28%; }
-
-.rooms__mid {
-  left: calc(124 * var(--u)); top: calc(12 * var(--u));
-  width: calc(153 * var(--u));
+.rooms__track {
   display: flex;
   flex-direction: column;
   gap: calc(15 * var(--u));
+  animation: rooms-reel var(--duration) linear var(--delay) infinite;
+  will-change: transform;
 }
-.rooms__blank,
-.rooms__stack {
-  position: relative;
-  height: calc(200 * var(--u));
-  border-radius: calc(8 * var(--u));
-  overflow: hidden;
-}
-.rooms__blank { background: #d9d9d9; }
-.rooms__stack img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.rooms__lane--left .rooms__track { margin-left: calc(-13 * var(--u)); }
 
-.rooms__mask {
-  top: calc(32 * var(--u));
-  width: calc(16 * var(--u)); height: calc(468 * var(--u));
-  background: var(--bg);
+.rooms__card {
+  flex: none;
+  width: calc(108 * var(--u));
+  height: calc(146 * var(--u));
+  border-radius: calc(8 * var(--u));
+  object-fit: cover;
 }
-.rooms__mask--left { left: 0; }
-.rooms__mask--right { left: calc(385 * var(--u)); }
+.rooms__lane--mid .rooms__card {
+  width: calc(153 * var(--u));
+  height: calc(200 * var(--u));
+}
+
+/* Each track holds its posters several times over; sliding exactly one
+   set's height and snapping back is seamless. */
+@keyframes rooms-reel {
+  from { transform: translateY(calc(-1 * var(--cycle))); }
+  to { transform: translateY(0); }
+}
 
 .rooms__shade {
   left: calc(16 * var(--u)); top: calc(326 * var(--u));
   width: calc(369 * var(--u)); height: calc(198 * var(--u));
 }
 
-.room--girls {
-  left: calc(124 * var(--u)); top: calc(11 * var(--u));
-  width: calc(153 * var(--u)); height: calc(201 * var(--u));
-  border-radius: calc(8 * var(--u));
-}
-.room--girls img { inset: 0; width: 100%; height: 100%; object-fit: cover; }
-
-.room--cat {
-  left: calc(290 * var(--u)); top: calc(355 * var(--u));
-  width: calc(95 * var(--u)); height: calc(121 * var(--u));
-  border-radius: calc(8 * var(--u));
-}
-.room--cat img { left: -8.65%; top: -0.48%; width: 117.89%; height: 121%; }
-
 .rooms__fade {
   left: 0; top: calc(349 * var(--u));
   width: calc(402 * var(--u)); height: calc(152 * var(--u));
   background: linear-gradient(to bottom, rgba(68, 68, 68, 0) 11.818%, rgba(55, 55, 55, 0.4) 28.352%, var(--bg) 79.65%);
 }
-
-.room--alien {
-  left: calc(290 * var(--u)); top: calc(33 * var(--u));
-  width: calc(95 * var(--u)); height: calc(146 * var(--u));
-  border-radius: calc(8 * var(--u)) 0 0 calc(8 * var(--u));
-}
-.room--alien img { left: -5.27%; top: -0.01%; width: 117.89%; height: 100.28%; }
-
-.room--jurassic {
-  left: calc(16 * var(--u)); top: calc(193 * var(--u));
-  width: calc(95 * var(--u)); height: calc(146 * var(--u));
-  border-radius: 0 calc(8 * var(--u)) calc(8 * var(--u)) 0;
-}
-.room--jurassic img { left: -17.89%; top: -0.14%; width: 117.89%; height: 100.28%; }
 
 .cta {
   left: calc(26 * var(--u)); top: calc(476 * var(--u));
@@ -696,8 +669,8 @@ html:has(.room-sheet[open], .terms-sheet[open]) { overflow: hidden; }
 /* Fallback entrance when the poster can't morph (no view transitions) */
 .room-sheet[open] { animation: sheet-in 320ms var(--ease-out); }
 .room-sheet[open]::backdrop { animation: backdrop-in 320ms ease; }
-:root[data-morph] .room-sheet,
-:root[data-morph] .room-sheet::backdrop { animation: none; }
+.room-sheet[data-morph],
+.room-sheet[data-morph]::backdrop { animation: none; }
 
 @keyframes sheet-in {
   from { opacity: 0; transform: translateY(calc(16 * var(--u))) scale(0.96); }
@@ -1340,4 +1313,6 @@ html:has(.room-sheet[open], .terms-sheet[open]) { overflow: hidden; }
   [data-reveal] { translate: none; transition-property: opacity; }
   @keyframes sheet-in { from { opacity: 0; } }
   @keyframes terms-up { from { opacity: 0; } }
+  /* Hold the reel on its Figma frame */
+  .rooms__track { animation-play-state: paused; }
 }

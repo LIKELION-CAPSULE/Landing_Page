@@ -5,6 +5,8 @@ import poster4 from '../assets/hero/poster-4.png'
 import poster5 from '../assets/hero/poster-5.png'
 import poster6 from '../assets/hero/poster-6.png'
 import poster7 from '../assets/hero/poster-7.png'
+import poster8 from '../assets/rooms/poster-8.png'
+import poster9 from '../assets/rooms/poster-9.png'
 
 export type Room = {
   id: string
@@ -27,4 +29,6 @@ export const ROOMS: Room[] = [
   { id: 'cat', name: '냥냥이가 날 그렇게 쳐다보면 집중할 수가 없잖아!!', description: DESCRIPTION_PLACEHOLDER, image: poster5, variant: '' },
   { id: 'baekdojun', name: '백도준', description: DESCRIPTION_PLACEHOLDER, image: poster6, variant: 'poster--r5 poster--fill' },
   { id: 'jurassic', name: '쥬라기 독서실', description: DESCRIPTION_PLACEHOLDER, image: poster7, variant: '', tags: '#청춘 #연애' },
+  { id: 'iljin', name: '모르는 일진이 나한테 말을 건다', description: DESCRIPTION_PLACEHOLDER, image: poster8, variant: 'poster--r9' },
+  { id: 'lab', name: '뚝딱뚝딱 실험실', description: DESCRIPTION_PLACEHOLDER, image: poster9, variant: 'poster--r9' },
 ]
