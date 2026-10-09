@@ -108,3 +108,4 @@ select email, age, marketing_consent, voted_room_id, created_at from landing_pre
 - 마이그레이션을 PGlite(Postgres 17 WASM)에서 실행해 확인: anon INSERT 허용, 잘못된 `room_id`·대문자 이메일·형식 오류·동의 없음은 23514 로 거부, 중복 이메일은 23505, anon SELECT/UPDATE/DELETE 는 0행, anon 의 집계 뷰 조회는 42501, 재투표 시 마지막 표만 집계, 두 번 적용해도 오류 없음.
 - 모의 Supabase/Mixpanel 서버에 붙여 전체 흐름(랜딩 → 투표 → 수요조사 → 사전예약 → 완료)을 돌려 확인: 경로당 `$mp_web_page_view` 1건, 이벤트 순서대로 전송, 이메일은 소문자로 INSERT, `visitor_id` = Mixpanel `distinct_id`, Mixpanel 본문 어디에도 이메일 없음.
 - 환경변수를 비운 상태에서 기존 흐름이 그대로 동작하고 외부 요청이 나가지 않음.
+- **실제 Supabase 프로젝트(idviltrngwmvyanxbben)와 Mixpanel 에 붙여 확인**: publishable 키로 curl 11개 항목(INSERT 201, 잘못된 room_id·대문자 이메일·동의 없음 400/23514, 중복 이메일 409/23505, anon SELECT/UPDATE/DELETE 0행, 집계 뷰 401/42501) 통과. 브라우저로 랜딩 → 투표 → 수요조사 → 사전예약 → 완료를 돌려 `landing_vote`·`landing_preorder` INSERT 와 Mixpanel `/track` 전송 확인, 콘솔 오류 없음. 테스트 행(`*@example.com`, visitor `curl-check-*`)은 대시보드에서 지우면 된다.
