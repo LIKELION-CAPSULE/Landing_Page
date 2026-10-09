@@ -6,6 +6,7 @@ export const ROUTES = {
   rooms: '/rooms',
   survey: '/survey',
   preorder: '/preorder',
+  done: '/done',
 } as const
 
 type Direction = 'forward' | 'back'
@@ -30,6 +31,8 @@ function transition(direction: Direction, update: () => void) {
 export function useRoute() {
   const [path, setPath] = useState(() => window.location.pathname)
   const idxRef = useRef<number>((window.history.state as HistoryState | null)?.idx ?? 0)
+  // Set by restart(): the next pop lands on home, at the top.
+  const restartRef = useRef(false)
 
   useEffect(() => {
     window.history.scrollRestoration = 'manual'
@@ -43,9 +46,16 @@ export function useRoute() {
       const direction: Direction = idx < idxRef.current ? 'back' : 'forward'
       idxRef.current = idx
 
+      const restarting = restartRef.current
+      restartRef.current = false
+      // The first entry may not be home if the visit began deeper in.
+      if (restarting && window.location.pathname !== ROUTES.home) {
+        window.history.replaceState({ idx, scrollY: 0 } satisfies HistoryState, '', ROUTES.home)
+      }
+
       transition(direction, () => {
         flushSync(() => setPath(window.location.pathname))
-        window.scrollTo(0, state?.scrollY ?? 0)
+        window.scrollTo(0, restarting ? 0 : state?.scrollY ?? 0)
       })
     }
 
@@ -79,5 +89,20 @@ export function useRoute() {
     })
   }, [])
 
-  return { path, navigate, goBack }
+  // Back to the very start: rewind history rather than pushing, so the
+  // browser's back button doesn't return to the finished flow.
+  const restart = useCallback(() => {
+    if (idxRef.current > 0) {
+      restartRef.current = true
+      window.history.go(-idxRef.current)
+      return
+    }
+    window.history.replaceState({ idx: 0, scrollY: 0 } satisfies HistoryState, '', ROUTES.home)
+    transition('back', () => {
+      flushSync(() => setPath(ROUTES.home))
+      window.scrollTo(0, 0)
+    })
+  }, [])
+
+  return { path, navigate, goBack, restart }
 }

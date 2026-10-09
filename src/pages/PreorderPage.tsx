@@ -13,10 +13,11 @@ const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 type Props = {
   votedRoom: Room | null
+  onComplete: () => void
   onBack: () => void
 }
 
-export default function PreorderPage({ votedRoom, onBack }: Props) {
+export default function PreorderPage({ votedRoom, onComplete, onBack }: Props) {
   const [email, setEmail] = useState('')
   const [age, setAge] = useState('')
   const [habits, setHabits] = useState<ReadonlySet<string>>(() => new Set())
@@ -63,9 +64,10 @@ export default function PreorderPage({ votedRoom, onBack }: Props) {
     closeTerms()
   }
 
-  // TODO: send the pre-registration once the backend and the done screen exist.
+  // TODO: send the pre-registration once there's a backend to receive it.
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+    if (canSubmit) onComplete()
   }
 
   return (
