@@ -1,5 +1,6 @@
 import { useEffect, type Dispatch, type FormEvent, type SetStateAction } from 'react'
 import { SURVEY_GROUPS, type SurveyAnswers } from '../data/survey.ts'
+import { track } from '../lib/analytics.ts'
 import arrow from '../assets/story/cta-arrow.svg'
 import skipUnderline from '../assets/survey/skip-underline.svg'
 
@@ -33,10 +34,17 @@ export default function SurveyPage({ answers, onAnswersChange, onNext, onBack }:
     })
   }
 
-  // TODO: send the answers once there's a backend to receive them.
+  // 답변은 사전예약 행에 같이 저장된다 (PreorderPage). 여기서는 사전예약 시작만 센다.
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    if (hasAnswer) onNext()
+    if (!hasAnswer) return
+    track('presign_cta_clicked', { source: 'survey_submit' })
+    onNext()
+  }
+
+  const handleSkip = () => {
+    track('presign_cta_clicked', { source: 'survey_skip' })
+    onNext()
   }
 
   return (
@@ -102,7 +110,7 @@ export default function SurveyPage({ answers, onAnswersChange, onNext, onBack }:
           <img className="cta__arrow form-submit__arrow" src={arrow} alt="" width={24} height={24} />
         </button>
 
-        <button type="button" className="survey__skip" onClick={onNext}>
+        <button type="button" className="survey__skip" onClick={handleSkip}>
           <span>건너뛰고 사전 예약하기</span>
           <img src={skipUnderline} alt="" width={115.017} height={1} />
         </button>

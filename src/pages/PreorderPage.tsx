@@ -4,6 +4,9 @@ import TermsSheet from '../components/TermsSheet.tsx'
 import { useAnimatedDialog } from '../hooks/useAnimatedDialog.ts'
 import { AGE_OPTIONS, CONSENTS, STUDY_HABITS, type Consent } from '../data/preorder.ts'
 import type { Room } from '../data/rooms.ts'
+import type { SurveyAnswers } from '../data/survey.ts'
+import { track } from '../lib/analytics.ts'
+import { savePreorder } from '../lib/api.ts'
 import arrow from '../assets/story/cta-arrow.svg'
 import gift from '../assets/preorder/gift.svg'
 import selectArrow from '../assets/preorder/select-arrow.svg'
@@ -13,15 +16,19 @@ const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 type Props = {
   votedRoom: Room | null
+  // 약관의 수집 항목(선택)에 포함돼 사전예약 행에 같이 저장한다.
+  surveyAnswers: SurveyAnswers
   onComplete: () => void
   onBack: () => void
 }
 
-export default function PreorderPage({ votedRoom, onComplete, onBack }: Props) {
+export default function PreorderPage({ votedRoom, surveyAnswers, onComplete, onBack }: Props) {
   const [email, setEmail] = useState('')
   const [age, setAge] = useState('')
   const [habits, setHabits] = useState<ReadonlySet<string>>(() => new Set())
   const [consents, setConsents] = useState<Record<Consent['id'], boolean>>({ privacy: false, marketing: false })
+  // 저장 요청이 나가 있는 동안 버튼을 잠근다 — 더블탭으로 같은 이메일이 두 번 들어가지 않게.
+  const [submitting, setSubmitting] = useState(false)
 
   // Last consent opened from "보기"; kept while the sheet animates out.
   const [termsId, setTermsId] = useState<Consent['id'] | null>(null)
@@ -30,7 +37,8 @@ export default function PreorderPage({ votedRoom, onComplete, onBack }: Props) {
   const { ref: termsRef, open: showTerms, close: closeTerms } = useAnimatedDialog()
   const termsConsent = CONSENTS.find((consent) => consent.id === termsId) ?? null
 
-  const canSubmit = EMAIL_PATTERN.test(email.trim()) && CONSENTS.every((c) => !c.required || consents[c.id])
+  const canSubmit =
+    !submitting && EMAIL_PATTERN.test(email.trim()) && CONSENTS.every((c) => !c.required || consents[c.id])
 
   useEffect(() => {
     const previous = document.title
@@ -64,10 +72,28 @@ export default function PreorderPage({ votedRoom, onComplete, onBack }: Props) {
     closeTerms()
   }
 
-  // TODO: send the pre-registration once there's a backend to receive it.
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  // 저장 결과와 무관하게 완료 화면으로 간다 — 실패 안내 UI 가 아직 없다 (docs/data-collection.md).
+  // 완료 이벤트는 DB 저장이 성공했을 때만, 중복 이메일은 별도 이벤트로 센다.
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    if (canSubmit) onComplete()
+    if (!canSubmit) return
+    setSubmitting(true)
+    const result = await savePreorder({
+      email,
+      age,
+      habits: [...habits],
+      surveyPicks: surveyAnswers.picks,
+      surveyWish: surveyAnswers.wish,
+      marketingConsent: consents.marketing,
+      votedRoomId: votedRoom?.id ?? null,
+    })
+    if (result === 'saved') {
+      track('presign_completed', { voted_room_id: votedRoom?.id ?? null, marketing_consent: consents.marketing })
+    } else if (result === 'duplicate') {
+      track('presign_duplicate', { voted_room_id: votedRoom?.id ?? null })
+    }
+    setSubmitting(false)
+    onComplete()
   }
 
   return (

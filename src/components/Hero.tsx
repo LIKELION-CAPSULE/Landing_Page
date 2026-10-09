@@ -1,5 +1,6 @@
 import { useRef, type MouseEvent } from 'react'
 import { useHeroExitFallback } from '../hooks/useHeroExitFallback.ts'
+import { track } from '../lib/analytics.ts'
 import logoIcon from '../assets/hero/logo-icon-sprite.png'
 import logoWordmark from '../assets/hero/logo-wordmark-sprite.png'
 import poster1 from '../assets/hero/poster-1.png'
@@ -19,6 +20,7 @@ export default function Hero() {
   // Scroll hint → glide to the story instead of jumping.
   const handleHintClick = (event: MouseEvent<HTMLAnchorElement>) => {
     event.preventDefault()
+    track('cta_clicked', { cta: 'scroll_hint', path: '/' })
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     document.getElementById('problem')?.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth' })
   }

@@ -1,0 +1,110 @@
+# 수요 검증 데이터 수집 — 연동 안내
+
+랜딩 페이지에서 일어나는 행동(PostHog)과 투표·사전예약 원본(Supabase)을 어디에 어떻게 남기는지 정리한다.
+화면·문구·흐름은 바꾸지 않았다. 환경변수가 비어 있으면 수집을 건너뛰고 연동 전과 똑같이 동작한다.
+
+## 구성
+
+| 역할 | 도구 | 키 | 비고 |
+| --- | --- | --- | --- |
+| 행동 분석 (방문·클릭·전환) | PostHog Cloud | `VITE_POSTHOG_KEY` (공개 프로젝트 키) | 분석용. 사업계획서의 투표 수·이메일 수 원본이 아니다 |
+| 투표·사전예약 원본 저장 | Supabase (Postgres) | `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` | anon 키는 INSERT 만 된다 (RLS) |
+| 관리자 조회·CSV | Supabase 대시보드 | 대시보드 로그인 | 별도 관리자 화면 없음 |
+
+별도 서버는 없다. 브라우저가 Supabase REST 로 직접 INSERT 하고, 검증은 CHECK 제약·UNIQUE·RLS 가 맡는다.
+코드: [`src/lib/analytics.ts`](../src/lib/analytics.ts), [`src/lib/api.ts`](../src/lib/api.ts),
+스키마: [`supabase/migrations/2026-10-10_landing_data.sql`](../supabase/migrations/2026-10-10_landing_data.sql).
+
+## 설정 (한 번)
+
+1. **Supabase** — CAPSULE 전용 프로젝트를 새로 만든다 (다른 제품 DB 와 섞지 않는다).
+   SQL Editor 에 `supabase/migrations/2026-10-10_landing_data.sql` 을 붙여 넣어 실행한다. 두 번 실행해도 안전하다.
+   프로젝트 설정 → API 에서 URL 과 **anon(public)** 키를 복사한다. `service_role` 키는 어디에도 넣지 않는다.
+2. **PostHog** — 프로젝트를 만들고 Project API key(`phc_…`)를 복사한다. EU 리전이면 `VITE_POSTHOG_HOST=https://eu.i.posthog.com`.
+3. 호스팅(Vercel 등)의 환경변수에 `.env.example` 의 네 값을 넣고 다시 빌드한다. 로컬은 `.env.local` 에 넣는다 (git 무시됨).
+
+`VITE_` 값은 빌드 결과물에 그대로 들어가므로 공개해도 되는 키만 쓴다.
+
+## PostHog 이벤트
+
+| 이벤트 | 언제 | 속성 | 위치 |
+| --- | --- | --- | --- |
+| `$pageview` | 경로가 바뀔 때마다 SDK 가 자동 전송 (`capture_pageview: 'history_change'`) | `$current_url` | `src/lib/analytics.ts` |
+| `cta_clicked` | 랜딩의 "다른 스터디룸 구경하고 투표하기", 히어로 "스크롤해서 더 알아보기" 클릭 | `cta`: `open_rooms` \| `scroll_hint`, `path` | `Rooms.tsx`, `Hero.tsx` |
+| `artwork_vote_submitted` | "이 스터디룸 투표하기" 클릭 후 **DB 저장이 성공했을 때만** | `room_id` | `App.tsx` |
+| `presign_cta_clicked` | 수요조사 제출 또는 건너뛰기로 `/preorder` 에 진입할 때 | `source`: `survey_submit` \| `survey_skip` | `SurveyPage.tsx` |
+| `presign_completed` | 사전예약 제출 후 **DB 저장이 성공했을 때만** | `voted_room_id`, `marketing_consent` | `PreorderPage.tsx` |
+| `presign_duplicate` | 이미 등록된 이메일로 제출 (DB UNIQUE 위반) | `voted_room_id` | `PreorderPage.tsx` |
+| `landing_api_failed` | INSERT 가 실패 (중복 제외) | `table`, `code` (Postgres 에러 코드) | `src/lib/api.ts` |
+
+- 수동 `landing_view` 는 보내지 않는다. `$pageview` 의 `$current_url = /` 가 랜딩 방문이다. 자동 클릭 수집(autocapture)은 꺼서 CTA 이벤트와 중복되지 않는다.
+- 이메일, 자유 서술, 나이 등 식별 가능한 값은 어떤 이벤트에도 넣지 않는다.
+- `distinct_id` 는 PostHog 익명 ID 이고, DB 행의 `visitor_id` 와 같은 값이다. 둘을 이어 볼 수 있다.
+- `$pageview` 의 `title` 은 직전 페이지 제목이 찍힌다 (제목은 페이지가 그려진 뒤 바뀐다). 경로는 `$current_url` 로 보면 된다.
+- 유입 경로·캠페인은 PostHog 가 `$referrer`, `utm_*` 를 자동으로 붙인다. 공유 링크에 `?utm_source=instagram&utm_campaign=…` 를 달면 된다.
+
+## 지표 정의 (사업계획서용)
+
+분모와 분자를 섞지 않는다. 이벤트 횟수 ≠ 사람 수다.
+
+| 지표 | 정의 | 출처 |
+| --- | --- | --- |
+| 방문자 수 | `$pageview` 의 고유 `distinct_id` 수 | PostHog |
+| 페이지뷰 | `$pageview` 이벤트 수 | PostHog |
+| CTA CTR | `cta_clicked`(cta=open_rooms) 고유 distinct_id ÷ `/` 를 본 고유 distinct_id | PostHog |
+| 투표자 수 | `landing_vote` 의 고유 `visitor_id` 수 (`landing_funnel_summary.voters`) | DB |
+| 작품별 투표 수·비율 | 방문자당 **마지막** 표만 센 `landing_vote_summary.votes`, `share_pct` | DB |
+| 투표 전환율 | 투표자 수 ÷ 방문자 수 | DB ÷ PostHog |
+| 사전예약 시작 수 | `presign_cta_clicked` 고유 distinct_id | PostHog |
+| 사전예약 완료 수 | `landing_preorder` 행 수 (`landing_preorder_summary.preorders`) | DB |
+| 사전예약 전환율 | 사전예약 완료 수 ÷ 방문자 수 | DB ÷ PostHog |
+
+- 로그인이 없다. `visitor_id` 는 브라우저 저장소의 익명 ID 라 기기·브라우저를 바꾸면 다른 사람으로 센다. **1인 1표가 보장되지 않는다**고 적는다.
+- 사전예약 이메일은 출시 알림 수요다. 유료 구매 의향이 검증된 수치로 쓰지 않는다.
+
+## DB
+
+| 테이블 / 뷰 | 내용 |
+| --- | --- |
+| `landing_vote` | 투표 원본. `room_id`(rooms.ts 의 id, CHECK), `visitor_id`, `created_at`. 재투표는 행이 하나 더 들어간다 |
+| `landing_preorder` | 사전예약 원본. `email`(소문자, UNIQUE, 형식 CHECK), `age`, `habits`, `survey_picks`, `survey_wish`, `privacy_consent`(반드시 true), `marketing_consent`, `voted_room_id`, `visitor_id`, `created_at` |
+| `landing_vote_summary` | 룸별 유효표(`votes`), 비율(`share_pct`), 재투표 포함 전체(`raw_votes`) |
+| `landing_preorder_summary` | 총계, 마케팅 동의 수, 투표 포함 수, 처음·마지막 등록 시각 |
+| `landing_funnel_summary` | 투표자 수, 전체 표 수, 사전예약 수 한 줄 |
+
+중복 정책: 같은 이메일은 두 번 저장되지 않는다(UNIQUE). 사용자에게는 완료 화면을 그대로 보여주고 `presign_duplicate` 로만 구분한다.
+같은 방문자의 재투표는 저장은 되지만 집계에서는 마지막 표만 센다.
+
+### 관리자 조회
+
+Supabase 대시보드 → Table Editor 에서 `landing_preorder` 를 열면 목록이 보이고 **Export → CSV** 로 내려받을 수 있다. 집계는 SQL Editor 에서:
+
+```sql
+select * from landing_vote_summary;
+select * from landing_preorder_summary;
+select * from landing_funnel_summary;
+-- 사전예약자 목록 (CSV 는 결과 창의 Download)
+select email, age, marketing_consent, voted_room_id, created_at from landing_preorder order by created_at;
+```
+
+프론트에서 집계를 보여주고 싶다면(예: "현재까지 N명이 투표했어요") anon 으로는 읽을 수 없다. 서버 쪽에서 service_role 키로 `landing_funnel_summary` 를 읽어 숫자만 내려주는 함수가 하나 필요하다. 이 작업 범위에는 넣지 않았다.
+
+### 개인정보
+
+- `landing_preorder.email` 은 개인정보다. 약관대로 서비스 출시 후 6개월이 지나면 삭제한다.
+- 대시보드 접근 권한이 곧 개인정보 접근 권한이다. 필요한 사람에게만 준다.
+- 수신 동의 철회 요청이 오면 `marketing_consent` 를 false 로 바꾼다.
+
+## 알려진 한계
+
+- **속도 제한 없음.** anon 키로 INSERT 가 열려 있어 스크립트로 쓰레기 행을 넣을 수 있다. 형식 CHECK 와 UNIQUE 가 거를 뿐이다. 실제로 당하면 INSERT 를 Edge Function 하나로 옮기고 IP 당 제한을 건다.
+- **저장 실패를 사용자에게 알리지 않는다.** 기존 화면에 오류 표시 UI 가 없어서, 실패해도 다음 화면으로 넘어가고 콘솔과 `landing_api_failed` 에만 남는다. 안내가 필요하면 프론트에서 `saveVote`/`savePreorder` 의 반환값(`'failed'`)을 받아 처리하면 된다.
+- 룸을 추가하면 `landing_vote.room_id` CHECK 도 같이 고쳐야 한다. 안 고치면 그 룸 투표는 저장이 실패한다.
+- `posthog-js` 가 번들을 약 110 kB(gzip) 키운다. 로딩 속도가 문제가 되면 `initAnalytics` 안에서 동적 `import()` 로 바꾼다.
+- PostHog 는 브라우저 저장소(localStorage·쿠키)에 익명 ID 를 둔다. 푸터의 개인정보처리방침 링크(지금은 `#`)에 분석 도구 사용을 적어야 한다.
+
+## 검증 기록 (2026-10-10)
+
+- 마이그레이션을 PGlite(Postgres 17 WASM)에서 실행해 확인: anon INSERT 허용, 잘못된 `room_id`·대문자 이메일·형식 오류·동의 없음은 23514 로 거부, 중복 이메일은 23505, anon SELECT/UPDATE/DELETE 는 0행, anon 의 집계 뷰 조회는 42501, 재투표 시 마지막 표만 집계, 두 번 적용해도 오류 없음.
+- 모의 Supabase/PostHog 서버에 붙여 전체 흐름(랜딩 → 투표 → 수요조사 → 사전예약 → 완료)을 돌려 확인: 경로당 `$pageview` 1건, 이벤트 7종 순서대로 전송, 이메일은 소문자로 INSERT, `visitor_id` = PostHog `distinct_id`, PostHog 본문 어디에도 이메일 없음.
+- 환경변수를 비운 상태에서 기존 흐름이 그대로 동작하고 외부 요청이 나가지 않음.

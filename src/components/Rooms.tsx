@@ -1,6 +1,7 @@
 import { useState, type CSSProperties, type MouseEvent } from 'react'
 import { ROUTES } from '../hooks/useRoute.ts'
 import { ROOMS } from '../data/rooms.ts'
+import { track } from '../lib/analytics.ts'
 import shade from '../assets/story/gallery-shade.svg'
 import ctaArrow from '../assets/story/cta-arrow.svg'
 
@@ -65,6 +66,7 @@ export default function Rooms({ onOpenRooms }: Props) {
 
   // Let modified clicks (new tab, etc.) fall through to the real link.
   const handleCtaClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    track('cta_clicked', { cta: 'open_rooms', path: '/' })
     if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return
     event.preventDefault()
     onOpenRooms()

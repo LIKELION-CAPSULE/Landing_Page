@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# 환경변수 — 키는 커밋하지 않는다 (.env.example 참고)
+.env

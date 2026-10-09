@@ -7,14 +7,20 @@ import DonePage from './pages/DonePage.tsx'
 import { ROOMS } from './data/rooms.ts'
 import { EMPTY_SURVEY, type SurveyAnswers } from './data/survey.ts'
 import { ROUTES, useRoute } from './hooks/useRoute.ts'
+import { track } from './lib/analytics.ts'
+import { saveVote } from './lib/api.ts'
 
 export default function App() {
   const { path, navigate, goBack, restart } = useRoute()
   const [votedRoomId, setVotedRoomId] = useState<string | null>(null)
   const [surveyAnswers, setSurveyAnswers] = useState<SurveyAnswers>(EMPTY_SURVEY)
 
-  const handleVote = (roomId: string) => {
+  // 저장 결과와 무관하게 다음 화면으로 간다 — 실패 안내 UI 가 아직 없다 (docs/data-collection.md).
+  // 투표 완료 이벤트는 DB 저장이 성공했을 때만 보낸다.
+  const handleVote = async (roomId: string) => {
     setVotedRoomId(roomId)
+    const result = await saveVote(roomId)
+    if (result === 'saved') track('artwork_vote_submitted', { room_id: roomId })
     navigate(ROUTES.survey)
   }
 
@@ -27,6 +33,7 @@ export default function App() {
     return (
       <PreorderPage
         votedRoom={votedRoom}
+        surveyAnswers={surveyAnswers}
         onComplete={() => navigate(ROUTES.done)}
         onBack={() => goBack(ROUTES.survey)}
       />
