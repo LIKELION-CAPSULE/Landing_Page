@@ -32,12 +32,13 @@ function morph(card: HTMLElement | undefined, opening: boolean, update: () => vo
 }
 
 type Props = {
+  // One vote per person; held by App so it survives leaving the page.
+  votedRoomId: string | null
+  onVote: (roomId: string) => void
   onBack: () => void
 }
 
-export default function RoomsPage({ onBack }: Props) {
-  // One vote per person: voting for a room replaces the previous pick.
-  const [selectedId, setSelectedId] = useState<string | null>(null)
+export default function RoomsPage({ votedRoomId, onVote, onBack }: Props) {
   // Last opened room; kept after closing so the sheet can morph back.
   const [activeId, setActiveId] = useState<string | null>(null)
   const sheetRef = useRef<HTMLDialogElement>(null)
@@ -60,23 +61,21 @@ export default function RoomsPage({ onBack }: Props) {
     })
   }
 
-  const closeRoom = (beforeClose?: () => void) => {
+  const closeRoom = () => {
     const sheet = sheetRef.current
     if (!sheet?.open) return
-    morph(activeId ? cardRefs.current.get(activeId) : undefined, false, () => {
-      if (beforeClose) flushSync(beforeClose)
-      sheet.close()
-    })
+    morph(activeId ? cardRefs.current.get(activeId) : undefined, false, () => sheet.close())
   }
 
+  // Voting moves on to the survey; the page push carries the open sheet away.
   const voteForActive = () => {
-    closeRoom(() => setSelectedId(activeId))
+    if (activeId) onVote(activeId)
   }
 
   return (
     <main className="vote">
       {/* 3. Room vote (Figma 273:356) */}
-      <button type="button" className="vote__back" aria-label="뒤로 가기" onClick={onBack}>
+      <button type="button" className="page-back" aria-label="뒤로 가기" onClick={onBack}>
         <img src={backArrow} alt="" width={24} height={24} />
       </button>
 
@@ -98,7 +97,7 @@ export default function RoomsPage({ onBack }: Props) {
               type="button"
               className={`poster vote__card ${room.variant}`}
               aria-haspopup="dialog"
-              data-voted={selectedId === room.id || undefined}
+              data-voted={votedRoomId === room.id || undefined}
               ref={(el) => {
                 if (el) cardRefs.current.set(room.id, el)
                 else cardRefs.current.delete(room.id)
@@ -106,7 +105,7 @@ export default function RoomsPage({ onBack }: Props) {
               onClick={() => openRoom(room.id)}
             >
               <img src={room.image} alt={room.name} />
-              {selectedId === room.id && <span className="sr-only">(투표함)</span>}
+              {votedRoomId === room.id && <span className="sr-only">(투표함)</span>}
             </button>
             {room.tags && <p className="vote__tags">{room.tags}</p>}
           </li>

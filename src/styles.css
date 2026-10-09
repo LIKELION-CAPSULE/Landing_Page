@@ -565,7 +565,7 @@ main { overflow-x: clip; }
 }
 
 /* 44px hit area; offset so the chevron's ink lines up with the title at x 24 */
-.vote__back {
+.page-back {
   position: absolute;
   left: calc(6 * var(--u));
   top: calc(10 * var(--u) + env(safe-area-inset-top));
@@ -580,11 +580,11 @@ main { overflow-x: clip; }
   cursor: pointer;
   transition: transform 160ms var(--ease-out), background-color 160ms ease;
 }
-.vote__back img { width: 24px; height: 24px; }
-.vote__back:active { transform: scale(0.92); }
-.vote__back:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.page-back img { width: 24px; height: 24px; }
+.page-back:active { transform: scale(0.92); }
+.page-back:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 @media (hover: hover) and (pointer: fine) {
-  .vote__back:hover { background: rgba(255, 255, 255, 0.08); }
+  .page-back:hover { background: rgba(255, 255, 255, 0.08); }
 }
 
 .vote__header {
@@ -811,6 +811,156 @@ html:has(.room-sheet[open]) { overflow: hidden; }
   animation-duration: 420ms;
   animation-timing-function: var(--ease-push);
 }
+/* On a page push the sheet leaves with its page instead of morphing */
+:root[data-nav] .room-sheet__art { view-transition-name: none; }
+
+/* ---------- 5. Character survey (Figma 160:354) ---------- */
+
+.survey {
+  position: relative;
+  width: calc(402 * var(--u));
+  min-height: 100svh;
+  margin: 0 auto;
+  padding: calc(64 * var(--u)) 0 calc(14 * var(--u) + env(safe-area-inset-bottom));
+  line-height: normal;
+}
+
+.survey__header {
+  width: calc(310 * var(--u));
+  margin-left: calc(26 * var(--u));
+  display: flex;
+  flex-direction: column;
+  gap: calc(10 * var(--u));
+}
+.survey__title {
+  font-size: calc(40 * var(--u));
+  font-weight: 800;
+  white-space: nowrap;
+}
+.survey__title span { display: block; }
+.survey__lead {
+  font-size: calc(16 * var(--u));
+  font-weight: 500;
+  line-height: calc(21 * var(--u));
+  white-space: nowrap;
+}
+
+.survey__note {
+  position: absolute;
+  left: calc(281 * var(--u)); top: calc(237 * var(--u));
+  margin: 0;
+  padding: 0;
+  font-size: calc(13 * var(--u));
+  font-weight: 500;
+  white-space: nowrap;
+}
+.survey__note li { margin-left: calc(19.5 * var(--u)); list-style: disc; }
+
+.survey__groups {
+  margin: calc(34 * var(--u)) 0 0 calc(27 * var(--u));
+  display: flex;
+  flex-direction: column;
+  gap: calc(30 * var(--u));
+}
+.survey__group {
+  display: flex;
+  flex-direction: column;
+  gap: calc(10 * var(--u));
+}
+.survey__group-title { font-size: calc(28 * var(--u)); font-weight: 700; }
+.survey__rows {
+  display: flex;
+  flex-direction: column;
+  gap: calc(8 * var(--u));
+}
+.survey__row {
+  display: flex;
+  gap: calc(10 * var(--u));
+}
+
+.chip-toggle {
+  padding: calc(5 * var(--u)) calc(14 * var(--u));
+  border: 1px solid #d8c5ff;
+  border-radius: calc(15 * var(--u));
+  background: var(--bg);
+  color: #fff;
+  font: inherit;
+  font-size: calc(17 * var(--u));
+  font-weight: 400;
+  line-height: normal;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 160ms ease, color 160ms ease, transform 160ms var(--ease-out);
+}
+.chip-toggle--compact { font-size: calc(16 * var(--u)); font-weight: 500; }
+.chip-toggle[aria-pressed="true"] { background: #d8c5ff; color: #000; }
+.chip-toggle:active { transform: scale(0.96); }
+.chip-toggle:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+
+.survey__wish {
+  display: block;
+  width: calc(350 * var(--u));
+  margin: calc(25.5 * var(--u)) 0 0 calc(23 * var(--u));
+}
+.survey__wish-label {
+  display: block;
+  padding-left: calc(2 * var(--u));
+  font-size: calc(16 * var(--u));
+  font-weight: 500;
+}
+.survey__wish-input {
+  display: block;
+  width: 100%;
+  height: calc(63 * var(--u));
+  margin-top: calc(10 * var(--u));
+  padding: calc(9 * var(--u)) calc(13 * var(--u));
+  border: 1px solid #d8c5ff;
+  border-radius: calc(10 * var(--u));
+  background: var(--bg);
+  color: #fff;
+  font: inherit;
+  /* 16px minimum keeps iOS Safari from zooming in on focus */
+  font-size: max(16px, calc(13 * var(--u)));
+  font-weight: 500;
+  line-height: normal;
+  resize: none;
+}
+.survey__wish-input::placeholder { color: rgba(255, 255, 255, 0.6); font-size: calc(13 * var(--u)); }
+.survey__wish-input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+.survey__submit {
+  position: relative;
+  left: auto; top: auto;
+  margin: calc(18 * var(--u)) 0 0 calc(26 * var(--u));
+  border: 0;
+  color: #fff;
+  font-family: inherit;
+  cursor: pointer;
+}
+.survey__submit-arrow {
+  left: calc(314 * var(--u)); top: calc(12 * var(--u));
+  rotate: 180deg;
+}
+
+.survey__skip {
+  position: relative;
+  display: block;
+  width: calc(115 * var(--u));
+  height: calc(16 * var(--u));
+  margin: calc(7 * var(--u)) auto 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: rgba(255, 255, 255, 0.6);
+  font: inherit;
+  font-size: calc(12 * var(--u));
+  font-weight: 500;
+  line-height: normal;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.survey__skip img { position: absolute; left: 0; top: 100%; }
+.survey__skip:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 2px; }
 
 /* ---------- Page transition ----------
    Landing → rooms pushes the new page in from the right over a dimmed,

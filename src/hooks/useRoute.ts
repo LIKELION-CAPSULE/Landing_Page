@@ -4,6 +4,7 @@ import { flushSync } from 'react-dom'
 export const ROUTES = {
   home: '/',
   rooms: '/rooms',
+  survey: '/survey',
 } as const
 
 type Direction = 'forward' | 'back'
@@ -64,15 +65,15 @@ export function useRoute() {
   }, [])
 
   // Prefer a real history pop so the previous page's scroll comes back.
-  // Opened directly (nothing to pop)? Slide back to home in place instead.
-  const goBack = useCallback(() => {
+  // Opened directly (nothing to pop)? Slide back to `fallback` in place instead.
+  const goBack = useCallback((fallback: string = ROUTES.home) => {
     if (idxRef.current > 0) {
       window.history.back()
       return
     }
-    window.history.replaceState({ idx: 0, scrollY: 0 } satisfies HistoryState, '', ROUTES.home)
+    window.history.replaceState({ idx: 0, scrollY: 0 } satisfies HistoryState, '', fallback)
     transition('back', () => {
-      flushSync(() => setPath(ROUTES.home))
+      flushSync(() => setPath(fallback))
       window.scrollTo(0, 0)
     })
   }, [])
