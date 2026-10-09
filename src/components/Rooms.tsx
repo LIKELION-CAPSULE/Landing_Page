@@ -1,3 +1,5 @@
+import type { MouseEvent } from 'react'
+import { ROUTES } from '../hooks/useRoute.ts'
 import col1Top from '../assets/story/gallery-col1-top.png'
 import slot from '../assets/story/gallery-slot.svg'
 import fenesis from '../assets/story/gallery-fenesis.png'
@@ -10,7 +12,18 @@ import alien from '../assets/story/gallery-alien.png'
 import jurassic from '../assets/story/gallery-jurassic.png'
 import ctaArrow from '../assets/story/cta-arrow.svg'
 
-export default function Rooms() {
+type Props = {
+  onOpenRooms: () => void
+}
+
+export default function Rooms({ onOpenRooms }: Props) {
+  // Let modified clicks (new tab, etc.) fall through to the real link.
+  const handleCtaClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return
+    event.preventDefault()
+    onOpenRooms()
+  }
+
   return (
     <section className="rooms" aria-label="다른 스터디룸" data-reveal>
       <div className="rooms__col rooms__col--left" aria-hidden="true">
@@ -37,7 +50,7 @@ export default function Rooms() {
       <div className="room room--girls"><img src={threeGirls} alt="미소로 바뀐 교실 속 세 소녀" /></div>
       <div className="room room--cat"><img src={cat} alt="냥냥이 때문에 공부가 안 돼!" /></div>
       <div className="rooms__fade" aria-hidden="true"></div>
-      <a className="cta" href="#">
+      <a className="cta" href={ROUTES.rooms} onClick={handleCtaClick}>
         <span>다른 스터디룸 구경하고 투표하기</span>
         <img className="cta__arrow" src={ctaArrow} alt="" width={24} height={24} />
       </a>
