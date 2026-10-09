@@ -5,6 +5,7 @@ export const ROUTES = {
   home: '/',
   rooms: '/rooms',
   survey: '/survey',
+  preorder: '/preorder',
 } as const
 
 type Direction = 'forward' | 'back'

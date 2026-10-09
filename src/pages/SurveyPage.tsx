@@ -1,17 +1,20 @@
-import { useEffect, useState, type FormEvent } from 'react'
-import { SURVEY_GROUPS } from '../data/survey.ts'
+import { useEffect, type Dispatch, type FormEvent, type SetStateAction } from 'react'
+import { SURVEY_GROUPS, type SurveyAnswers } from '../data/survey.ts'
 import arrow from '../assets/story/cta-arrow.svg'
 import skipUnderline from '../assets/survey/skip-underline.svg'
 
-type Answers = Record<string, ReadonlySet<string>>
-
 type Props = {
+  // Held by App so answers survive going on to pre-registration and back.
+  answers: SurveyAnswers
+  onAnswersChange: Dispatch<SetStateAction<SurveyAnswers>>
+  // Both submitting and skipping lead to pre-registration.
+  onNext: () => void
   onBack: () => void
 }
 
-export default function SurveyPage({ onBack }: Props) {
-  const [answers, setAnswers] = useState<Answers>({})
-  const [wish, setWish] = useState('')
+export default function SurveyPage({ answers, onAnswersChange, onNext, onBack }: Props) {
+  // Submitting needs at least one answer; otherwise the skip link is the way on.
+  const hasAnswer = Object.values(answers.picks).some((picked) => picked.size > 0) || answers.wish.trim() !== ''
 
   useEffect(() => {
     const previous = document.title
@@ -23,16 +26,17 @@ export default function SurveyPage({ onBack }: Props) {
 
   // Every group allows several picks.
   const toggle = (groupId: string, label: string) => {
-    setAnswers((current) => {
-      const next = new Set(current[groupId])
+    onAnswersChange((current) => {
+      const next = new Set(current.picks[groupId])
       if (!next.delete(label)) next.add(label)
-      return { ...current, [groupId]: next }
+      return { ...current, picks: { ...current.picks, [groupId]: next } }
     })
   }
 
-  // TODO: hook up to the pre-registration step once it's designed.
+  // TODO: send the answers once there's a backend to receive them.
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+    if (hasAnswer) onNext()
   }
 
   return (
@@ -70,7 +74,7 @@ export default function SurveyPage({ onBack }: Props) {
                         type="button"
                         key={option.label}
                         className={`chip-toggle${option.compact ? ' chip-toggle--compact' : ''}`}
-                        aria-pressed={answers[group.id]?.has(option.label) ?? false}
+                        aria-pressed={answers.picks[group.id]?.has(option.label) ?? false}
                         onClick={() => toggle(group.id, option.label)}
                       >
                         {option.label}
@@ -88,17 +92,17 @@ export default function SurveyPage({ onBack }: Props) {
           <textarea
             className="survey__wish-input"
             placeholder="예: 나 혼자만 좋아하는 학생회 선배"
-            value={wish}
-            onChange={(event) => setWish(event.target.value)}
+            value={answers.wish}
+            onChange={(event) => onAnswersChange((current) => ({ ...current, wish: event.target.value }))}
           />
         </label>
 
-        <button type="submit" className="cta survey__submit">
+        <button type="submit" className="cta form-submit" disabled={!hasAnswer}>
           <span>사전예약 완료하기</span>
-          <img className="cta__arrow survey__submit-arrow" src={arrow} alt="" width={24} height={24} />
+          <img className="cta__arrow form-submit__arrow" src={arrow} alt="" width={24} height={24} />
         </button>
 
-        <button type="button" className="survey__skip">
+        <button type="button" className="survey__skip" onClick={onNext}>
           <span>건너뛰고 사전 예약하기</span>
           <img src={skipUnderline} alt="" width={115.017} height={1} />
         </button>

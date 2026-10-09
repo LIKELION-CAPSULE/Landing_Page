@@ -37,3 +37,11 @@ export const SURVEY_GROUPS: SurveyGroup[] = [
     ],
   },
 ]
+
+export type SurveyAnswers = {
+  // Picked labels per group id.
+  picks: Record<string, ReadonlySet<string>>
+  wish: string
+}
+
+export const EMPTY_SURVEY: SurveyAnswers = { picks: {}, wish: '' }

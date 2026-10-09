@@ -673,7 +673,7 @@ main { overflow-x: clip; }
 
 /* ---------- 4. Room detail (Figma 161:756) ---------- */
 
-html:has(.room-sheet[open]) { overflow: hidden; }
+html:has(.room-sheet[open], .terms-sheet[open]) { overflow: hidden; }
 
 .room-sheet {
   width: calc(320 * var(--u));
@@ -814,6 +814,34 @@ html:has(.room-sheet[open]) { overflow: hidden; }
 /* On a page push the sheet leaves with its page instead of morphing */
 :root[data-nav] .room-sheet__art { view-transition-name: none; }
 
+/* ---------- Form submit (survey, pre-registration) ----------
+   The landing CTA in normal flow. Disabled reads as "not yet" rather
+   than broken: a muted purple that fills in once the form is ready. */
+
+.form-submit {
+  position: relative;
+  left: auto; top: auto;
+  margin-left: calc(26 * var(--u));
+  border: 0;
+  color: #fff;
+  font-family: inherit;
+  cursor: pointer;
+  transition: transform 160ms var(--ease-out), filter 160ms ease, background-color 240ms ease, color 240ms ease;
+}
+.form-submit__arrow {
+  left: calc(314 * var(--u)); top: calc(12 * var(--u));
+  rotate: 180deg;
+  transition: opacity 240ms ease;
+}
+.form-submit:disabled {
+  background: rgba(179, 136, 255, 0.28);
+  color: rgba(255, 255, 255, 0.45);
+  cursor: not-allowed;
+  transform: none;
+  filter: none;
+}
+.form-submit:disabled .form-submit__arrow { opacity: 0.45; }
+
 /* ---------- 5. Character survey (Figma 160:354) ---------- */
 
 .survey {
@@ -928,19 +956,7 @@ html:has(.room-sheet[open]) { overflow: hidden; }
 .survey__wish-input::placeholder { color: rgba(255, 255, 255, 0.6); font-size: calc(13 * var(--u)); }
 .survey__wish-input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 
-.survey__submit {
-  position: relative;
-  left: auto; top: auto;
-  margin: calc(18 * var(--u)) 0 0 calc(26 * var(--u));
-  border: 0;
-  color: #fff;
-  font-family: inherit;
-  cursor: pointer;
-}
-.survey__submit-arrow {
-  left: calc(314 * var(--u)); top: calc(12 * var(--u));
-  rotate: 180deg;
-}
+.survey .form-submit { margin-top: calc(18 * var(--u)); }
 
 .survey__skip {
   position: relative;
@@ -961,6 +977,327 @@ html:has(.room-sheet[open]) { overflow: hidden; }
 }
 .survey__skip img { position: absolute; left: 0; top: 100%; }
 .survey__skip:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 2px; }
+
+/* ---------- 6. Pre-registration (Figma 161:514) ---------- */
+
+.preorder {
+  position: relative;
+  width: calc(402 * var(--u));
+  min-height: 100svh;
+  margin: 0 auto;
+  padding: calc(64 * var(--u)) 0 calc(17 * var(--u) + env(safe-area-inset-bottom));
+  line-height: normal;
+}
+
+.preorder__header {
+  width: calc(360 * var(--u));
+  margin-left: calc(24 * var(--u));
+  display: flex;
+  flex-direction: column;
+  gap: calc(13 * var(--u));
+}
+.preorder__intro {
+  display: flex;
+  flex-direction: column;
+  gap: calc(15 * var(--u));
+}
+.preorder__title {
+  font-size: calc(40 * var(--u));
+  font-weight: 800;
+  white-space: nowrap;
+}
+.preorder__title span { display: block; }
+.preorder__lead { font-size: calc(18 * var(--u)); font-weight: 500; }
+
+/* Benefit card. Text column grows if the room name wraps; the note
+   stays pinned to the bottom so a one-line name lands as designed. */
+.perk {
+  position: relative;
+  min-height: calc(104 * var(--u));
+  display: flex;
+  flex-direction: column;
+  padding: calc(16 * var(--u)) calc(12 * var(--u)) calc(10.5 * var(--u)) calc(136 * var(--u));
+  border-radius: calc(10 * var(--u));
+  background: rgba(157, 157, 157, 0.2);
+}
+.perk__icon {
+  position: absolute;
+  left: calc(31 * var(--u)); top: calc(23 * var(--u));
+  width: calc(64 * var(--u)); height: calc(64 * var(--u));
+}
+.perk__title { font-size: calc(18 * var(--u)); font-weight: 700; }
+.perk__room {
+  margin-top: calc(6.5 * var(--u));
+  font-size: calc(14 * var(--u));
+  font-weight: 700;
+  color: var(--accent);
+  word-break: keep-all;
+}
+.perk__note {
+  margin-top: auto;
+  padding-top: calc(8 * var(--u));
+  font-size: calc(13 * var(--u));
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.preorder__form { margin-top: calc(17 * var(--u)); }
+
+.field {
+  display: block;
+  width: calc(359 * var(--u));
+  margin-left: calc(24 * var(--u));
+}
+.field + .field { margin-top: calc(17 * var(--u)); }
+.field__label {
+  display: block;
+  padding-left: calc(2 * var(--u));
+  font-size: calc(20 * var(--u));
+  font-weight: 700;
+}
+.field__control {
+  display: block;
+  width: 100%;
+  height: calc(35 * var(--u));
+  margin-top: calc(9 * var(--u));
+  padding: 0 calc(17 * var(--u));
+  border: 1px solid #d8c5ff;
+  border-radius: calc(10 * var(--u));
+  background: var(--bg);
+  color: #fff;
+  font: inherit;
+  font-size: max(16px, calc(16 * var(--u)));
+  font-weight: 400;
+  -webkit-appearance: none;
+  appearance: none;
+  transition: border-color 160ms ease;
+}
+.field__control::placeholder,
+.field__control[data-empty] { color: rgba(255, 255, 255, 0.4); }
+.field__control option { color: #fff; background: var(--bg); }
+.field__control:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+.field__select {
+  position: relative;
+  display: block;
+  margin-top: calc(9 * var(--u));
+}
+.field__select .field__control { margin-top: 0; padding-right: calc(40 * var(--u)); cursor: pointer; }
+.field__select-arrow {
+  position: absolute;
+  right: calc(9 * var(--u)); top: calc(7 * var(--u));
+  width: calc(21 * var(--u)); height: calc(21 * var(--u));
+  rotate: -90deg;
+  pointer-events: none;
+}
+
+.habits {
+  width: calc(352 * var(--u));
+  margin: calc(17 * var(--u)) 0 0 calc(24 * var(--u));
+}
+.habits__head {
+  display: flex;
+  align-items: baseline;
+  gap: calc(7 * var(--u));
+  padding-left: calc(1 * var(--u));
+}
+.habits__head .field__label { padding-left: 0; }
+.habits__note {
+  font-size: calc(11 * var(--u));
+  font-weight: 700;
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-position: from-font;
+}
+.habits__list {
+  display: grid;
+  grid-auto-rows: calc(29.4 * var(--u));
+  margin-top: calc(11 * var(--u));
+  font-size: calc(16 * var(--u));
+}
+
+/* Checkbox row: Figma box icon + native input underneath */
+.check {
+  display: flex;
+  align-items: center;
+  gap: calc(8 * var(--u));
+  width: fit-content;
+  cursor: pointer;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.check__input {
+  position: absolute;
+  width: 1px; height: 1px;
+  margin: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+.check__box {
+  position: relative;
+  flex: none;
+  width: calc(24 * var(--u));
+  height: calc(24 * var(--u));
+  border-radius: calc(4 * var(--u));
+  transition: scale 160ms var(--ease-out);
+}
+.check__box img,
+.check__mark { position: absolute; inset: 0; width: 100%; height: 100%; }
+.check__mark {
+  color: var(--accent);
+  opacity: 0;
+  scale: 0.6;
+  transition: opacity 140ms ease, scale 200ms var(--ease-out);
+}
+.check__input:checked + .check__box .check__mark { opacity: 1; scale: 1; }
+.check__input:focus-visible + .check__box { outline: 2px solid var(--accent); outline-offset: 0; }
+.check:active .check__box { scale: 0.9; }
+.check__label { white-space: nowrap; }
+
+.preorder__divider {
+  display: block;
+  width: calc(359 * var(--u));
+  height: 0.5px;
+  margin: calc(10 * var(--u)) 0 0 calc(28 * var(--u));
+}
+
+.consents {
+  width: calc(352 * var(--u));
+  margin: calc(9 * var(--u)) 0 0 calc(24 * var(--u));
+  font-size: calc(14 * var(--u));
+}
+.consents__row {
+  height: calc(29 * var(--u));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.consents__view {
+  /* Taller hit area without moving the text */
+  margin: calc(-8 * var(--u)) 0;
+  padding: calc(8 * var(--u)) 0 calc(8 * var(--u)) calc(12 * var(--u));
+  border: 0;
+  background: none;
+  color: rgba(255, 255, 255, 0.8);
+  font: inherit;
+  font-size: calc(11 * var(--u));
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-position: from-font;
+  cursor: pointer;
+}
+.consents__view:focus-visible { outline: 2px solid var(--accent); outline-offset: -4px; border-radius: 4px; }
+
+.preorder__fine {
+  margin: calc(8 * var(--u)) 0 0 calc(27 * var(--u));
+  font-size: calc(12 * var(--u));
+  color: rgba(255, 255, 255, 0.6);
+  white-space: nowrap;
+}
+
+.preorder .form-submit { margin-top: calc(11 * var(--u)); }
+
+/* Terms bottom sheet: same surface, backdrop and curve as the room
+   detail card, rising from the bottom edge like a native sheet. */
+.terms-sheet {
+  inset: auto 0 0 0;
+  width: calc(402 * var(--u));
+  max-width: none;
+  max-height: 85svh;
+  margin: 0 auto;
+  padding: 0;
+  border: 0;
+  border-radius: calc(16 * var(--u)) calc(16 * var(--u)) 0 0;
+  background: rgba(60, 60, 60, 0.96);
+  color: #fff;
+  overflow: hidden;
+  line-height: normal;
+}
+.terms-sheet[open] { display: flex; animation: terms-up 420ms var(--ease-push); }
+/* showModal() may focus the sheet itself; its controls keep their own rings */
+.terms-sheet:focus-visible { outline: none; }
+.terms-sheet[data-closing] { animation: terms-down 240ms cubic-bezier(0.4, 0, 1, 1) forwards; }
+.terms-sheet::backdrop {
+  background: rgba(18, 18, 18, 0.5);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+.terms-sheet[open]::backdrop { animation: backdrop-in 320ms ease; }
+.terms-sheet[data-closing]::backdrop { animation: backdrop-out 240ms ease forwards; }
+
+@keyframes terms-up { from { transform: translateY(100%); } }
+@keyframes terms-down { to { transform: translateY(100%); } }
+@keyframes backdrop-out { to { opacity: 0; } }
+
+.terms-sheet__inner {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.terms-sheet__grabber {
+  flex: none;
+  width: 36px;
+  height: 4px;
+  margin: calc(10 * var(--u)) auto 0;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.terms-sheet__head { padding: calc(22 * var(--u)) calc(26 * var(--u)) 0; }
+.terms-sheet__tag {
+  display: inline-block;
+  padding: calc(3 * var(--u)) calc(10 * var(--u));
+  border: 1px solid #d8c5ff;
+  border-radius: calc(15 * var(--u));
+  font-size: calc(12 * var(--u));
+  font-weight: 500;
+}
+.terms-sheet__title {
+  margin-top: calc(10 * var(--u));
+  font-size: calc(22 * var(--u));
+  font-weight: 700;
+}
+
+.terms-sheet__body {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: calc(20 * var(--u)) calc(26 * var(--u)) calc(4 * var(--u));
+}
+.terms { margin: 0; }
+.terms__row { padding: calc(14 * var(--u)) 0; }
+.terms__row + .terms__row { border-top: 0.5px solid rgba(255, 255, 255, 0.15); }
+.terms__row:first-child { padding-top: 0; }
+.terms__label {
+  font-size: calc(13 * var(--u));
+  font-weight: 700;
+  color: var(--accent);
+}
+.terms__value {
+  margin: calc(6 * var(--u)) 0 0;
+  font-size: calc(15 * var(--u));
+  font-weight: 500;
+  line-height: 1.5;
+  word-break: keep-all;
+}
+.terms-sheet__note {
+  margin-top: calc(6 * var(--u));
+  padding: calc(12 * var(--u)) calc(14 * var(--u));
+  border-radius: calc(10 * var(--u));
+  background: rgba(130, 130, 130, 0.2);
+  font-size: calc(13 * var(--u));
+  font-weight: 500;
+  line-height: 1.55;
+  color: var(--text-muted);
+  word-break: keep-all;
+}
+
+.terms-sheet__foot {
+  flex: none;
+  padding: calc(16 * var(--u)) 0 calc(17 * var(--u) + env(safe-area-inset-bottom));
+}
+.terms-sheet .form-submit { margin: 0 auto; }
 
 /* ---------- Page transition ----------
    Landing → rooms pushes the new page in from the right over a dimmed,
@@ -1002,4 +1339,5 @@ html:has(.room-sheet[open]) { overflow: hidden; }
   @keyframes hero-exit { to { opacity: 0.1; } }
   [data-reveal] { translate: none; transition-property: opacity; }
   @keyframes sheet-in { from { opacity: 0; } }
+  @keyframes terms-up { from { opacity: 0; } }
 }
