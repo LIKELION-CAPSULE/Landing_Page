@@ -1,13 +1,13 @@
 # 수요 검증 데이터 수집 — 연동 안내
 
-랜딩 페이지에서 일어나는 행동(PostHog)과 투표·사전예약 원본(Supabase)을 어디에 어떻게 남기는지 정리한다.
+랜딩 페이지에서 일어나는 행동(Mixpanel)과 투표·사전예약 원본(Supabase)을 어디에 어떻게 남기는지 정리한다.
 화면·문구·흐름은 바꾸지 않았다. 환경변수가 비어 있으면 수집을 건너뛰고 연동 전과 똑같이 동작한다.
 
 ## 구성
 
 | 역할 | 도구 | 키 | 비고 |
 | --- | --- | --- | --- |
-| 행동 분석 (방문·클릭·전환) | PostHog Cloud | `VITE_POSTHOG_KEY` (공개 프로젝트 키) | 분석용. 사업계획서의 투표 수·이메일 수 원본이 아니다 |
+| 행동 분석 (방문·클릭·전환) | Mixpanel | `VITE_MIXPANEL_TOKEN` (공개 프로젝트 토큰) | 분석용. 사업계획서의 투표 수·이메일 수 원본이 아니다 |
 | 투표·사전예약 원본 저장 | Supabase (Postgres) | `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` | anon 키는 INSERT 만 된다 (RLS) |
 | 관리자 조회·CSV | Supabase 대시보드 | 대시보드 로그인 | 별도 관리자 화면 없음 |
 
@@ -20,16 +20,16 @@
 1. **Supabase** — CAPSULE 전용 프로젝트를 새로 만든다 (다른 제품 DB 와 섞지 않는다).
    SQL Editor 에 `supabase/migrations/2026-10-10_landing_data.sql` 을 붙여 넣어 실행한다. 두 번 실행해도 안전하다.
    프로젝트 설정 → API 에서 URL 과 **anon(public)** 키를 복사한다. `service_role` 키는 어디에도 넣지 않는다.
-2. **PostHog** — 프로젝트를 만들고 Project API key(`phc_…`)를 복사한다. EU 리전이면 `VITE_POSTHOG_HOST=https://eu.i.posthog.com`.
-3. 호스팅(Vercel 등)의 환경변수에 `.env.example` 의 네 값을 넣고 다시 빌드한다. 로컬은 `.env.local` 에 넣는다 (git 무시됨).
+2. **Mixpanel** — 프로젝트를 만들고 Settings → Project Settings 의 Project Token 을 복사한다. 언어는 우측 상단 프로필 → 한국어. EU 리전으로 만들었으면 `VITE_MIXPANEL_API_HOST=https://api-eu.mixpanel.com`.
+3. 호스팅(Vercel 등)의 환경변수에 `.env.example` 의 값을 넣고 다시 빌드한다. 로컬은 `.env.local` 에 넣는다 (git 무시됨).
 
 `VITE_` 값은 빌드 결과물에 그대로 들어가므로 공개해도 되는 키만 쓴다.
 
-## PostHog 이벤트
+## Mixpanel 이벤트
 
 | 이벤트 | 언제 | 속성 | 위치 |
 | --- | --- | --- | --- |
-| `$pageview` | 경로가 바뀔 때마다 SDK 가 자동 전송 (`capture_pageview: 'history_change'`) | `$current_url` | `src/lib/analytics.ts` |
+| `$mp_web_page_view` | 경로가 바뀔 때마다 SDK 가 자동 전송 (`track_pageview: 'url-with-path'`) | `current_url_path`, `$current_url` | `src/lib/analytics.ts` |
 | `cta_clicked` | 랜딩의 "다른 스터디룸 구경하고 투표하기", 히어로 "스크롤해서 더 알아보기" 클릭 | `cta`: `open_rooms` \| `scroll_hint`, `path` | `Rooms.tsx`, `Hero.tsx` |
 | `artwork_vote_submitted` | "이 스터디룸 투표하기" 클릭 후 **DB 저장이 성공했을 때만** | `room_id` | `App.tsx` |
 | `presign_cta_clicked` | 수요조사 제출 또는 건너뛰기로 `/preorder` 에 진입할 때 | `source`: `survey_submit` \| `survey_skip` | `SurveyPage.tsx` |
@@ -37,11 +37,11 @@
 | `presign_duplicate` | 이미 등록된 이메일로 제출 (DB UNIQUE 위반) | `voted_room_id` | `PreorderPage.tsx` |
 | `landing_api_failed` | INSERT 가 실패 (중복 제외) | `table`, `code` (Postgres 에러 코드) | `src/lib/api.ts` |
 
-- 수동 `landing_view` 는 보내지 않는다. `$pageview` 의 `$current_url = /` 가 랜딩 방문이다. 자동 클릭 수집(autocapture)은 꺼서 CTA 이벤트와 중복되지 않는다.
+- 수동 `landing_view` 는 보내지 않는다. `$mp_web_page_view` 의 `current_url_path = /` 가 랜딩 방문이다. 자동 클릭 수집(autocapture)은 꺼서 CTA 이벤트와 중복되지 않는다.
 - 이메일, 자유 서술, 나이 등 식별 가능한 값은 어떤 이벤트에도 넣지 않는다.
-- `distinct_id` 는 PostHog 익명 ID 이고, DB 행의 `visitor_id` 와 같은 값이다. 둘을 이어 볼 수 있다.
-- `$pageview` 의 `title` 은 직전 페이지 제목이 찍힌다 (제목은 페이지가 그려진 뒤 바뀐다). 경로는 `$current_url` 로 보면 된다.
-- 유입 경로·캠페인은 PostHog 가 `$referrer`, `utm_*` 를 자동으로 붙인다. 공유 링크에 `?utm_source=instagram&utm_campaign=…` 를 달면 된다.
+- `distinct_id` 는 Mixpanel 익명 ID 이고, DB 행의 `visitor_id` 와 같은 값이다. 둘을 이어 볼 수 있다.
+- 페이지뷰의 `current_page_title` 은 직전 페이지 제목이 찍힐 수 있다 (제목은 페이지가 그려진 뒤 바뀐다). 경로는 `current_url_path` 로 보면 된다.
+- 유입 경로·캠페인은 Mixpanel 이 `$referrer`, `utm_*` 를 자동으로 붙인다. 공유 링크에 `?utm_source=instagram&utm_campaign=…` 를 달면 된다.
 
 ## 지표 정의 (사업계획서용)
 
@@ -49,15 +49,15 @@
 
 | 지표 | 정의 | 출처 |
 | --- | --- | --- |
-| 방문자 수 | `$pageview` 의 고유 `distinct_id` 수 | PostHog |
-| 페이지뷰 | `$pageview` 이벤트 수 | PostHog |
-| CTA CTR | `cta_clicked`(cta=open_rooms) 고유 distinct_id ÷ `/` 를 본 고유 distinct_id | PostHog |
+| 방문자 수 | `$mp_web_page_view` 의 고유 `distinct_id` 수 | Mixpanel |
+| 페이지뷰 | `$mp_web_page_view` 이벤트 수 | Mixpanel |
+| CTA CTR | `cta_clicked`(cta=open_rooms) 고유 distinct_id ÷ `/` 를 본 고유 distinct_id | Mixpanel |
 | 투표자 수 | `landing_vote` 의 고유 `visitor_id` 수 (`landing_funnel_summary.voters`) | DB |
 | 작품별 투표 수·비율 | 방문자당 **마지막** 표만 센 `landing_vote_summary.votes`, `share_pct` | DB |
-| 투표 전환율 | 투표자 수 ÷ 방문자 수 | DB ÷ PostHog |
-| 사전예약 시작 수 | `presign_cta_clicked` 고유 distinct_id | PostHog |
+| 투표 전환율 | 투표자 수 ÷ 방문자 수 | DB ÷ Mixpanel |
+| 사전예약 시작 수 | `presign_cta_clicked` 고유 distinct_id | Mixpanel |
 | 사전예약 완료 수 | `landing_preorder` 행 수 (`landing_preorder_summary.preorders`) | DB |
-| 사전예약 전환율 | 사전예약 완료 수 ÷ 방문자 수 | DB ÷ PostHog |
+| 사전예약 전환율 | 사전예약 완료 수 ÷ 방문자 수 | DB ÷ Mixpanel |
 
 - 로그인이 없다. `visitor_id` 는 브라우저 저장소의 익명 ID 라 기기·브라우저를 바꾸면 다른 사람으로 센다. **1인 1표가 보장되지 않는다**고 적는다.
 - 사전예약 이메일은 출시 알림 수요다. 유료 구매 의향이 검증된 수치로 쓰지 않는다.
@@ -100,11 +100,11 @@ select email, age, marketing_consent, voted_room_id, created_at from landing_pre
 - **속도 제한 없음.** anon 키로 INSERT 가 열려 있어 스크립트로 쓰레기 행을 넣을 수 있다. 형식 CHECK 와 UNIQUE 가 거를 뿐이다. 실제로 당하면 INSERT 를 Edge Function 하나로 옮기고 IP 당 제한을 건다.
 - **저장 실패를 사용자에게 알리지 않는다.** 기존 화면에 오류 표시 UI 가 없어서, 실패해도 다음 화면으로 넘어가고 콘솔과 `landing_api_failed` 에만 남는다. 안내가 필요하면 프론트에서 `saveVote`/`savePreorder` 의 반환값(`'failed'`)을 받아 처리하면 된다.
 - 룸을 추가하면 `landing_vote.room_id` CHECK 도 같이 고쳐야 한다. 안 고치면 그 룸 투표는 저장이 실패한다.
-- `posthog-js` 가 번들을 약 110 kB(gzip) 키운다. 로딩 속도가 문제가 되면 `initAnalytics` 안에서 동적 `import()` 로 바꾼다.
-- PostHog 는 브라우저 저장소(localStorage·쿠키)에 익명 ID 를 둔다. 푸터의 개인정보처리방침 링크(지금은 `#`)에 분석 도구 사용을 적어야 한다.
+- `mixpanel-browser` 는 core 엔트리(`src/loaders/loader-module-core`, 세션 녹화·autocapture 제외)로 넣었다. 전체 번들 약 120 kB(gzip). 더 줄여야 하면 `initAnalytics` 안에서 동적 `import()` 로 바꾼다.
+- Mixpanel 은 브라우저 저장소(localStorage)에 익명 ID 를 둔다. 푸터의 개인정보처리방침 링크(지금은 `#`)에 분석 도구 사용을 적어야 한다.
 
 ## 검증 기록 (2026-10-10)
 
 - 마이그레이션을 PGlite(Postgres 17 WASM)에서 실행해 확인: anon INSERT 허용, 잘못된 `room_id`·대문자 이메일·형식 오류·동의 없음은 23514 로 거부, 중복 이메일은 23505, anon SELECT/UPDATE/DELETE 는 0행, anon 의 집계 뷰 조회는 42501, 재투표 시 마지막 표만 집계, 두 번 적용해도 오류 없음.
-- 모의 Supabase/PostHog 서버에 붙여 전체 흐름(랜딩 → 투표 → 수요조사 → 사전예약 → 완료)을 돌려 확인: 경로당 `$pageview` 1건, 이벤트 7종 순서대로 전송, 이메일은 소문자로 INSERT, `visitor_id` = PostHog `distinct_id`, PostHog 본문 어디에도 이메일 없음.
+- 모의 Supabase/Mixpanel 서버에 붙여 전체 흐름(랜딩 → 투표 → 수요조사 → 사전예약 → 완료)을 돌려 확인: 경로당 `$mp_web_page_view` 1건, 이벤트 순서대로 전송, 이메일은 소문자로 INSERT, `visitor_id` = Mixpanel `distinct_id`, Mixpanel 본문 어디에도 이메일 없음.
 - 환경변수를 비운 상태에서 기존 흐름이 그대로 동작하고 외부 요청이 나가지 않음.

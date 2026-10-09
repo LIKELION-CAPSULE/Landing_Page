@@ -1,19 +1,18 @@
-import posthog from 'posthog-js'
+import mixpanel from 'mixpanel-browser/src/loaders/loader-module-core'
 
-// PostHog 공개 프로젝트 키. 비어 있으면 모든 호출이 no-op 이라 로컬 개발·빌드에 키가 필요 없다.
-const KEY = import.meta.env.VITE_POSTHOG_KEY as string | undefined
-const HOST = (import.meta.env.VITE_POSTHOG_HOST as string | undefined) || 'https://us.i.posthog.com'
+// Mixpanel 프로젝트 토큰(공개용). 비어 있으면 모든 호출이 no-op 이라 로컬 개발·빌드에 토큰이 필요 없다.
+const TOKEN = import.meta.env.VITE_MIXPANEL_TOKEN as string | undefined
 
 export function initAnalytics() {
-  if (!KEY) return
-  posthog.init(KEY, {
-    api_host: HOST,
-    // pushState 라우터(useRoute)라 경로 변경마다 $pageview 를 SDK 가 자동으로 보낸다.
+  if (!TOKEN) return
+  mixpanel.init(TOKEN, {
+    // pushState 라우터(useRoute)라 경로가 바뀔 때마다 SDK 가 $mp_web_page_view 를 보낸다.
     // 수동 landing_view 는 보내지 않는다 — 같은 방문이 두 번 집계된다.
-    capture_pageview: 'history_change',
-    capture_pageleave: true,
+    track_pageview: 'url-with-path',
     // 클릭 자동 수집을 끈다. 아래 track() 으로 보내는 CTA 이벤트와 중복된다.
     autocapture: false,
+    persistence: 'localStorage',
+    ...(import.meta.env.VITE_MIXPANEL_API_HOST ? { api_host: import.meta.env.VITE_MIXPANEL_API_HOST as string } : {}),
   })
 }
 
@@ -27,14 +26,14 @@ export type EventName =
 
 // ⚠️ 이메일·자유 서술 등 직접 식별 정보는 속성에 넣지 않는다 (docs/data-collection.md).
 export function track(event: EventName, props?: Record<string, string | number | boolean | null>) {
-  if (!KEY) return
-  posthog.capture(event, props)
+  if (!TOKEN) return
+  mixpanel.track(event, props)
 }
 
-// 투표·사전예약 행에 같이 저장하는 방문자 ID. PostHog 의 익명 distinct_id 를 그대로 써서
-// 분석 이벤트와 DB 행을 같은 키로 이을 수 있다. 키가 없으면 localStorage 의 UUID 로 대신한다.
+// 투표·사전예약 행에 같이 저장하는 방문자 ID. Mixpanel 의 익명 distinct_id 를 그대로 써서
+// 분석 이벤트와 DB 행을 같은 키로 이을 수 있다. 토큰이 없으면 localStorage 의 UUID 로 대신한다.
 export function visitorId(): string {
-  if (KEY) return posthog.get_distinct_id()
+  if (TOKEN) return String(mixpanel.get_distinct_id())
   const key = 'capsule_visitor_id'
   try {
     const stored = localStorage.getItem(key)
