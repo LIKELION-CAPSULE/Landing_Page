@@ -4,30 +4,28 @@ import RoomSheet from '../components/RoomSheet.tsx'
 import { ROOMS } from '../data/rooms.ts'
 import backArrow from '../assets/story/cta-arrow.svg'
 
-// Slots for rooms that aren't revealed yet.
-const PLACEHOLDER_COUNT = 2
-
 // The grid poster and the sheet's art share this name, so the view
 // transition morphs one into the other. Same 116:152 aspect, no distortion.
 const ART_NAME = 'room-art'
 
-function morph(card: HTMLElement | undefined, opening: boolean, update: () => void) {
+function canMorph(card: HTMLElement | undefined): card is HTMLElement {
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-  if (!card || !document.startViewTransition || reduceMotion) {
-    update()
+  return !!card && !!document.startViewTransition && !reduceMotion
+}
+
+function morph(card: HTMLElement | undefined, opening: boolean, update: () => void | Promise<void>) {
+  if (!canMorph(card)) {
+    void update()
     return
   }
 
-  const root = document.documentElement
-  root.dataset.morph = ''
   if (opening) card.style.viewTransitionName = ART_NAME
 
-  document.startViewTransition(() => {
+  document.startViewTransition(async () => {
     card.style.viewTransitionName = opening ? '' : ART_NAME
-    update()
+    await update()
   }).finished.finally(() => {
     card.style.viewTransitionName = ''
-    delete root.dataset.morph
   })
 }
 
@@ -55,9 +53,21 @@ export default function RoomsPage({ votedRoomId, onVote, onBack }: Props) {
   }, [])
 
   const openRoom = (id: string) => {
-    morph(cardRefs.current.get(id), true, () => {
+    const card = cardRefs.current.get(id)
+    const sheet = sheetRef.current
+    if (!sheet) return
+
+    // Decide once, before opening, whether the poster morphs in. The CSS
+    // fallback entrance keys off this and must not flip while the sheet is
+    // open, or it replays as a blink when the morph ends.
+    sheet.toggleAttribute('data-morph', canMorph(card))
+
+    morph(card, true, async () => {
       flushSync(() => setActiveId(id))
-      sheetRef.current?.showModal()
+      sheet.showModal()
+      // Snapshot the new state only once the art is decoded, so the
+      // morph never lands on an empty frame.
+      await sheet.querySelector('img')?.decode().catch(() => {})
     })
   }
 
@@ -108,11 +118,6 @@ export default function RoomsPage({ votedRoomId, onVote, onBack }: Props) {
               {votedRoomId === room.id && <span className="sr-only">(투표함)</span>}
             </button>
             {room.tags && <p className="vote__tags">{room.tags}</p>}
-          </li>
-        ))}
-        {Array.from({ length: PLACEHOLDER_COUNT }, (_, i) => (
-          <li className="vote__item" key={`placeholder-${i}`} aria-hidden="true">
-            <div className="poster poster--r5 poster--fill"></div>
           </li>
         ))}
       </ul>
