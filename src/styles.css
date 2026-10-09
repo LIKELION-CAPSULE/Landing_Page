@@ -646,7 +646,7 @@ main { overflow-x: clip; }
   transition: transform 160ms var(--ease-out), outline-color 160ms ease, filter 160ms ease;
 }
 .vote__card:active { transform: scale(0.97); }
-.vote__card[aria-pressed="true"] { outline-color: var(--accent); }
+.vote__card[data-voted] { outline-color: var(--accent); }
 .vote__card:focus-visible { outline-color: #fff; }
 @media (hover: hover) and (pointer: fine) {
   .vote__card:hover { filter: brightness(1.08); }
@@ -669,6 +669,147 @@ main { overflow-x: clip; }
   font-weight: 700;
   line-height: normal;
   white-space: nowrap;
+}
+
+/* ---------- 4. Room detail (Figma 161:756) ---------- */
+
+html:has(.room-sheet[open]) { overflow: hidden; }
+
+.room-sheet {
+  width: calc(320 * var(--u));
+  max-width: none;
+  max-height: none;
+  padding: 0;
+  border: 0;
+  border-radius: calc(10 * var(--u));
+  background: rgba(60, 60, 60, 0.96);
+  color: #fff;
+  overflow: hidden;
+}
+/* Dim and soften the room grid so the picked room carries the focus */
+.room-sheet::backdrop {
+  background: rgba(18, 18, 18, 0.5);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+
+/* Fallback entrance when the poster can't morph (no view transitions) */
+.room-sheet[open] { animation: sheet-in 320ms var(--ease-out); }
+.room-sheet[open]::backdrop { animation: backdrop-in 320ms ease; }
+:root[data-morph] .room-sheet,
+:root[data-morph] .room-sheet::backdrop { animation: none; }
+
+@keyframes sheet-in {
+  from { opacity: 0; transform: translateY(calc(16 * var(--u))) scale(0.96); }
+}
+@keyframes backdrop-in {
+  from { opacity: 0; }
+}
+
+.room-sheet__card {
+  position: relative;
+  min-height: calc(557 * var(--u));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* Pinned to the bottom: a one-line title lands at y 376 as designed,
+     and a long room name grows up over the fade instead of pushing the
+     button down. */
+  justify-content: flex-end;
+  padding: calc(240 * var(--u)) calc(20 * var(--u)) calc(11 * var(--u));
+  line-height: normal;
+}
+.room-sheet__card > :not(.room-sheet__art, .room-sheet__fade, .room-sheet__close) { position: relative; }
+
+.room-sheet__art {
+  position: absolute;
+  left: 0; top: calc(1 * var(--u));
+  width: 100%;
+  height: calc(419.31 * var(--u));
+  border-radius: calc(10 * var(--u)) calc(10 * var(--u)) 0 0;
+  overflow: hidden;
+  view-transition-name: room-art;
+}
+.room-sheet__art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.8;
+}
+.room-sheet__fade {
+  position: absolute;
+  left: 0; top: calc(324 * var(--u));
+  width: 100%;
+  height: calc(140 * var(--u));
+  background: linear-gradient(to bottom, rgba(68, 68, 68, 0), #444 60.474%);
+}
+
+/* 40px hit area centred on the arrow at (8, 11) */
+.room-sheet__close {
+  position: absolute;
+  left: 0; top: calc(3 * var(--u));
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  cursor: pointer;
+  transition: transform 160ms var(--ease-out);
+}
+.room-sheet__close img { width: 24px; height: 24px; }
+.room-sheet__close:active { transform: scale(0.92); }
+
+.room-sheet__title {
+  font-size: calc(30 * var(--u));
+  font-weight: 700;
+  text-align: center;
+  text-wrap: balance;
+  word-break: keep-all;
+}
+.room-sheet__desc {
+  width: calc(277 * var(--u));
+  min-height: calc(57 * var(--u));
+  margin-top: calc(23 * var(--u));
+  font-size: calc(16 * var(--u));
+  font-weight: 500;
+  text-align: center;
+}
+.room-sheet__vote {
+  width: calc(280 * var(--u));
+  height: calc(45 * var(--u));
+  margin-top: calc(9 * var(--u));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  border-radius: calc(10 * var(--u));
+  background: var(--accent);
+  color: #fff;
+  font: inherit;
+  font-size: calc(17 * var(--u));
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 160ms var(--ease-out), filter 160ms ease;
+}
+.room-sheet__vote-arrow {
+  position: absolute;
+  left: calc(247 * var(--u)); top: calc(11 * var(--u));
+  width: calc(24 * var(--u)); height: calc(24 * var(--u));
+  rotate: 180deg;
+}
+.room-sheet__vote:active { transform: scale(0.97); }
+.room-sheet button:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+@media (hover: hover) and (pointer: fine) {
+  .room-sheet__vote:hover { filter: brightness(1.06); }
+}
+
+::view-transition-group(room-art) {
+  animation-duration: 420ms;
+  animation-timing-function: var(--ease-push);
 }
 
 /* ---------- Page transition ----------
@@ -710,4 +851,5 @@ main { overflow-x: clip; }
   .scroll-hint__arrow { animation: none; }
   @keyframes hero-exit { to { opacity: 0.1; } }
   [data-reveal] { translate: none; transition-property: opacity; }
+  @keyframes sheet-in { from { opacity: 0; } }
 }

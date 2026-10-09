@@ -1,42 +1,49 @@
-import { useEffect, useState } from 'react'
-import poster1 from '../assets/hero/poster-1.png'
-import poster2 from '../assets/hero/poster-2.png'
-import poster3 from '../assets/hero/poster-3.png'
-import poster4 from '../assets/hero/poster-4.png'
-import poster5 from '../assets/hero/poster-5.png'
-import poster6 from '../assets/hero/poster-6.png'
-import poster7 from '../assets/hero/poster-7.png'
+import { useEffect, useRef, useState } from 'react'
+import { flushSync } from 'react-dom'
+import RoomSheet from '../components/RoomSheet.tsx'
+import { ROOMS } from '../data/rooms.ts'
 import backArrow from '../assets/story/cta-arrow.svg'
-
-type Room = {
-  id: string
-  name: string
-  image: string
-  // Matches the hero poster classes: corner radius and image crop differ per art.
-  variant: string
-  tags?: string
-}
-
-const ROOMS: Room[] = [
-  { id: 'smile', name: '쌀쌀맞은 가루짝꿍이 나에게만 친절하다!', image: poster1, variant: 'poster--r5 poster--fill', tags: '#청춘 #연애' },
-  { id: 'lantern', name: '김상병의 두근두근 비밀연등', image: poster2, variant: 'poster--r9' },
-  { id: 'top', name: '전교 1등을 이겨라', image: poster3, variant: 'poster--r9' },
-  { id: 'fenesis', name: '페네시스 마법학교', image: poster4, variant: 'poster--r5 poster--fill poster--crop' },
-  { id: 'cat', name: '냥냥이가 날 그렇게 쳐다보면 집중할 수가 없잖아!!', image: poster5, variant: '' },
-  { id: 'baekdojun', name: '백도준', image: poster6, variant: 'poster--r5 poster--fill' },
-  { id: 'jurassic', name: '쥬라기 독서실', image: poster7, variant: '', tags: '#청춘 #연애' },
-]
 
 // Slots for rooms that aren't revealed yet.
 const PLACEHOLDER_COUNT = 2
+
+// The grid poster and the sheet's art share this name, so the view
+// transition morphs one into the other. Same 116:152 aspect, no distortion.
+const ART_NAME = 'room-art'
+
+function morph(card: HTMLElement | undefined, opening: boolean, update: () => void) {
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  if (!card || !document.startViewTransition || reduceMotion) {
+    update()
+    return
+  }
+
+  const root = document.documentElement
+  root.dataset.morph = ''
+  if (opening) card.style.viewTransitionName = ART_NAME
+
+  document.startViewTransition(() => {
+    card.style.viewTransitionName = opening ? '' : ART_NAME
+    update()
+  }).finished.finally(() => {
+    card.style.viewTransitionName = ''
+    delete root.dataset.morph
+  })
+}
 
 type Props = {
   onBack: () => void
 }
 
 export default function RoomsPage({ onBack }: Props) {
-  // One vote per person: picking a room replaces the previous pick.
+  // One vote per person: voting for a room replaces the previous pick.
   const [selectedId, setSelectedId] = useState<string | null>(null)
+  // Last opened room; kept after closing so the sheet can morph back.
+  const [activeId, setActiveId] = useState<string | null>(null)
+  const sheetRef = useRef<HTMLDialogElement>(null)
+  const cardRefs = useRef(new Map<string, HTMLButtonElement>())
+
+  const activeRoom = ROOMS.find((room) => room.id === activeId) ?? null
 
   useEffect(() => {
     const previous = document.title
@@ -46,8 +53,24 @@ export default function RoomsPage({ onBack }: Props) {
     }
   }, [])
 
-  const toggle = (id: string) => {
-    setSelectedId((current) => (current === id ? null : id))
+  const openRoom = (id: string) => {
+    morph(cardRefs.current.get(id), true, () => {
+      flushSync(() => setActiveId(id))
+      sheetRef.current?.showModal()
+    })
+  }
+
+  const closeRoom = (beforeClose?: () => void) => {
+    const sheet = sheetRef.current
+    if (!sheet?.open) return
+    morph(activeId ? cardRefs.current.get(activeId) : undefined, false, () => {
+      if (beforeClose) flushSync(beforeClose)
+      sheet.close()
+    })
+  }
+
+  const voteForActive = () => {
+    closeRoom(() => setSelectedId(activeId))
   }
 
   return (
@@ -74,10 +97,16 @@ export default function RoomsPage({ onBack }: Props) {
             <button
               type="button"
               className={`poster vote__card ${room.variant}`}
-              aria-pressed={selectedId === room.id}
-              onClick={() => toggle(room.id)}
+              aria-haspopup="dialog"
+              data-voted={selectedId === room.id || undefined}
+              ref={(el) => {
+                if (el) cardRefs.current.set(room.id, el)
+                else cardRefs.current.delete(room.id)
+              }}
+              onClick={() => openRoom(room.id)}
             >
               <img src={room.image} alt={room.name} />
+              {selectedId === room.id && <span className="sr-only">(투표함)</span>}
             </button>
             {room.tags && <p className="vote__tags">{room.tags}</p>}
           </li>
@@ -90,6 +119,9 @@ export default function RoomsPage({ onBack }: Props) {
       </ul>
 
       <p className="vote__hint">스터디룸을 선택해서 <span className="accent">당신의 취향</span>을 확인하세요</p>
+
+      {/* 4. Room detail (Figma 161:756) */}
+      <RoomSheet ref={sheetRef} room={activeRoom} onClose={() => closeRoom()} onVote={voteForActive} />
     </main>
   )
 }
