@@ -62,6 +62,25 @@
 - 로그인이 없다. `visitor_id` 는 브라우저 저장소의 익명 ID 라 기기·브라우저를 바꾸면 다른 사람으로 센다. **1인 1표가 보장되지 않는다**고 적는다.
 - 사전예약 이메일은 출시 알림 수요다. 유료 구매 의향이 검증된 수치로 쓰지 않는다.
 
+## Mixpanel 에서 숫자 보는 법
+
+mixpanel.com 로그인 → 왼쪽 메뉴. 처음 한 번 우측 상단 프로필 → 언어 → 한국어.
+
+| 보고 싶은 것 | 메뉴 | 설정 |
+| --- | --- | --- |
+| 지금 이벤트가 들어오는지 | **Events** (이벤트) | 실시간 목록. 랜딩을 열고 새로고침하면 `$mp_web_page_view` 가 몇 초 안에 떠야 한다 |
+| 방문자 수 | **Insights** → 이벤트 `$mp_web_page_view` | 집계를 **Unique users** 로. `Total` 이면 페이지뷰 |
+| 랜딩 방문자만 | 위와 같음 + 필터 | `current_url_path` = `/` |
+| 유입 경로 | 위와 같음 + Breakdown | `utm_source` 또는 `$referring_domain` |
+| CTA CTR | Insights 에 이벤트 2개: A `$mp_web_page_view`(필터 `/`), B `cta_clicked`(필터 `cta` = `open_rooms`) | 둘 다 Unique users → 상단 **Formula** 에 `B/A` |
+| 방문 → 투표 → 사전예약 전환율 | **Funnels** | 단계: `$mp_web_page_view` → `artwork_vote_submitted` → `presign_completed`. 전환 기간 7일 |
+| 룸별 투표 (대략) | Insights → `artwork_vote_submitted` | Breakdown `room_id`. ⚠️ 정확한 수치는 DB `landing_vote_summary` |
+| 사전예약 시작 vs 완료 | Funnels | `presign_cta_clicked` → `presign_completed` |
+
+만든 리포트는 **Boards** 에 저장해 두면 사업계획서 쓸 때 그대로 캡처할 수 있다.
+
+Mixpanel 은 사람 수를 브라우저 기준(`distinct_id`)으로 세므로 같은 사람이 폰과 노트북으로 오면 2명이다. 정확한 투표·사전예약 수는 항상 DB 쪽 숫자를 쓴다.
+
 ## DB
 
 | 테이블 / 뷰 | 내용 |
