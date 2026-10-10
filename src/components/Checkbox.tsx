@@ -1,20 +1,34 @@
-import type { ReactNode } from 'react'
+import type { ReactNode, Ref } from 'react'
 import box from '../assets/preorder/checkbox.svg'
 
 type Props = {
   checked: boolean
   onChange: (checked: boolean) => void
   children: ReactNode
+  ref?: Ref<HTMLInputElement>
+  id?: string
+  name?: string
+  value?: string
+  required?: boolean
+  invalid?: boolean
+  describedBy?: string
 }
 
 // Native checkbox (keyboard, form semantics) dressed in the Figma box icon.
 // The design only has the empty box, so the checked mark is drawn here to
 // sit exactly inside the icon's 4–20 frame.
-export default function Checkbox({ checked, onChange, children }: Props) {
+export default function Checkbox({ checked, onChange, children, ref, id, name, value, required, invalid, describedBy }: Props) {
   return (
     <label className="check">
       <input
         type="checkbox"
+        ref={ref}
+        id={id}
+        name={name}
+        value={value}
+        required={required}
+        aria-invalid={invalid || undefined}
+        aria-describedby={describedBy}
         className="check__input"
         checked={checked}
         onChange={(event) => onChange(event.target.checked)}

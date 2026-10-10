@@ -1,45 +1,66 @@
 #!/usr/bin/env bash
-# Downloads the images imported by src/components from the Figma MCP asset
-# server. These URLs expire 7 days after export (exported 2026-10-09);
-# after that, re-export them from Figma nodes 264:176 and 160:625.
+# Download Figma assets; .webp targets use lossless encoding at original resolution.
+# Read the latest design context first; asset URLs expire after seven days.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-HERO="https://www.figma.com/api/mcp/asset/cfd121ac-4d2f-4160-8d87-42fcd2da1a86"
-STORY="https://www.figma.com/api/mcp/asset/6dc2ad32-0957-4947-a998-c1b0ab022588"
+if [ "$#" -ne 1 ]; then
+  echo "Usage: bash scripts/download-figma-assets.sh /absolute/path/to/figma-assets.json" >&2
+  exit 2
+fi
 
-mkdir -p src/assets/hero src/assets/story
+node --input-type=module - "$1" <<'NODE'
+import { execFile } from 'node:child_process'
+import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
+import { tmpdir } from 'node:os'
+import { dirname, extname, isAbsolute, join, relative, resolve } from 'node:path'
+import { promisify } from 'node:util'
 
-fetch() { curl -fsSL -o "$2" "$1"; echo "ok  $2"; }
-
-# Hero (264:176)
-fetch "$HERO/73deb.png" src/assets/hero/poster-1.png
-fetch "$HERO/d8700.png" src/assets/hero/poster-2.png
-fetch "$HERO/4d09f.png" src/assets/hero/poster-3.png
-fetch "$HERO/6ff2f.png" src/assets/hero/poster-4.png
-fetch "$HERO/4b662.png" src/assets/hero/poster-5.png
-fetch "$HERO/12350.png" src/assets/hero/poster-6.png
-fetch "$HERO/840cd.png" src/assets/hero/poster-7.png
-fetch "$HERO/b880d.png" src/assets/hero/logo-icon-sprite.png
-fetch "$HERO/a2833.png" src/assets/hero/logo-wordmark-sprite.png
-fetch "$HERO/24946.svg" src/assets/hero/arrow.svg
-
-# Story (160:625)
-fetch "$STORY/bbab3.png" src/assets/story/intro-character.png
-fetch "$STORY/154aa.svg" src/assets/story/bubble-tail.svg
-fetch "$STORY/268b2.png" src/assets/story/step-media.png
-fetch "$STORY/84d52.svg" src/assets/story/divider.svg
-fetch "$STORY/c35c9.png" src/assets/story/gallery-col1-top.png
-fetch "$STORY/1c2f1.svg" src/assets/story/gallery-slot.svg
-fetch "$STORY/6ff2f.png" src/assets/story/gallery-fenesis.png
-fetch "$STORY/6d5c4.png" src/assets/story/gallery-mid-a.png
-fetch "$STORY/2eb54.png" src/assets/story/gallery-mid-b.png
-fetch "$STORY/9035b.svg" src/assets/story/gallery-shade.svg
-fetch "$STORY/73deb.png" src/assets/story/gallery-three-girls.png
-fetch "$STORY/8294a.png" src/assets/story/gallery-cat.png
-fetch "$STORY/ec3e9.png" src/assets/story/gallery-alien.png
-fetch "$STORY/a7d88.png" src/assets/story/gallery-jurassic.png
-fetch "$STORY/fcb1d.svg" src/assets/story/cta-arrow.svg
-fetch "$STORY/b1c73.svg" src/assets/story/divider-footer.svg
-fetch "$STORY/85326.svg" src/assets/story/copyright-circle.svg
-fetch "$STORY/1a245.svg" src/assets/story/footer-sep.svg
+const assets = JSON.parse(await readFile(process.argv[2], 'utf8'))
+if (!Array.isArray(assets)) throw new Error('Expected an array of { url, path } entries')
+const run = promisify(execFile)
+if (assets.some(asset => extname(asset.path).toLowerCase() === '.webp')) {
+  await run('cwebp', ['-version']).catch(() => {
+    throw new Error('WebP downloads require cwebp. On macOS: brew install webp')
+  })
+}
+const root = resolve('src/assets')
+for (const asset of assets) {
+  const url = new URL(asset.url)
+  const target = resolve(asset.path)
+  const path = relative(root, target)
+  if (url.protocol !== 'https:' || url.hostname !== 'www.figma.com' || !url.pathname.startsWith('/api/mcp/asset/')) {
+    throw new Error('Expected a Figma MCP asset URL')
+  }
+  if (!path || isAbsolute(path) || path === '..' || path.startsWith('../')) {
+    throw new Error('Asset paths must be inside src/assets/')
+  }
+  const response = await fetch(url)
+  if (!response.ok) throw new Error(`Download failed (${response.status}): ${asset.path}`)
+  let data = Buffer.from(await response.arrayBuffer())
+  if (!data.length) throw new Error(`Empty asset: ${asset.path}`)
+  if (extname(target).toLowerCase() === '.webp') {
+    const temporary = await mkdtemp(join(tmpdir(), 'capsule-figma-'))
+    try {
+      const input = join(temporary, 'source')
+      const output = join(temporary, 'asset.webp')
+      await writeFile(input, data)
+      await run('cwebp', ['-quiet', '-lossless', '-q', '75', '-m', '4', '-exact', '-metadata', 'icc', input, '-o', output])
+      data = await readFile(output)
+    } finally {
+      await rm(temporary, { recursive: true, force: true })
+    }
+  }
+  const previous = await readFile(target).catch(error => {
+    if (error.code !== 'ENOENT') throw error
+    return null
+  })
+  if (previous?.equals(data)) {
+    console.log(`unchanged: ${asset.path}`)
+    continue
+  }
+  await mkdir(dirname(target), { recursive: true })
+  await writeFile(target, data)
+  console.log(`updated: ${asset.path}`)
+}
+NODE

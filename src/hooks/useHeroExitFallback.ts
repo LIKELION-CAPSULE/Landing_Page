@@ -31,9 +31,13 @@ export function useHeroExitFallback(
     }
 
     window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('resize', onScroll)
+    reduceMotion.addEventListener('change', onScroll)
     update()
     return () => {
       window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', onScroll)
+      reduceMotion.removeEventListener('change', onScroll)
       cancelAnimationFrame(frame)
     }
   }, [innerRef, hintRef])

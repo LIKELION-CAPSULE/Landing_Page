@@ -1,4 +1,4 @@
-import introCharacter from '../assets/story/intro-character.png'
+import introCharacter from '../assets/story/intro-character.webp'
 import bubbleTail from '../assets/story/bubble-tail.svg'
 
 export default function Problem() {

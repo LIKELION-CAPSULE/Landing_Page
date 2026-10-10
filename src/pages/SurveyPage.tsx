@@ -1,19 +1,19 @@
 import { useEffect, type Dispatch, type FormEvent, type SetStateAction } from 'react'
-import { SURVEY_GROUPS, type SurveyAnswers } from '../data/survey.ts'
+import { SURVEY_GROUPS, SURVEY_WISH_LIMIT, type SurveyAnswers, type SurveyStatus } from '../data/survey.ts'
+import FunnelHeader from '../components/FunnelHeader.tsx'
 import arrow from '../assets/story/cta-arrow.svg'
-import skipUnderline from '../assets/survey/skip-underline.svg'
 
 type Props = {
   // Held by App so answers survive going on to pre-registration and back.
   answers: SurveyAnswers
   onAnswersChange: Dispatch<SetStateAction<SurveyAnswers>>
   // Both submitting and skipping lead to pre-registration.
-  onNext: () => void
+  onNext: (status: Exclude<SurveyStatus, 'unanswered'>) => void
   onBack: () => void
 }
 
 export default function SurveyPage({ answers, onAnswersChange, onNext, onBack }: Props) {
-  // Submitting needs at least one answer; otherwise the skip link is the way on.
+  // The survey is optional, including when the main next button is used.
   const hasAnswer = Object.values(answers.picks).some((picked) => picked.size > 0) || answers.wish.trim() !== ''
 
   useEffect(() => {
@@ -33,18 +33,15 @@ export default function SurveyPage({ answers, onAnswersChange, onNext, onBack }:
     })
   }
 
-  // TODO: send the answers once there's a backend to receive them.
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    if (hasAnswer) onNext()
+    onNext(hasAnswer ? 'answered' : 'skipped')
   }
 
   return (
     <main className="survey">
       {/* 5. Character survey (Figma 160:354) */}
-      <button type="button" className="page-back" aria-label="뒤로 가기" onClick={onBack}>
-        <img src={arrow} alt="" width={24} height={24} />
-      </button>
+      <FunnelHeader current={2} onBack={onBack} />
 
       <header className="survey__header">
         <h1 className="survey__title">
@@ -52,20 +49,19 @@ export default function SurveyPage({ answers, onAnswersChange, onNext, onBack }:
           <span className="accent">공부하고 싶어요?</span>
         </h1>
         <p className="survey__lead">
-          현재 앞으로 개발할 스터디룸을 수요조사 중이에요<br />
-          원하는 캐릭터를 알려주시면 만들어드릴게요
+          원하는 캐릭터를 알려주세요.<br />
+          다음 스터디룸 기획에 반영할게요.
         </p>
       </header>
 
       <form className="survey__form" onSubmit={handleSubmit}>
-        <ul className="survey__note">
-          <li>복수 선택 가능</li>
-        </ul>
-
         <div className="survey__groups">
-          {SURVEY_GROUPS.map((group) => (
+          {SURVEY_GROUPS.map((group, groupIndex) => (
             <div className="survey__group" key={group.id} role="group" aria-labelledby={`survey-${group.id}`}>
-              <h2 className="survey__group-title" id={`survey-${group.id}`}>{group.title}</h2>
+              <div className="survey__group-head">
+                <h2 className="survey__group-title" id={`survey-${group.id}`}>{group.title}</h2>
+                {groupIndex === 0 && <p className="survey__note">복수 선택 가능</p>}
+              </div>
               <div className="survey__rows">
                 {group.rows.map((row, i) => (
                   <div className="survey__row" key={i}>
@@ -74,6 +70,7 @@ export default function SurveyPage({ answers, onAnswersChange, onNext, onBack }:
                         type="button"
                         key={option.label}
                         className={`chip-toggle${option.compact ? ' chip-toggle--compact' : ''}`}
+                        id={`survey-${group.id}-${option.label}`}
                         aria-pressed={answers.picks[group.id]?.has(option.label) ?? false}
                         onClick={() => toggle(group.id, option.label)}
                       >
@@ -91,20 +88,26 @@ export default function SurveyPage({ answers, onAnswersChange, onNext, onBack }:
           <span className="survey__wish-label">같이 공부하고 싶은 캐릭터를 자유롭게 적어주세요</span>
           <textarea
             className="survey__wish-input"
+            name="characterWish"
+            maxLength={SURVEY_WISH_LIMIT}
+            aria-describedby="survey-wish-hint"
             placeholder="예: 나 혼자만 좋아하는 학생회 선배"
             value={answers.wish}
             onChange={(event) => onAnswersChange((current) => ({ ...current, wish: event.target.value }))}
           />
+          <span className="field__meta">
+            <span id="survey-wish-hint">선택 입력 · 최대 {SURVEY_WISH_LIMIT}자</span>
+            <span aria-hidden="true">{answers.wish.length}/{SURVEY_WISH_LIMIT}</span>
+          </span>
         </label>
 
-        <button type="submit" className="cta form-submit" disabled={!hasAnswer}>
-          <span>사전예약 완료하기</span>
+        <button type="submit" className="cta form-submit" id="survey-next">
+          <span>다음: 사전예약</span>
           <img className="cta__arrow form-submit__arrow" src={arrow} alt="" width={24} height={24} />
         </button>
 
-        <button type="button" className="survey__skip" onClick={onNext}>
-          <span>건너뛰고 사전 예약하기</span>
-          <img src={skipUnderline} alt="" width={115.017} height={1} />
+        <button type="button" className="survey__skip" id="survey-skip" onClick={() => onNext('skipped')}>
+          건너뛰고 사전예약하기
         </button>
       </form>
     </main>

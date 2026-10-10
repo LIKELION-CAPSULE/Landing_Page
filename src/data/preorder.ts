@@ -24,6 +24,23 @@ export type Consent = {
   terms: Terms
 }
 
+export type PreorderDraft = {
+  email: string
+  age: string
+  habits: ReadonlySet<string>
+  habitOther: string
+  consents: Record<Consent['id'], boolean>
+}
+
+// A local review is intentionally separate from a server-confirmed reservation.
+export type PreorderReview = { email: string; roomId: string }
+
+export const HABIT_OTHER_LIMIT = 100
+
+export function createPreorderDraft(): PreorderDraft {
+  return { email: '', age: '', habits: new Set(), habitOther: '', consents: { privacy: false, marketing: false } }
+}
+
 export const CONSENTS: Consent[] = [
   {
     id: 'privacy',
