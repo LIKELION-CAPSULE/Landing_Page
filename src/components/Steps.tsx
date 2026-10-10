@@ -1,6 +1,5 @@
 import { Fragment } from 'react'
 import StepDemo from './StepDemo.tsx'
-import divider from '../assets/story/divider.svg'
 
 type Step = {
   label: string
@@ -41,7 +40,7 @@ export default function Steps() {
             </div>
             <StepDemo step={(index + 1) as 1 | 2 | 3} />
           </article>
-          <img className="divider" src={divider} alt="" />
+          <div className="divider" aria-hidden="true" />
         </Fragment>
       ))}
     </section>
