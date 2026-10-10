@@ -61,7 +61,13 @@
 }
 .macbook-landing .scroll-hint { animation: none; pointer-events: auto; }
 .macbook-landing .hero__title { margin-top: calc(96 * var(--u) + var(--macbook-content-offset)); }
-.macbook-landing__hint-scroll { position: absolute; left: 0; right: 0; bottom: 0; height: calc(80 * var(--u)); }
+.macbook-landing__hint-scroll {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(min(100%, var(--macbook-visible-bottom, 100svh)) - 80 * var(--u) - max(24px, env(safe-area-inset-bottom, 0px)));
+  height: calc(80 * var(--u));
+}
 .macbook-landing [data-intro-item], .macbook-landing [data-landing-item] { opacity: 0; visibility: hidden; }
 .macbook-landing[data-reduced-motion='true'] [data-intro-item], .macbook-landing[data-reduced-motion='true'] [data-landing-item] { opacity: 1; visibility: visible; }
 .macbook-landing__model-space { width: calc(364 * var(--u)); height: calc(225 * var(--u)); }

@@ -1,0 +1,631 @@
+{
+  "viewportChecks": {
+    "cases": [
+      "desktop 1360x880",
+      "mobile 390x844",
+      "short viewport 390x620",
+      "small mobile 320x568",
+      "visual viewport 620 within layout viewport 844",
+      "visual viewport resized to 520 with offsetTop 24"
+    ],
+    "hintBoundsWithinVisibleArea": true,
+    "bottomClearanceAtLeast24px": true,
+    "visualViewportUpdatesWithoutModelResize": true,
+    "source": "Chrome viewport checks and screenshots in /private/tmp/hero-hint-step-qa"
+  },
+  "gradientChecks": {
+    "viewports": [
+      {
+        "name": "desktop",
+        "cases": [
+          {
+            "step": "STEP 1",
+            "rise": [
+              41,
+              41,
+              40,
+              39,
+              37,
+              35,
+              33,
+              31,
+              28,
+              25,
+              22,
+              19,
+              16,
+              14,
+              11,
+              9,
+              7,
+              5,
+              4,
+              4,
+              3
+            ],
+            "fall": [
+              3,
+              4,
+              4,
+              5,
+              7,
+              9,
+              11,
+              14,
+              16,
+              19,
+              22,
+              25,
+              28,
+              31,
+              33,
+              35,
+              37,
+              39,
+              40,
+              41,
+              41
+            ],
+            "atStart": [
+              41,
+              41,
+              41
+            ],
+            "atMidpoint": [
+              41,
+              41,
+              41
+            ],
+            "atGlow": [
+              47,
+              47,
+              47
+            ],
+            "afterGlow": [
+              41,
+              41,
+              41
+            ],
+            "horizontal": [
+              [
+                3,
+                3,
+                3
+              ],
+              [
+                3,
+                3,
+                3
+              ],
+              [
+                3,
+                3,
+                3
+              ]
+            ]
+          },
+          {
+            "step": "STEP 2",
+            "rise": [
+              41,
+              41,
+              40,
+              39,
+              37,
+              35,
+              33,
+              31,
+              28,
+              25,
+              22,
+              19,
+              16,
+              14,
+              11,
+              9,
+              7,
+              5,
+              4,
+              4,
+              3
+            ],
+            "fall": [
+              3,
+              4,
+              4,
+              5,
+              7,
+              9,
+              11,
+              14,
+              17,
+              19,
+              22,
+              25,
+              28,
+              31,
+              34,
+              36,
+              37,
+              39,
+              40,
+              41,
+              41
+            ],
+            "atStart": [
+              41,
+              41,
+              41
+            ],
+            "atMidpoint": [
+              41,
+              41,
+              41
+            ],
+            "atGlow": [
+              47,
+              47,
+              47
+            ],
+            "afterGlow": [
+              41,
+              41,
+              41
+            ],
+            "horizontal": [
+              [
+                3,
+                3,
+                3
+              ],
+              [
+                3,
+                3,
+                3
+              ],
+              [
+                3,
+                3,
+                3
+              ]
+            ]
+          },
+          {
+            "step": "STEP 3",
+            "rise": [
+              41,
+              41,
+              40,
+              39,
+              37,
+              35,
+              33,
+              31,
+              28,
+              25,
+              22,
+              19,
+              16,
+              14,
+              11,
+              9,
+              7,
+              5,
+              4,
+              4,
+              3
+            ],
+            "fall": [
+              3,
+              4,
+              4,
+              5,
+              7,
+              9,
+              11,
+              14,
+              16,
+              19,
+              22,
+              25,
+              28,
+              31,
+              33,
+              36,
+              37,
+              39,
+              40,
+              41,
+              41
+            ],
+            "atStart": [
+              41,
+              41,
+              41
+            ],
+            "atMidpoint": [
+              41,
+              41,
+              41
+            ],
+            "atGlow": [
+              47,
+              47,
+              47
+            ],
+            "afterGlow": [
+              41,
+              41,
+              41
+            ],
+            "horizontal": [
+              [
+                3,
+                3,
+                3
+              ],
+              [
+                3,
+                3,
+                3
+              ],
+              [
+                3,
+                3,
+                3
+              ]
+            ]
+          }
+        ],
+        "horizontalOverflow": false
+      },
+      {
+        "name": "mobile",
+        "cases": [
+          {
+            "step": "STEP 1",
+            "rise": [
+              41,
+              41,
+              40,
+              39,
+              37,
+              35,
+              33,
+              31,
+              28,
+              25,
+              22,
+              19,
+              16,
+              14,
+              11,
+              9,
+              7,
+              5,
+              4,
+              4,
+              3
+            ],
+            "fall": [
+              3,
+              4,
+              4,
+              5,
+              7,
+              9,
+              11,
+              14,
+              16,
+              19,
+              23,
+              25,
+              28,
+              31,
+              33,
+              35,
+              37,
+              39,
+              40,
+              41,
+              41
+            ],
+            "atStart": [
+              41,
+              41,
+              41
+            ],
+            "atMidpoint": [
+              41,
+              41,
+              41
+            ],
+            "atGlow": [
+              47,
+              47,
+              47
+            ],
+            "afterGlow": [
+              41,
+              41,
+              41
+            ],
+            "horizontal": [
+              [
+                3,
+                3,
+                3
+              ],
+              [
+                4,
+                4,
+                4
+              ],
+              [
+                3,
+                3,
+                3
+              ]
+            ]
+          },
+          {
+            "step": "STEP 2",
+            "rise": [
+              41,
+              41,
+              40,
+              39,
+              38,
+              35,
+              33,
+              31,
+              28,
+              25,
+              22,
+              19,
+              16,
+              14,
+              11,
+              9,
+              7,
+              5,
+              4,
+              4,
+              3
+            ],
+            "fall": [
+              3,
+              4,
+              4,
+              5,
+              7,
+              9,
+              11,
+              14,
+              17,
+              19,
+              22,
+              25,
+              28,
+              31,
+              33,
+              36,
+              38,
+              39,
+              40,
+              41,
+              41
+            ],
+            "atStart": [
+              41,
+              41,
+              41
+            ],
+            "atMidpoint": [
+              41,
+              41,
+              41
+            ],
+            "atGlow": [
+              48,
+              48,
+              48
+            ],
+            "afterGlow": [
+              41,
+              41,
+              41
+            ],
+            "horizontal": [
+              [
+                3,
+                3,
+                3
+              ],
+              [
+                4,
+                4,
+                4
+              ],
+              [
+                3,
+                3,
+                3
+              ]
+            ]
+          },
+          {
+            "step": "STEP 3",
+            "rise": [
+              41,
+              41,
+              40,
+              39,
+              37,
+              36,
+              33,
+              31,
+              28,
+              25,
+              22,
+              20,
+              16,
+              14,
+              11,
+              9,
+              7,
+              5,
+              4,
+              4,
+              3
+            ],
+            "fall": [
+              3,
+              4,
+              4,
+              5,
+              7,
+              9,
+              11,
+              14,
+              17,
+              19,
+              22,
+              25,
+              28,
+              31,
+              33,
+              36,
+              38,
+              39,
+              40,
+              41,
+              41
+            ],
+            "atStart": [
+              41,
+              41,
+              41
+            ],
+            "atMidpoint": [
+              41,
+              41,
+              41
+            ],
+            "atGlow": [
+              48,
+              48,
+              48
+            ],
+            "afterGlow": [
+              41,
+              41,
+              41
+            ],
+            "horizontal": [
+              [
+                3,
+                3,
+                3
+              ],
+              [
+                4,
+                4,
+                4
+              ],
+              [
+                3,
+                3,
+                3
+              ]
+            ]
+          }
+        ],
+        "horizontalOverflow": false
+      }
+    ],
+    "errors": [],
+    "analyticsStubbed": true,
+    "cleanupVerified": true
+  },
+  "limitations": "Instagram iOS/Android app webviews were not tested on a physical device.",
+  "previousGradientChecks": {
+    "viewports": [],
+    "errors": [],
+    "analyticsStubbed": true,
+    "widerVerticalBand": {
+      "before": {
+        "first": 273,
+        "last": 352,
+        "width": 80
+      },
+      "after": {
+        "first": 253,
+        "last": 372,
+        "width": 120
+      }
+    },
+    "uniformHorizontalGradient": {
+      "darkBandPixels": [
+        [
+          0,
+          0,
+          0,
+          255
+        ],
+        [
+          0,
+          0,
+          0,
+          255
+        ],
+        [
+          0,
+          0,
+          0,
+          255
+        ]
+      ],
+      "glowBandPixels": [
+        [
+          50,
+          50,
+          50,
+          255
+        ],
+        [
+          50,
+          50,
+          50,
+          255
+        ],
+        [
+          50,
+          50,
+          50,
+          255
+        ]
+      ],
+      "glowBlendingPixels": [
+        [
+          50,
+          50,
+          50,
+          255
+        ],
+        [
+          43,
+          43,
+          43,
+          255
+        ],
+        [
+          41,
+          41,
+          41,
+          255
+        ]
+      ]
+    }
+  }
+}
