@@ -1,17 +1,17 @@
-import poster1 from '../assets/hero/poster-1.png'
-import poster2 from '../assets/hero/poster-2.png'
-import poster3 from '../assets/hero/poster-3.png'
-import poster4 from '../assets/hero/poster-4.png'
-import poster5 from '../assets/hero/poster-5.png'
-import poster6 from '../assets/hero/poster-6.png'
-import poster7 from '../assets/hero/poster-7.png'
-import poster8 from '../assets/rooms/poster-8.png'
-import poster9 from '../assets/rooms/poster-9.png'
+import poster1 from '../assets/hero/poster-1.webp'
+import poster2 from '../assets/hero/poster-2.webp'
+import poster3 from '../assets/hero/poster-3.webp'
+import poster4 from '../assets/hero/poster-4.webp'
+import poster5 from '../assets/hero/poster-5.webp'
+import poster6 from '../assets/hero/poster-6.webp'
+import poster7 from '../assets/hero/poster-7.webp'
+import poster8 from '../assets/rooms/poster-8.webp'
+import poster9 from '../assets/rooms/poster-9.webp'
 
 export type Room = {
   id: string
   name: string
-  // Synopsis is still being written; every room shows a placeholder for now.
+  // An empty synopsis stays hidden until the copy is ready.
   description: string
   image: string
   // Matches the hero poster classes: corner radius and image crop differ per art.
@@ -19,7 +19,7 @@ export type Room = {
   tags?: string
 }
 
-const DESCRIPTION_PLACEHOLDER = '설명'
+const DESCRIPTION_PLACEHOLDER = ''
 
 export const ROOMS: Room[] = [
   { id: 'smile', name: '쌀쌀맞은 가루짝꿍이 나에게만 친절하다!', description: DESCRIPTION_PLACEHOLDER, image: poster1, variant: 'poster--r5 poster--fill', tags: '#청춘 #연애' },

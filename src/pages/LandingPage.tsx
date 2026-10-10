@@ -17,10 +17,10 @@ export default function LandingPage({ onOpenRooms }: Props) {
 
   return (
     <main ref={mainRef}>
-      {/* 1. Hero (Figma 264:176) */}
+      {/* 1. Hero (Figma 1:187) */}
       <Hero />
 
-      {/* 2. Story (Figma 160:625) */}
+      {/* 2. Story (Figma 1:100) */}
       <div className="story">
         <Problem />
         <Steps />

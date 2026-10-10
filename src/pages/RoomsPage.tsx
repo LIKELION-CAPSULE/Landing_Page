@@ -1,48 +1,26 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { flushSync } from 'react-dom'
 import RoomSheet from '../components/RoomSheet.tsx'
+import CheckIcon from '../components/CheckIcon.tsx'
+import FunnelHeader from '../components/FunnelHeader.tsx'
 import { ROOMS } from '../data/rooms.ts'
-import backArrow from '../assets/story/cta-arrow.svg'
-
-// The grid poster and the sheet's art share this name, so the view
-// transition morphs one into the other. Same 116:152 aspect, no distortion.
-const ART_NAME = 'room-art'
-
-function canMorph(card: HTMLElement | undefined): card is HTMLElement {
-  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-  return !!card && !!document.startViewTransition && !reduceMotion
-}
-
-function morph(card: HTMLElement | undefined, opening: boolean, update: () => void | Promise<void>) {
-  if (!canMorph(card)) {
-    void update()
-    return
-  }
-
-  if (opening) card.style.viewTransitionName = ART_NAME
-
-  document.startViewTransition(async () => {
-    card.style.viewTransitionName = opening ? '' : ART_NAME
-    await update()
-  }).finished.finally(() => {
-    card.style.viewTransitionName = ''
-  })
-}
+import { useRoomPosterTransition } from '../hooks/useRoomPosterTransition.ts'
 
 type Props = {
-  // One vote per person; held by App so it survives leaving the page.
+  // Local selection is held by App; vote persistence belongs to the backend.
   votedRoomId: string | null
+  isEditing: boolean
   onVote: (roomId: string) => void
   onBack: () => void
 }
 
-export default function RoomsPage({ votedRoomId, onVote, onBack }: Props) {
-  // Last opened room; kept after closing so the sheet can morph back.
+export default function RoomsPage({ votedRoomId, isEditing, onVote, onBack }: Props) {
+  // Keep the selected content in place while the sheet fades out.
   const [activeId, setActiveId] = useState<string | null>(null)
-  const sheetRef = useRef<HTMLDialogElement>(null)
-  const cardRefs = useRef(new Map<string, HTMLButtonElement>())
+  const { ref: sheetRef, open: showRoom, close: closeRoom } = useRoomPosterTransition()
 
   const activeRoom = ROOMS.find((room) => room.id === activeId) ?? null
+  const selectedRoom = ROOMS.find((room) => room.id === votedRoomId) ?? null
 
   useEffect(() => {
     const previous = document.title
@@ -52,29 +30,10 @@ export default function RoomsPage({ votedRoomId, onVote, onBack }: Props) {
     }
   }, [])
 
-  const openRoom = (id: string) => {
-    const card = cardRefs.current.get(id)
-    const sheet = sheetRef.current
-    if (!sheet) return
-
-    // Decide once, before opening, whether the poster morphs in. The CSS
-    // fallback entrance keys off this and must not flip while the sheet is
-    // open, or it replays as a blink when the morph ends.
-    sheet.toggleAttribute('data-morph', canMorph(card))
-
-    morph(card, true, async () => {
-      flushSync(() => setActiveId(id))
-      sheet.showModal()
-      // Snapshot the new state only once the art is decoded, so the
-      // morph never lands on an empty frame.
-      await sheet.querySelector('img')?.decode().catch(() => {})
-    })
-  }
-
-  const closeRoom = () => {
-    const sheet = sheetRef.current
-    if (!sheet?.open) return
-    morph(activeId ? cardRefs.current.get(activeId) : undefined, false, () => sheet.close())
+  const openRoom = (id: string, source: HTMLButtonElement) => {
+    if (!sheetRef.current || sheetRef.current.open) return
+    flushSync(() => setActiveId(id))
+    showRoom(source)
   }
 
   // Voting moves on to the survey; the page push carries the open sheet away.
@@ -85,9 +44,7 @@ export default function RoomsPage({ votedRoomId, onVote, onBack }: Props) {
   return (
     <main className="vote">
       {/* 3. Room vote (Figma 273:356) */}
-      <button type="button" className="page-back" aria-label="뒤로 가기" onClick={onBack}>
-        <img src={backArrow} alt="" width={24} height={24} />
-      </button>
+      <FunnelHeader current={1} onBack={onBack} />
 
       <header className="vote__header">
         <div className="vote__intro">
@@ -95,9 +52,11 @@ export default function RoomsPage({ votedRoomId, onVote, onBack }: Props) {
             <span>같이 공부하고 싶은</span>
             <span className="accent">룸을 골라주세요</span>
           </h1>
-          <p className="vote__lead">투표한 룸은 사전예약하면 무료로 열어드려요!</p>
+          <p className="vote__lead">사전예약하면 투표한 룸을 무료로 열어드려요.</p>
+          <p className="vote__condition">해당 룸이 출시되는 경우 제공돼요.</p>
         </div>
-        <p className="vote__count">현재까지 N명이 투표했어요</p>
+        <p className="vote__instructions">포스터를 눌러 자세히 보고, 룸 1개를 선택해주세요.</p>
+        {selectedRoom && <p className="vote__selection"><CheckIcon />선택한 룸: {selectedRoom.name}</p>}
       </header>
 
       <ul className="vote__grid" aria-label="스터디룸">
@@ -106,26 +65,28 @@ export default function RoomsPage({ votedRoomId, onVote, onBack }: Props) {
             <button
               type="button"
               className={`poster vote__card ${room.variant}`}
+              id={`room-${room.id}`}
               aria-haspopup="dialog"
               data-voted={votedRoomId === room.id || undefined}
-              ref={(el) => {
-                if (el) cardRefs.current.set(room.id, el)
-                else cardRefs.current.delete(room.id)
-              }}
-              onClick={() => openRoom(room.id)}
+              onClick={(event) => openRoom(room.id, event.currentTarget)}
             >
               <img src={room.image} alt={room.name} />
-              {votedRoomId === room.id && <span className="sr-only">(투표함)</span>}
+              {votedRoomId === room.id && <span className="vote__badge"><CheckIcon />선택<span className="sr-only">한 룸</span></span>}
             </button>
             {room.tags && <p className="vote__tags">{room.tags}</p>}
           </li>
         ))}
       </ul>
 
-      <p className="vote__hint">스터디룸을 선택해서 <span className="accent">당신의 취향</span>을 확인하세요</p>
+      <p className="vote__hint">마음에 드는 룸을 고르면 다음 단계로 넘어가요.</p>
+      {selectedRoom && (
+        <button type="button" className="cta form-submit vote__continue" id="rooms-continue" onClick={() => onVote(selectedRoom.id)}>
+          {isEditing ? '선택 유지하고 돌아가기' : '선택한 룸으로 계속하기'}
+        </button>
+      )}
 
       {/* 4. Room detail (Figma 161:756) */}
-      <RoomSheet ref={sheetRef} room={activeRoom} onClose={() => closeRoom()} onVote={voteForActive} />
+      <RoomSheet ref={sheetRef} room={activeRoom} voteLabel={isEditing ? '이 룸으로 변경하기' : '이 스터디룸 투표하기'} onClose={closeRoom} onVote={voteForActive} />
     </main>
   )
 }
