@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type SetStateAction } from 'react'
+import { lazy, Suspense, useEffect, useRef, useState, type SetStateAction } from 'react'
 import { flushSync } from 'react-dom'
 import LandingPage from './pages/LandingPage.tsx'
 import RoomsPage from './pages/RoomsPage.tsx'
@@ -13,6 +13,8 @@ import { ROUTES, useRoute } from './hooks/useRoute.ts'
 import { useRoomPosterTransition } from './hooks/useRoomPosterTransition.ts'
 import { track } from './lib/analytics.ts'
 import { savePreorder, saveSurvey, saveVote } from './lib/api.ts'
+
+const MacbookTestPage = lazy(() => import('./pages/MacbookTestPage.tsx'))
 
 export default function App() {
   const { path, navigate, goBack, restart, returnTo } = useRoute()
@@ -151,6 +153,17 @@ export default function App() {
   const openSurvey = () => {
     track('survey_cta_clicked', { room_id: preorderReceipt?.roomId ?? null })
     navigate(ROUTES.survey, { returnTo: ROUTES.done })
+  }
+
+  if (path === ROUTES.test) {
+    return (
+      <Suspense fallback={<main role="status" style={{ padding: 32 }}>테스트 페이지를 불러오는 중…</main>}>
+        <MacbookTestPage
+          onHome={() => navigate(ROUTES.home, { animate: false })}
+          onOpenRooms={() => navigate(ROUTES.rooms)}
+        />
+      </Suspense>
+    )
   }
 
   let page

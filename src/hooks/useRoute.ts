@@ -7,6 +7,7 @@ export const ROUTES = {
   survey: '/survey',
   preorder: '/preorder',
   done: '/done',
+  test: '/test',
 } as const
 
 type Direction = 'forward' | 'back'
