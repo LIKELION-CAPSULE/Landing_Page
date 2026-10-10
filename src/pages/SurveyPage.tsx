@@ -18,7 +18,7 @@ export default function SurveyPage({ answers, onAnswersChange, onNext, onBack }:
 
   useEffect(() => {
     const previous = document.title
-    document.title = '캐릭터 수요조사 · 캡슐 CAPSULE'
+    document.title = '설문조사 · 캡슐 CAPSULE'
     return () => {
       document.title = previous
     }

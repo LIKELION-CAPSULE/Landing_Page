@@ -9,11 +9,12 @@ import { EMPTY_SURVEY, type SurveyAnswers, type SurveyStatus } from './data/surv
 import { createPreorderDraft, type PreorderDraft, type PreorderReview } from './data/preorder.ts'
 import { ROUTES, useRoute } from './hooks/useRoute.ts'
 
+type SurveyDraft = { answers: SurveyAnswers; status: SurveyStatus }
+
 export default function App() {
   const { path, navigate, goBack, restart, returnTo } = useRoute()
   const [votedRoomId, setVotedRoomId] = useState<string | null>(null)
-  const [surveyAnswers, setSurveyAnswers] = useState<SurveyAnswers>(EMPTY_SURVEY)
-  const [surveyStatus, setSurveyStatus] = useState<SurveyStatus>('unanswered')
+  const [surveyDraft, setSurveyDraft] = useState<SurveyDraft>({ answers: EMPTY_SURVEY, status: 'unanswered' })
   const [preorderDraft, setPreorderDraft] = useState(createPreorderDraft)
   const [preorderReview, setPreorderReview] = useState<PreorderReview | null>(null)
   const editingRoom = path === ROUTES.rooms && returnTo === ROUTES.preorder
@@ -29,7 +30,7 @@ export default function App() {
   }
 
   const updateSurvey = (update: SetStateAction<SurveyAnswers>) => {
-    setSurveyAnswers(update)
+    setSurveyDraft((current) => ({ ...current, answers: typeof update === 'function' ? update(current.answers) : update }))
     setPreorderReview(null)
   }
 
@@ -59,11 +60,8 @@ export default function App() {
         votedRoom={votedRoom}
         draft={preorderDraft}
         onDraftChange={updatePreorder}
-        surveyAnswers={surveyAnswers}
-        surveyStatus={surveyStatus}
         onReview={reviewPreorder}
         onChangeRoom={() => navigate(ROUTES.rooms, { returnTo: ROUTES.preorder })}
-        onEditSurvey={() => navigate(ROUTES.survey)}
         onBack={() => goBack(ROUTES.survey)}
       />
     )
@@ -71,9 +69,9 @@ export default function App() {
   if (path === ROUTES.survey) {
     return (
       <SurveyPage
-        answers={surveyAnswers}
+        answers={surveyDraft.answers}
         onAnswersChange={updateSurvey}
-        onNext={(status) => { setSurveyStatus(status); setPreorderReview(null); navigate(ROUTES.preorder) }}
+        onNext={(status) => { setSurveyDraft((current) => ({ ...current, status })); setPreorderReview(null); navigate(ROUTES.preorder) }}
         onBack={() => goBack(ROUTES.rooms)}
       />
     )

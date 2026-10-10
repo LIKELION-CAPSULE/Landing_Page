@@ -1,14 +1,3 @@
-// Age brackets aren't in the design yet; placeholders until they're decided.
-export const AGE_OPTIONS = ['10대', '20대', '30대', '40대 이상']
-
-export const STUDY_HABITS = [
-  '친구와 디코·줌 켜고',
-  '스터디위드미 영상 틀고',
-  '공부 타이머 앱 (열품타 등)',
-  '카페·도서관에서 혼자',
-  '기타',
-]
-
 export type Terms = {
   title: string
   rows: { label: string; value: string }[]
@@ -26,19 +15,14 @@ export type Consent = {
 
 export type PreorderDraft = {
   email: string
-  age: string
-  habits: ReadonlySet<string>
-  habitOther: string
   consents: Record<Consent['id'], boolean>
 }
 
 // A local review is intentionally separate from a server-confirmed reservation.
 export type PreorderReview = { email: string; roomId: string }
 
-export const HABIT_OTHER_LIMIT = 100
-
 export function createPreorderDraft(): PreorderDraft {
-  return { email: '', age: '', habits: new Set(), habitOther: '', consents: { privacy: false, marketing: false } }
+  return { email: '', consents: { privacy: false, marketing: false } }
 }
 
 export const CONSENTS: Consent[] = [
@@ -49,7 +33,7 @@ export const CONSENTS: Consent[] = [
     terms: {
       title: '개인정보 수집·이용 동의',
       rows: [
-        { label: '수집 항목', value: '이메일 주소(필수), 나이대·공부 방식·캐릭터 수요조사 응답(선택)' },
+        { label: '수집 항목', value: '이메일 주소(필수), 설문조사 응답(선택)' },
         { label: '이용 목적', value: '출시 알림 발송, 사전예약 혜택(투표한 룸 무료 해금) 지급, 스터디룸 기획을 위한 통계' },
         { label: '보유 기간', value: '서비스 출시 후 6개월이 지나면 바로 파기해요.' },
       ],

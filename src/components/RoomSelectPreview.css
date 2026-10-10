@@ -4,7 +4,7 @@
 .room-preview__brand { display: flex; align-items: center; gap: calc(3 * var(--u)); color: #9a6cfa; font-size: calc(7 * var(--u)); font-weight: 900; line-height: 1.1; }
 .room-preview__brand-mark { position: relative; width: calc(10.5 * var(--u)); height: calc(10.5 * var(--u)); border-radius: calc(2.5 * var(--u)); background: #9a6cfa; }
 .room-preview__capsule { position: absolute; left: calc(0.55 * var(--u)); top: calc(3.15 * var(--u)); width: calc(9.43359 * var(--u)); height: calc(4.2041 * var(--u)); rotate: -40deg; }
-.room-preview__capsule img, .room-preview__icon img { transform: scale(calc(var(--u) / 1px)); transform-origin: top left; }
+.room-preview__capsule img, .room-preview__icon img { width: 100%; height: 100%; }
 .room-preview__search { display: flex; align-items: center; gap: calc(2.5 * var(--u)); width: calc(75 * var(--u)); height: calc(12 * var(--u)); padding-inline: calc(4.5 * var(--u)) calc(6 * var(--u)); border-radius: calc(24 * var(--u)); background: #1e2635; color: #8a93a6; font-size: calc(4.25 * var(--u)); line-height: 1.35; }
 .room-preview__icon { display: block; flex: none; }
 .room-preview__icon--search { width: calc(5.5 * var(--u)); height: calc(5.5 * var(--u)); }
@@ -17,9 +17,14 @@
 .room-preview__grid { flex: 1; min-width: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-rows: calc(87.5 * var(--u)); gap: calc(5 * var(--u)); }
 .room-preview__poster { position: relative; overflow: hidden; border-radius: calc(4 * var(--u)); }
 .room-preview__poster > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-.room-preview__poster--selected { outline: calc(1 * var(--u)) solid #b388ff; outline-offset: calc(-1 * var(--u)); }
+/* Paint above the artwork and shade so selection remains visible when zoomed. */
+.room-preview__poster::after { content: ''; position: absolute; z-index: 2; inset: 0; border: calc(1.5 * var(--u)) solid #b388ff; border-radius: inherit; opacity: 0; pointer-events: none; transition: opacity 160ms var(--ease-out); }
+.room-preview__poster--selected::after { opacity: 1; }
 .room-preview__shade { position: absolute; inset: auto 0 0; height: calc(22.5 * var(--u)); background: linear-gradient(transparent, rgba(10, 15, 26, 0.88)); }
 .room-preview__poster--selected .room-preview__shade { height: calc(37.5 * var(--u)); }
 .room-preview__badge { position: absolute; left: calc(2 * var(--u)); top: calc(2 * var(--u)); display: flex; align-items: center; gap: calc(1.5 * var(--u)); padding: calc(1.25 * var(--u)) calc(2.5 * var(--u)); border-radius: calc(14 * var(--u)); background: #9a6cfa; font-size: calc(3.25 * var(--u)); font-weight: 700; line-height: 1.2; }
 .room-preview__enter { position: absolute; inset: auto calc(2.5 * var(--u)) calc(2.5 * var(--u)); height: calc(15.5 * var(--u)); display: flex; align-items: center; justify-content: center; gap: calc(2 * var(--u)); border-radius: calc(23 * var(--u)); background: #9a6cfa; font-size: calc(5.5 * var(--u)); font-weight: 700; line-height: 1.2; }
-.room-preview__tags { position: absolute; bottom: calc(3.6 * var(--u)); left: calc(3.5 * var(--u)); font-size: calc(3.25 * var(--u)); font-weight: 500; line-height: 1.2; opacity: 0.9; }
+
+@media (prefers-reduced-motion: reduce) {
+  .room-preview__poster::after { transition: none; }
+}

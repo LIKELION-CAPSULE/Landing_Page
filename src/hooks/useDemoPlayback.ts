@@ -16,13 +16,15 @@ function prepareImage(src: string) {
 }
 
 // A single explanatory pass, with a clock that pauses outside the viewport
-// or in a background tab. No frame-by-frame React updates are needed.
+// or in a background tab. Only the active demo updates its numeric counters.
 export function useDemoPlayback(durations: readonly number[], phaseImages: readonly (readonly string[])[]) {
   const ref = useRef<HTMLDivElement>(null)
   const [reduced, setReduced] = useState(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches)
   const [phase, setPhase] = useState(() => reduced ? durations.length - 1 : 0)
   const [requestedPhase, setRequestedPhase] = useState(phase)
   const [playing, setPlaying] = useState(false)
+  const [progress, setProgress] = useState(() => ({ phase, value: reduced ? 1 : 0 }))
+  const requestedProgress = useRef(0)
   const [visible, setVisible] = useState(() => typeof IntersectionObserver === 'undefined')
   const [near, setNear] = useState(() => typeof IntersectionObserver === 'undefined')
   const [tabVisible, setTabVisible] = useState(() => !document.hidden)
@@ -34,10 +36,12 @@ export function useDemoPlayback(durations: readonly number[], phaseImages: reado
   const generation = useRef(0)
   const remaining = useRef(durations[phase])
 
-  const requestPhase = useCallback((next: number) => {
+  const requestPhase = useCallback((next: number, complete = false) => {
     generation.current += 1
     requestedPhaseRef.current = next
-    remaining.current = durations[next]
+    remaining.current = complete ? 0 : durations[next]
+    requestedProgress.current = complete ? 1 : 0
+    if (next === currentPhase.current) setProgress({ phase: next, value: requestedProgress.current })
     setRequestedPhase(next)
   }, [durations])
 
@@ -45,7 +49,7 @@ export function useDemoPlayback(durations: readonly number[], phaseImages: reado
     started.current = true
     setNear(true)
     setPlaying(false)
-    requestPhase(next)
+    requestPhase(next, true)
   }, [requestPhase])
 
   const ready = decorationsReady && phaseImages[phase].every(src => prepared.settled.has(src))
@@ -95,6 +99,7 @@ export function useDemoPlayback(durations: readonly number[], phaseImages: reado
     const firstFrame = requestAnimationFrame(() => {
       secondFrame = requestAnimationFrame(() => {
         currentPhase.current = requestedPhase
+        setProgress({ phase: requestedPhase, value: requestedProgress.current })
         setPhase(requestedPhase)
       })
     })
@@ -113,7 +118,7 @@ export function useDemoPlayback(durations: readonly number[], phaseImages: reado
       if (media.matches) {
         started.current = true
         setPlaying(false)
-        requestPhase(durations.length - 1)
+        requestPhase(durations.length - 1, true)
       }
     }
     const onVisibility = () => setTabVisible(!document.hidden)
@@ -147,7 +152,10 @@ export function useDemoPlayback(durations: readonly number[], phaseImages: reado
     const pass = generation.current
     const start = performance.now()
     const time = remaining.current
+    const updateProgress = () => setProgress({ phase, value: Math.min(1, (durations[phase] - time + performance.now() - start) / durations[phase]) })
+    const ticker = window.setInterval(updateProgress, 50)
     const timer = window.setTimeout(() => {
+      setProgress({ phase, value: 1 })
       if (phase === durations.length - 1) {
         setPlaying(false)
       } else {
@@ -156,6 +164,7 @@ export function useDemoPlayback(durations: readonly number[], phaseImages: reado
     }, time)
     return () => {
       window.clearTimeout(timer)
+      window.clearInterval(ticker)
       if (generation.current === pass && currentPhase.current === phase) {
         remaining.current = Math.max(0, time - (performance.now() - start))
       }
@@ -179,5 +188,5 @@ export function useDemoPlayback(durations: readonly number[], phaseImages: reado
     }
   }
 
-  return { ref, phase, playing, running, reduced, pending, loadedImages: prepared.loaded, advance, toggle }
+  return { ref, phase, progress: progress.phase === phase ? progress.value : 0, playing, running, reduced, pending, near, loadedImages: prepared.loaded, advance, toggle }
 }
