@@ -1,5 +1,11 @@
 # 애니메이션 점검 · 2026-10-10
 
+## 포스터 상세의 얇은 경계 보정
+
+360px·393px, DPR 3의 WebKit에서 포스터 하단과 버튼 영역의 레이아웃 간격은 0px였지만 경계에 한 줄 밝은 픽셀이 생기는 것을 재현했다. 소수점 높이와 별도 페인트 레이어의 경계를 보정하기 위해 버튼 영역을 포스터에 1 CSS px 겹치고, 그라데이션의 마지막 2px을 버튼 배경과 같은 `#444`로 고정했다. 닫기 시 하단 영역의 transform 기준점은 실제 겹친 위치를 측정해 사용한다. 기존 확대 280ms·축소 200ms와 하단 펼침은 유지한다.
+
+Chrome·WebKit 각각 360/393px·DPR 3 및 320px·글자 200%·모션 줄이기에서 상단·중간·하단 포스터를 열고 닫았다. 확대 후와 축소 중 간격이 벌어지지 않고 원본 포스터의 포커스가 복귀하며 가로 넘침·JS 오류가 없음을 확인했다. 캡처에서 경계의 밝은 선이 사라졌으며 버튼 배경과의 색상 차이는 채널당 최대 1/255였다. `npm run build`, `npm run lint`, `git diff --check` 통과. 스크립트·캡처: `/private/tmp/capsule-room-seam-probe.mjs`, `/private/tmp/capsule-room-seam-probe/`, `/private/tmp/capsule-room-seam-qa.mjs`, `/private/tmp/capsule-room-seam-qa/`. 운영 DB에 쓰지 않았다.
+
 ## 최신 반영: Figma ‘스텝별화면’
 
 섹션 `23:2205`의 초기·공부·반응·친밀감 화면을 기준으로 시연을 갱신했다. 사진·로고·아이콘은 Figma 원본을 사용하고, 시간·호감도·말풍선·에피소드는 React UI로 구성한다.

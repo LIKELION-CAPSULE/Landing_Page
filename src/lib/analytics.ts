@@ -29,6 +29,8 @@ export type EventName =
   | 'presign_cta_clicked'
   | 'presign_completed'
   | 'presign_duplicate'
+  | 'survey_cta_clicked'
+  | 'survey_completed'
   | 'landing_api_failed'
 
 // ⚠️ 이메일·자유 서술 등 직접 식별 정보는 속성에 넣지 않는다 (docs/data-collection.md).

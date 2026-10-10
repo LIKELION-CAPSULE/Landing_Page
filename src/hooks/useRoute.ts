@@ -43,6 +43,8 @@ export function useRoute() {
     const shouldRestore = restoreFocusRef.current
     restoreFocusRef.current = false
     const frame = window.requestAnimationFrame(() => {
+      // A persistent vote confirmation keeps focus while its background changes.
+      if (document.querySelector('dialog[open]')) return
       const rememberedId = shouldRestore ? focusByPath.current.get(path) : undefined
       const remembered = rememberedId ? document.getElementById(rememberedId) : null
       const visibleRemembered = remembered && !remembered.closest('dialog:not([open])') && remembered.getClientRects().length > 0
@@ -93,7 +95,7 @@ export function useRoute() {
     return () => window.removeEventListener('popstate', onPopState)
   }, [])
 
-  const navigate = useCallback((to: string, options?: { returnTo: string }) => {
+  const navigate = useCallback((to: string, options?: { returnTo?: string; animate?: boolean }) => {
     if (to === window.location.pathname) return
     rememberFocus()
     restoreFocusRef.current = false
@@ -102,10 +104,12 @@ export function useRoute() {
     idxRef.current += 1
     window.history.pushState({ idx: idxRef.current, scrollY: 0, returnTo: options?.returnTo } satisfies HistoryState, '', to)
 
-    transition('forward', () => {
+    const update = () => {
       flushSync(() => setPath(to))
       window.scrollTo(0, 0)
-    })
+    }
+    if (options?.animate === false) update()
+    else transition('forward', update)
   }, [rememberFocus])
 
   // Prefer a real history pop so the previous page's scroll comes back.

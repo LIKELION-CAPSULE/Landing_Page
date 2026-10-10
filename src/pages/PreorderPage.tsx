@@ -111,7 +111,7 @@ export default function PreorderPage({ votedRoom, draft, onDraftChange, onSubmit
   return (
     <main className="preorder">
       {/* 6. Pre-registration (Figma 161:514) */}
-      <FunnelHeader current={3} onBack={onBack} disabled={submitting} />
+      <FunnelHeader current={2} onBack={onBack} disabled={submitting} />
 
       <header className="preorder__header">
         <div className="preorder__intro">
@@ -123,25 +123,27 @@ export default function PreorderPage({ votedRoom, draft, onDraftChange, onSubmit
         </div>
 
         <div className="preorder__room-card" data-empty={!votedRoom || undefined}>
-          <div className="preorder__room-head">
-            <p className="preorder__room-label">선택한 룸</p>
-            <button type="button" className="text-action preorder__room-change" id="preorder-change-room" ref={changeRoomRef} disabled={submitting} aria-describedby={roomMessage ? 'room-error' : undefined} onClick={onChangeRoom}>
-              {votedRoom ? '룸 변경' : '룸 선택'}
-            </button>
-          </div>
           <div className="preorder__room-body">
-            {votedRoom && <img className="preorder__room-thumb" src={votedRoom.image} alt="" width={200} height={275} />}
+            {votedRoom && (
+              <div className="preorder__room-art">
+                <img className="preorder__room-thumb" src={votedRoom.image} alt="" width={200} height={275} />
+                <p className="perk__note"><span>사전 예약 후, 해당 룸 출시 시 무료 해금</span></p>
+              </div>
+            )}
             <div className="preorder__room-info">
               <p className="perk__room">{votedRoom?.name ?? '먼저 룸을 선택해주세요'}</p>
+              <button type="button" className="text-action preorder__room-change" id="preorder-change-room" ref={changeRoomRef} disabled={submitting} aria-describedby={roomMessage ? 'room-error' : undefined} onClick={onChangeRoom}>
+                {votedRoom ? '스터디룸 변경할래요!' : '스터디룸 선택할래요!'}
+              </button>
             </div>
           </div>
-          <p className="perk__note">사전예약 후, 해당 룸 출시 시 무료 해금</p>
         </div>
         <p className="field__error" id="room-error">{roomMessage}</p>
       </header>
 
       <form className="preorder__form" onSubmit={handleSubmit} noValidate aria-busy={submitting}>
         <fieldset className="preorder__fields" disabled={submitting}>
+          <div className="preorder__divider" aria-hidden="true" />
           <label className="field">
             <span className="field__label">이메일 <span className="field__requirement">필수</span></span>
             <input
@@ -162,8 +164,6 @@ export default function PreorderPage({ votedRoom, draft, onDraftChange, onSubmit
             />
             <span className="field__error" id="email-error">{emailMessage}</span>
           </label>
-
-          <div className="preorder__divider" aria-hidden="true" />
 
           <div className="consents">
             {CONSENTS.map((consent) => (

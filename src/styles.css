@@ -554,6 +554,7 @@ main { overflow-x: clip; }
   width: calc(390 * var(--u));
   min-height: 44px;
   margin: 0 auto 24px;
+  padding-inline-end: calc(20 * var(--u));
   display: flex;
   align-items: center;
   gap: 8px;
@@ -561,33 +562,19 @@ main { overflow-x: clip; }
 .funnel-progress {
   flex: 1;
   min-width: 0;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px;
-  font-size: 0.75rem;
-  font-weight: 500;
-  line-height: 1.4;
-  color: var(--text-muted);
+  height: 6px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.16);
 }
-.funnel-progress li { display: flex; align-items: center; align-content: center; flex-wrap: wrap; gap: 4px; min-width: 0; }
-.funnel-progress li > span:not(.funnel-progress__number) { min-width: 0; overflow-wrap: anywhere; }
-.funnel-progress__number {
-  flex: none;
-  display: grid;
-  place-items: center;
-  width: 1.25rem;
-  height: 1.25rem;
-  border: 1px solid rgba(255, 255, 255, 0.65);
-  border-radius: 50%;
-  font-variant-numeric: tabular-nums;
+.funnel-progress__fill {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent);
+  transform-origin: left center;
 }
-.funnel-progress__number svg { width: 80%; height: 80%; }
-.funnel-progress [aria-current="step"] { color: #d8c5ff; font-weight: 700; }
-.funnel-progress [aria-current="step"] .funnel-progress__number,
-.funnel-progress [data-past] .funnel-progress__number { color: var(--bg); background: #d8c5ff; border-color: #d8c5ff; }
 .vote h1:focus, .survey h1:focus, .preorder h1:focus, .done h1:focus,
 main[tabindex="-1"]:focus { outline: none; }
 .text-action {
@@ -659,18 +646,25 @@ main[tabindex="-1"]:focus { outline: none; }
 }
 .vote__title span { display: block; }
 .vote__lead { font-size: max(0.875rem, calc(18 * var(--u))); font-weight: 500; line-height: 1.5; }
-.vote__condition { font-size: 0.8125rem; line-height: 1.5; color: var(--text-muted); }
-.vote__instructions { font-size: 0.875rem; line-height: 1.5; color: var(--text-muted); }
 .vote__count {
-  width: fit-content;
-  max-width: 100%;
-  padding: calc(8 * var(--u)) calc(12 * var(--u));
-  border: 1px solid var(--text-muted);
-  border-radius: calc(8 * var(--u));
+  width: 100%;
+  min-height: 1.875rem;
+  text-align: center;
   font-size: max(0.875rem, calc(17 * var(--u)));
   font-weight: 500;
   line-height: 1.5;
   color: var(--text-muted);
+}
+.vote__count strong {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--accent);
+  /* Two gentle cycles after the count arrives; finish at full opacity. */
+  animation: vote-count-pulse 2.4s var(--ease-in-out) 2;
+}
+@keyframes vote-count-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.72; }
 }
 
 .vote__grid {
@@ -718,23 +712,20 @@ main[tabindex="-1"]:focus { outline: none; }
 }
 .vote__badge svg { width: 12px; height: 12px; }
 .vote__card:active { transform: scale(0.97); }
-.vote__card[data-voted] { outline-color: var(--accent); }
+.vote__card[data-selected] { outline-color: var(--accent); }
 .vote__card:focus-visible { outline-color: #fff; }
 @media (hover: hover) and (pointer: fine) {
   .vote__card:hover { filter: brightness(1.08); }
 }
 
-.vote__hint {
+.vote__condition {
   width: calc(350 * var(--u));
-  margin: calc(38 * var(--u)) auto 0;
+  margin: 12px auto 0;
   text-align: center;
-  font-size: 0.875rem;
-  font-weight: 500;
+  font-size: 0.8125rem;
   line-height: 1.5;
   color: var(--text-muted);
 }
-.vote__continue { margin-top: 16px; }
-
 /* ---------- 4. Room detail (Figma 161:756) ---------- */
 
 html:has(.room-sheet[open], .terms-sheet[open], .legal-dialog[open]) { overflow: hidden; }
@@ -782,7 +773,18 @@ html:has(.room-sheet[open], .terms-sheet[open], .legal-dialog[open]) { overflow:
   line-height: normal;
   outline: none;
 }
-.room-sheet__content { display: flex; flex-direction: column; gap: var(--card-inset); padding: calc(20 * var(--u)); border-radius: 0 0 calc(10 * var(--u)) calc(10 * var(--u)); background: #444; clip-path: inset(0); transition: clip-path 200ms var(--ease-out); }
+.room-sheet__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--card-inset);
+  /* Cover the fractional poster edge instead of letting two paint layers meet. */
+  margin-top: -1px;
+  padding: calc(20 * var(--u));
+  border-radius: 0 0 calc(10 * var(--u)) calc(10 * var(--u));
+  background: #444;
+  clip-path: inset(0);
+  transition: clip-path 200ms var(--ease-out);
+}
 /* Reveal down from the poster edge. Moving/fading the entire footer leaves
    a transparent strip between its background and the poster's gradient. */
 .room-sheet[data-poster-transition] .room-sheet__content { clip-path: inset(0 0 100%); }
@@ -808,7 +810,8 @@ html:has(.room-sheet[open], .terms-sheet[open], .legal-dialog[open]) { overflow:
   position: absolute;
   inset: auto 0 0;
   height: calc(120 * var(--u));
-  background: linear-gradient(transparent, #444);
+  /* End with solid footer color before the image's subpixel clipping edge. */
+  background: linear-gradient(transparent, #444 calc(100% - 2px), #444);
   pointer-events: none;
   opacity: 1;
 }
@@ -863,6 +866,22 @@ html:has(.room-sheet[open], .terms-sheet[open], .legal-dialog[open]) { overflow:
   rotate: 180deg;
 }
 .room-sheet__vote:active { transform: scale(0.97); }
+.room-sheet__vote:disabled { opacity: 0.6; cursor: wait; }
+.room-sheet__error { color: var(--error); font-size: 0.875rem; line-height: 1.5; text-align: center; }
+.room-sheet[data-success] { background: #444; }
+.room-sheet__success {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: calc(26 * var(--u));
+  text-align: center;
+  outline: none;
+  opacity: 1;
+  transition: opacity 200ms var(--ease-out);
+}
+.room-sheet__success h2 { font-size: 1.75rem; font-weight: 800; line-height: 1.25; word-break: keep-all; overflow-wrap: anywhere; text-wrap: balance; }
+.room-sheet__success p { font-size: 1.0625rem; line-height: 1.6; word-break: keep-all; overflow-wrap: anywhere; text-wrap: balance; }
+@starting-style { .room-sheet__success { opacity: 0; } }
 .room-sheet button:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
 @media (hover: hover) and (pointer: fine) {
   .room-sheet__vote:hover { filter: brightness(1.06); }
@@ -943,6 +962,7 @@ html:has(.room-sheet[open], .terms-sheet[open], .legal-dialog[open]) { overflow:
   flex-direction: column;
   gap: calc(30 * var(--u));
 }
+.survey__fields { min-width: 0; padding: 0; margin: 0; border: 0; }
 .survey__group {
   display: flex;
   flex-direction: column;
@@ -1068,31 +1088,30 @@ html:has(.room-sheet[open], .terms-sheet[open], .legal-dialog[open]) { overflow:
 .preorder__title span { display: block; }
 .preorder__lead { font-size: max(0.875rem, calc(18 * var(--u))); font-weight: 500; line-height: 1.5; }
 
-/* Selection summary uses the same inset as the other content cards. */
+/* The poster and its reservation benefit sit directly on the page. */
 .preorder__room-card {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: var(--card-inset);
-  border-radius: calc(10 * var(--u));
-  background: rgba(157, 157, 157, 0.2);
 }
-.preorder__room-head { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 12px; }
 .preorder__room-change {
-  margin-inline-start: auto;
   max-width: 100%;
+  color: var(--text-muted);
   text-align: center;
+  word-break: keep-all;
   overflow-wrap: anywhere;
 }
 .preorder__room-body { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+.preorder__room-art {
+  position: relative;
+  /* 1.2 × the previous poster width, capped to the available page width. */
+  width: min(100%, calc(210 * var(--u) + 120px));
+}
 .preorder__room-thumb {
-  /* Halve the previous gap between the 200px poster and each card edge. */
-  width: min(100%, calc(50% + 100px + var(--card-inset)));
+  width: 100%;
   height: auto;
   border-radius: 4px;
 }
-.preorder__room-info { width: 100%; min-width: 0; text-align: center; }
-.preorder__room-label { font-size: 0.8125rem; font-weight: 500; line-height: 1.5; color: var(--text-muted); }
+.preorder__room-info { display: flex; flex-direction: column; align-items: center; gap: 4px; width: 100%; min-width: 0; text-align: center; }
 .perk__room {
   font-size: max(1rem, calc(18 * var(--u)));
   font-weight: 700;
@@ -1102,11 +1121,23 @@ html:has(.room-sheet[open], .terms-sheet[open], .legal-dialog[open]) { overflow:
   line-height: 1.5;
 }
 .perk__note {
+  position: absolute;
+  inset-inline: calc(12 * var(--u));
+  top: calc(12 * var(--u));
   font-size: 0.8125rem;
-  font-weight: 500;
-  color: var(--text-muted);
+  font-weight: 600;
+  color: #fff;
   line-height: 1.5;
   text-align: center;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9), 0 0 8px rgba(0, 0, 0, 0.75);
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+  pointer-events: none;
+}
+.perk__note span { display: block; animation: preorder-perk-pulse 2.4s var(--ease-in-out) infinite; }
+@keyframes preorder-perk-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.72; }
 }
 .preorder__fields { border: 0; padding: 0; margin: 0; min-width: 0; }
 
@@ -1202,7 +1233,7 @@ html:has(.room-sheet[open], .terms-sheet[open], .legal-dialog[open]) { overflow:
   width: calc(350 * var(--u));
   height: 0.5px;
   background: #fff;
-  margin: calc(10 * var(--u)) auto 0;
+  margin: 0 auto calc(20 * var(--u));
 }
 
 .consents {
@@ -1486,6 +1517,7 @@ html:has(.room-sheet[open], .terms-sheet[open], .legal-dialog[open]) { overflow:
   flex-direction: column;
   gap: calc(11 * var(--u));
 }
+.done__survey-thanks { padding: 16px; border-radius: 10px; background: rgba(179, 136, 255, 0.12); font-size: 0.9375rem; line-height: 1.6; text-align: center; }
 .done__button {
   display: flex;
   align-items: center;
@@ -1562,10 +1594,13 @@ html:has(.room-sheet[open], .terms-sheet[open], .legal-dialog[open]) { overflow:
   .form-submit:active, .done__button:active, .chip-toggle:active { transform: none; }
   .check:active .check__box { scale: 1; }
   .scroll-hint__arrow { animation: none; }
+  .vote__count strong { animation: none; }
+  .perk__note span { animation: none; }
   @keyframes hero-exit { to { opacity: 0.1; } }
   [data-reveal] { translate: none; transition-property: opacity; transition-duration: 160ms; transition-delay: 0ms; }
   .room-sheet, .room-sheet::backdrop { transition-duration: 100ms; }
   .room-sheet__content { transition: none; }
+  .room-sheet__success { transition-duration: 100ms; }
   @keyframes terms-up { from { opacity: 0; } }
   /* Hold the reel on its Figma frame */
   .rooms__track { animation: none; transform: translateY(var(--offset)); }

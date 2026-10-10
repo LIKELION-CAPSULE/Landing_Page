@@ -3,7 +3,7 @@ import { track, visitorId } from './analytics.ts'
 // Supabase REST(PostgREST)에 anon 키로 직접 INSERT 한다. 검증·중복 제한·읽기 차단은 DB 제약과 RLS 가
 // 맡는다 (supabase/migrations/). 연결이 없으면 disabled 를 반환한다.
 // 사전예약 완료 화면은 실제 저장 성공 또는 중복 확인 응답이 있어야 열린다.
-// ponytail: supabase-js 대신 fetch 두 번. INSERT 외에 쓰는 기능이 없어 SDK(약 40 kB gzip)가 값을 못 한다.
+// Save through REST without an additional client SDK.
 const BASE_URL = import.meta.env.VITE_SUPABASE_URL as string | undefined
 const ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined
 const enabled = Boolean(BASE_URL && ANON_KEY)
@@ -45,8 +45,8 @@ function failed(table: string, error: PgError): SaveResult {
   return 'failed'
 }
 
-// 같은 방문자가 다시 투표하면 행이 하나 더 들어간다. 집계 뷰(landing_vote_summary)가
-// 방문자당 마지막 표만 센다 — anon 에 UPDATE 를 열지 않기 위해서다.
+// App calls this for the first vote only; reservation room changes are local.
+// The existing DB still accepts additional votes and counts the latest per visitor.
 export async function saveVote(roomId: string): Promise<SaveResult> {
   if (!enabled) return 'disabled'
   const error = await insert('landing_vote', { room_id: roomId, visitor_id: visitorId() })
@@ -55,9 +55,8 @@ export async function saveVote(roomId: string): Promise<SaveResult> {
 
 export type PreorderInput = {
   email: string
-  surveyPicks: Record<string, ReadonlySet<string>>
-  surveyWish: string
   marketingConsent: boolean
+  // Keep the existing API field name; this is the room selected for reservation.
   votedRoomId: string | null
 }
 
@@ -65,10 +64,6 @@ export async function savePreorder(input: PreorderInput): Promise<SaveResult> {
   if (!enabled) return 'disabled'
   const error = await insert('landing_preorder', {
     email: input.email.trim().toLowerCase(),
-    survey_picks: Object.fromEntries(
-      Object.entries(input.surveyPicks).map(([group, picked]) => [group, [...picked]]),
-    ),
-    survey_wish: input.surveyWish.trim() || null,
     privacy_consent: true,
     marketing_consent: input.marketingConsent,
     voted_room_id: input.votedRoomId,
@@ -78,6 +73,25 @@ export async function savePreorder(input: PreorderInput): Promise<SaveResult> {
   // 23505 = unique_violation: show the existing-email state without claiming an update.
   if (error.code === '23505') return 'duplicate'
   return failed('landing_preorder', error)
+}
+
+export type SurveyInput = {
+  picks: Record<string, ReadonlySet<string>>
+  wish: string
+  roomId: string
+}
+
+// Follow-up opinions are separate from the immutable preorder email record.
+export async function saveSurvey(input: SurveyInput): Promise<SaveResult> {
+  if (!enabled) return 'disabled'
+  const error = await insert('landing_survey', {
+    visitor_id: visitorId(),
+    room_id: input.roomId,
+    survey_picks: Object.fromEntries(Object.entries(input.picks).filter(([, picked]) => picked.size > 0).map(([group, picked]) => [group, [...picked]])),
+    survey_wish: input.wish.trim() || null,
+    privacy_consent: true,
+  })
+  return error ? failed('landing_survey', error) : 'saved'
 }
 
 // "현재까지 N명이 투표했어요" 의 N. 투표한 고유 방문자 수를 DB 함수(landing_vote_total)로 받는다.

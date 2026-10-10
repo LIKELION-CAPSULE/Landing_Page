@@ -12,6 +12,8 @@ type Props = {
   onEdit: () => void
   onOpenPreorder: () => void
   onRestart: () => void
+  onOpenSurvey: () => void
+  surveySent: boolean
 }
 
 function maskEmail(email: string) {
@@ -19,7 +21,7 @@ function maskEmail(email: string) {
   return `${email.slice(0, Math.min(2, Math.max(1, at - 1)))}***${email.slice(at)}`
 }
 
-export default function DonePage({ receipt, votedRoom, onEdit, onOpenPreorder, onRestart }: Props) {
+export default function DonePage({ receipt, votedRoom, onEdit, onOpenPreorder, onRestart, onOpenSurvey, surveySent }: Props) {
   const duplicate = receipt?.status === 'duplicate'
   useEffect(() => {
     const previous = document.title
@@ -32,7 +34,7 @@ export default function DonePage({ receipt, votedRoom, onEdit, onOpenPreorder, o
   if (!receipt || !votedRoom) {
     return (
       <main className="done done--empty">
-        <FunnelHeader current={3} onBack={onOpenPreorder} backLabel="사전예약 입력으로 돌아가기" />
+        <FunnelHeader current={2} onBack={onOpenPreorder} backLabel="사전예약 입력으로 돌아가기" />
         <header className="done__header">
           <h1 className="done__title"><span>예약 완료 정보를</span><span>확인할 수 없어요</span></h1>
           <p className="done__lead">룸을 선택하고 예약 정보를 입력해주세요.</p>
@@ -52,7 +54,7 @@ export default function DonePage({ receipt, votedRoom, onEdit, onOpenPreorder, o
   return (
     <main className="done">
       {/* 7. Pre-registration done (Figma 160:571) */}
-      <FunnelHeader current={3} onBack={onEdit} backLabel="사전예약 화면으로 돌아가기" />
+      <FunnelHeader current={2} complete onBack={onEdit} backLabel="사전예약 화면으로 돌아가기" />
       <header className="done__header">
         <h1 className="done__title">
           {duplicate ? <><span>이미 사전예약한</span><span>이메일이에요</span></> : <><span>사전예약이</span><span>완료됐어요!</span></>}
@@ -68,7 +70,7 @@ export default function DonePage({ receipt, votedRoom, onEdit, onOpenPreorder, o
       </div>
 
       {!duplicate && <div className="done__perk">
-        <p className="done__perk-label">사전예약 혜택 · 투표한 룸 무료 해금</p>
+        <p className="done__perk-label">사전예약 혜택 · 선택한 룸 무료 해금</p>
         <p className="done__perk-room">선택한 룸: {votedRoom.name}</p>
         <p className="done__perk-note">해당 룸이 출시될 경우 제공돼요.</p>
       </div>}
@@ -87,6 +89,20 @@ export default function DonePage({ receipt, votedRoom, onEdit, onOpenPreorder, o
       </div>}
 
       <div className="done__actions">
+        {surveySent && <p className="done__survey-thanks" role="status">의견을 보내주셔서 고마워요!<br />다음 스터디룸 기획에 반영할게요.</p>}
+        <button
+          type="button"
+          className="done__button done__button--outline"
+          id="done-open-survey"
+          onClick={(event) => {
+            // Safari touch activation does not focus buttons. Remember this
+            // entry point so returning from the survey restores it as well.
+            event.currentTarget.focus({ preventScroll: true })
+            onOpenSurvey()
+          }}
+        >
+          나만의 세계 만들어보기
+        </button>
         <a className="done__button done__button--primary" href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer">
           인스타그램에서 캐릭터 구경하기
         </a>
