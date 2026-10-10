@@ -12,7 +12,6 @@ export function useMacbookIntro(
   typingComplete: boolean,
   status: MacbookLoadStatus,
   reducedMotion: boolean,
-  cycle: number,
 ) {
   const [complete, setComplete] = useState(reducedMotion)
   const [titleReady, setTitleReady] = useState(reducedMotion)
@@ -36,7 +35,7 @@ export function useMacbookIntro(
       })
     }, section)
     return () => context.revert()
-  }, [sectionRef, reducedMotion, cycle])
+  }, [sectionRef, reducedMotion])
 
   useLayoutEffect(() => {
     const section = sectionRef.current
@@ -50,7 +49,7 @@ export function useMacbookIntro(
       })
     }, section)
     return () => context.revert()
-  }, [sectionRef, typingComplete, status, reducedMotion, cycle])
+  }, [sectionRef, typingComplete, status, reducedMotion])
 
   return { complete, titleReady }
 }

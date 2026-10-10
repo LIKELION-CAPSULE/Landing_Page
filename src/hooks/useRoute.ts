@@ -7,8 +7,15 @@ export const ROUTES = {
   survey: '/survey',
   preorder: '/preorder',
   done: '/done',
-  test: '/test',
 } as const
+
+function currentPath() {
+  // Retired experiment URLs point to home without adding a history entry.
+  if (window.location.pathname === '/test') {
+    window.history.replaceState(window.history.state, '', ROUTES.home)
+  }
+  return window.location.pathname
+}
 
 type Direction = 'forward' | 'back'
 type HistoryState = { idx: number; scrollY: number; returnTo?: string }
@@ -30,7 +37,7 @@ function transition(direction: Direction, update: () => void) {
 
 // Keep navigation and focus together without adding a routing dependency.
 export function useRoute() {
-  const [path, setPath] = useState(() => window.location.pathname)
+  const [path, setPath] = useState(currentPath)
   const idxRef = useRef<number>((window.history.state as HistoryState | null)?.idx ?? 0)
   // Set by restart(): the next pop lands on home, at the top.
   const restartRef = useRef(false)
@@ -87,7 +94,7 @@ export function useRoute() {
       }
 
       transition(direction, () => {
-        flushSync(() => setPath(window.location.pathname))
+        flushSync(() => setPath(currentPath()))
         window.scrollTo(0, restarting ? 0 : state?.scrollY ?? 0)
       })
     }

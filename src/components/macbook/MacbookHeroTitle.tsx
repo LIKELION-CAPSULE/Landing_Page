@@ -7,12 +7,11 @@ const TOTAL_LENGTH = FIRST_LENGTH + Array.from(LINES[1]).length
 type Props = {
   copyRef: RefObject<HTMLHeadingElement | null>
   reducedMotion: boolean
-  cycle: number
   start: boolean
   onComplete: () => void
 }
 
-export default function MacbookHeroTitle({ copyRef, reducedMotion, cycle, start, onComplete }: Props) {
+export default function MacbookHeroTitle({ copyRef, reducedMotion, start, onComplete }: Props) {
   const [count, setCount] = useState(reducedMotion ? TOTAL_LENGTH : 0)
   useEffect(() => {
     if (reducedMotion) { onComplete(); return }
@@ -33,7 +32,7 @@ export default function MacbookHeroTitle({ copyRef, reducedMotion, cycle, start,
     }
     timer = window.setTimeout(type, 100)
     return () => { cancelled = true; window.clearTimeout(timer) }
-  }, [reducedMotion, cycle, start, onComplete])
+  }, [reducedMotion, start, onComplete])
 
   const visibleCount = reducedMotion ? TOTAL_LENGTH : start ? count : 0
   return (
@@ -42,11 +41,11 @@ export default function MacbookHeroTitle({ copyRef, reducedMotion, cycle, start,
         const length = index === 0 ? visibleCount : Math.max(0, visibleCount - FIRST_LENGTH)
         const typing = visibleCount > 0 && visibleCount < TOTAL_LENGTH && (index === 0 ? visibleCount < FIRST_LENGTH : visibleCount >= FIRST_LENGTH)
         return (
-          <span key={line} className={`macbook-test__type-line${index === 1 ? ' accent' : ''}`} aria-hidden="true">
-            <span className="macbook-test__type-reserve">{line}</span>
-            <span className="macbook-test__type-text">
+          <span key={line} className={`macbook-landing__type-line${index === 1 ? ' accent' : ''}`} aria-hidden="true">
+            <span className="macbook-landing__type-reserve">{line}</span>
+            <span className="macbook-landing__type-text">
               {Array.from(line).slice(0, length).join('')}
-              {typing && <i className="macbook-test__cursor" />}
+              {typing && <i className="macbook-landing__cursor" />}
             </span>
           </span>
         )

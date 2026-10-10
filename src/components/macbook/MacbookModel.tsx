@@ -1,11 +1,13 @@
 import { useEffect, useMemo } from 'react'
 import { useGLTF, useTexture } from '@react-three/drei'
+import { useThree } from '@react-three/fiber'
 import { Box3, Group, Mesh, MeshBasicMaterial, SRGBColorSpace } from 'three'
 import { MACBOOK_MODEL_URL, MACBOOK_PREVIEW_URL, type MacbookRig } from './macbook-config.ts'
 
 type Props = { onReady: (rig: MacbookRig | null) => void }
 
 export default function MacbookModel({ onReady }: Props) {
+  const gl = useThree(state => state.gl)
   // Drei caches the source assets. Only transforms and the display material belong to this instance.
   const gltf = useGLTF(MACBOOK_MODEL_URL)
   const sourceTexture = useTexture(MACBOOK_PREVIEW_URL)
@@ -21,6 +23,7 @@ export default function MacbookModel({ onReady }: Props) {
     const previewTexture = sourceTexture.clone()
     previewTexture.flipY = false
     previewTexture.colorSpace = SRGBColorSpace
+    previewTexture.anisotropy = Math.min(8, gl.capabilities.getMaxAnisotropy())
     previewTexture.needsUpdate = true
     const screenMaterial = new MeshBasicMaterial({
       map: previewTexture,
@@ -40,7 +43,7 @@ export default function MacbookModel({ onReady }: Props) {
       }
     })
     return { root, presentation, baseBounds, hinge, screen, screenMaterial, previewTexture }
-  }, [gltf.scene, sourceTexture])
+  }, [gltf.scene, sourceTexture, gl])
 
   useEffect(() => {
     const originalMaterial = rig.screen.material
