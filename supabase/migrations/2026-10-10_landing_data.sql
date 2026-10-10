@@ -7,7 +7,7 @@
 --     중복 제한은 UNIQUE, 읽기 차단은 RLS 가 맡는다.
 --   · anon 은 INSERT 만 된다. SELECT 정책이 없으므로 anon 으로는 아무 행도 못 읽는다.
 --   · 조회는 Supabase 대시보드(로그인 = 서버측 인증) 또는 service_role 키로만 한다.
---   · PostHog 는 행동 분석용이고, 사업계획서에 쓰는 투표 수·이메일 수의 원본은 이 테이블이다.
+--   · Mixpanel 은 행동 분석용이고, 사업계획서에 쓰는 투표 수·이메일 수의 원본은 이 테이블이다.
 --
 -- ponytail: 속도 제한이 없다. anon 키를 아는 사람이 스크립트로 쓰레기 행을 넣을 수 있다.
 --   UNIQUE(email) 과 CHECK 가 형식을 걸러 줄 뿐이다. 실제로 당하면 INSERT 를
@@ -19,11 +19,11 @@ begin;
 create table if not exists landing_vote (
     vote_id     uuid        primary key default gen_random_uuid(),
     -- src/data/rooms.ts 의 id 와 같아야 한다. ⚠️ 룸을 추가하면 이 CHECK 도 같이 고친다.
-    --   안 고치면 그 룸 투표는 저장이 실패하고 PostHog 에 landing_api_failed 로 남는다.
+    --   안 고치면 그 룸 투표는 저장이 실패하고 Mixpanel 에 landing_api_failed 로 남는다.
     room_id     text        not null
                 check (room_id in ('smile', 'lantern', 'top', 'fenesis', 'cat',
                                    'baekdojun', 'jurassic', 'iljin', 'lab')),
-    -- 브라우저가 만든 익명 ID (PostHog distinct_id). 로그인이 없으므로 1인 1표를
+    -- 브라우저가 만든 익명 ID (Mixpanel distinct_id). 로그인이 없으므로 1인 1표를
     -- 보장하지 못한다 — 브라우저·기기를 바꾸면 다른 사람으로 센다.
     visitor_id  text        not null check (char_length(visitor_id) between 8 and 64),
     created_at  timestamptz not null default now()
@@ -111,7 +111,7 @@ select
     max(created_at)                            as last_at
 from landing_preorder;
 
--- 투표자 수(고유 방문자)와 사전예약자 수를 한 줄로. 전환율 분모(방문자)는 PostHog 에 있다.
+-- 투표자 수(고유 방문자)와 사전예약자 수를 한 줄로. 전환율 분모(방문자)는 Mixpanel 에 있다.
 create or replace view landing_funnel_summary
     with (security_invoker = true) as
 select
