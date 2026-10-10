@@ -1,0 +1,366 @@
+{
+  "targetRoute": "/",
+  "desktop": [
+    {
+      "name": "closed",
+      "hinge": 0,
+      "height": 0,
+      "rotation": 0,
+      "brightness": 0,
+      "visible": true,
+      "frontView": true,
+      "landingCopy": [
+        {
+          "name": "caption",
+          "opacity": 0,
+          "visible": false
+        },
+        {
+          "name": "subtitle",
+          "opacity": 0,
+          "visible": false
+        }
+      ],
+      "canvas": {
+        "width": 1360,
+        "height": 880
+      }
+    },
+    {
+      "name": "open-start",
+      "hinge": 0,
+      "height": 0,
+      "rotation": 0,
+      "brightness": 0,
+      "visible": true,
+      "frontView": true,
+      "landingCopy": [
+        {
+          "name": "caption",
+          "opacity": 0,
+          "visible": false
+        },
+        {
+          "name": "subtitle",
+          "opacity": 0,
+          "visible": false
+        }
+      ],
+      "canvas": {
+        "width": 1360,
+        "height": 880
+      }
+    },
+    {
+      "name": "early-opening",
+      "hinge": 20,
+      "height": 0,
+      "rotation": 0,
+      "brightness": 0,
+      "visible": true,
+      "frontView": true,
+      "landingCopy": [
+        {
+          "name": "caption",
+          "opacity": 0,
+          "visible": false
+        },
+        {
+          "name": "subtitle",
+          "opacity": 0,
+          "visible": false
+        }
+      ],
+      "canvas": {
+        "width": 1360,
+        "height": 880
+      }
+    },
+    {
+      "name": "half-open",
+      "hinge": 62.78,
+      "height": 0,
+      "rotation": 0,
+      "brightness": 0,
+      "visible": true,
+      "frontView": true,
+      "landingCopy": [
+        {
+          "name": "caption",
+          "opacity": 0,
+          "visible": false
+        },
+        {
+          "name": "subtitle",
+          "opacity": 0,
+          "visible": false
+        }
+      ],
+      "canvas": {
+        "width": 1360,
+        "height": 880
+      }
+    },
+    {
+      "name": "screen-on",
+      "hinge": 87.78,
+      "height": 0,
+      "rotation": 0,
+      "brightness": 0.273,
+      "visible": true,
+      "frontView": true,
+      "landingCopy": [
+        {
+          "name": "caption",
+          "opacity": 0,
+          "visible": false
+        },
+        {
+          "name": "subtitle",
+          "opacity": 0,
+          "visible": false
+        }
+      ],
+      "canvas": {
+        "width": 1360,
+        "height": 880
+      }
+    },
+    {
+      "name": "fully-open",
+      "hinge": 90,
+      "height": 0,
+      "rotation": 0,
+      "brightness": 0.956,
+      "visible": true,
+      "frontView": true,
+      "landingCopy": [
+        {
+          "name": "caption",
+          "opacity": 0,
+          "visible": false
+        },
+        {
+          "name": "subtitle",
+          "opacity": 0,
+          "visible": false
+        }
+      ],
+      "canvas": {
+        "width": 1360,
+        "height": 880
+      }
+    },
+    {
+      "name": "complete",
+      "hinge": 90,
+      "height": 0,
+      "rotation": 0,
+      "brightness": 1,
+      "visible": true,
+      "frontView": true,
+      "landingCopy": [
+        {
+          "name": "caption",
+          "opacity": 1,
+          "visible": true
+        },
+        {
+          "name": "subtitle",
+          "opacity": 1,
+          "visible": true
+        }
+      ],
+      "canvas": {
+        "width": 1360,
+        "height": 880
+      }
+    }
+  ],
+  "mobile": [
+    {
+      "name": "closed",
+      "hinge": 0,
+      "height": 0,
+      "rotation": 0,
+      "brightness": 0,
+      "visible": true,
+      "frontView": true,
+      "landingCopy": [
+        {
+          "name": "caption",
+          "opacity": 0,
+          "visible": false
+        },
+        {
+          "name": "subtitle",
+          "opacity": 0,
+          "visible": false
+        }
+      ],
+      "canvas": {
+        "width": 780,
+        "height": 1695
+      }
+    },
+    {
+      "name": "opening",
+      "hinge": 62.78,
+      "height": 0,
+      "rotation": 0,
+      "brightness": 0,
+      "visible": true,
+      "frontView": true,
+      "landingCopy": [
+        {
+          "name": "caption",
+          "opacity": 0,
+          "visible": false
+        },
+        {
+          "name": "subtitle",
+          "opacity": 0,
+          "visible": false
+        }
+      ],
+      "canvas": {
+        "width": 780,
+        "height": 1695
+      }
+    },
+    {
+      "name": "complete",
+      "hinge": 90,
+      "height": 0,
+      "rotation": 0,
+      "brightness": 1,
+      "visible": true,
+      "frontView": true,
+      "landingCopy": [
+        {
+          "name": "caption",
+          "opacity": 1,
+          "visible": true
+        },
+        {
+          "name": "subtitle",
+          "opacity": 1,
+          "visible": true
+        }
+      ],
+      "canvas": {
+        "width": 780,
+        "height": 1695
+      }
+    }
+  ],
+  "errors": [],
+  "warnings": [
+    "THREE.Clock: This module has been deprecated. Please use THREE.Timer instead.",
+    "The resource http://localhost:5173/src/assets/fonts/capsule-ui.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.",
+    "THREE.Clock: This module has been deprecated. Please use THREE.Timer instead.",
+    "The resource http://localhost:5173/src/assets/fonts/capsule-ui.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.",
+    "The resource http://localhost:5173/src/assets/fonts/capsule-ui.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.",
+    "The resource http://localhost:5173/src/assets/fonts/capsule-ui.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.",
+    "THREE.Clock: This module has been deprecated. Please use THREE.Timer instead.",
+    "The resource http://localhost:5173/src/assets/fonts/capsule-ui.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.",
+    "THREE.Clock: This module has been deprecated. Please use THREE.Timer instead.",
+    "The resource http://localhost:5173/src/assets/fonts/capsule-ui.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.",
+    "THREE.Clock: This module has been deprecated. Please use THREE.Timer instead.",
+    "The resource http://localhost:5173/src/assets/fonts/capsule-ui.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.",
+    "The resource http://localhost:5173/src/assets/fonts/capsule-ui.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.",
+    "THREE.Clock: This module has been deprecated. Please use THREE.Timer instead."
+  ],
+  "analyticsStubbed": true,
+  "retiredTestRedirect": true,
+  "mainTitlePreserved": true,
+  "introOrder": [
+    {
+      "name": "logo",
+      "time": 865.1000000089407
+    },
+    {
+      "name": "title",
+      "time": 865.1000000089407
+    },
+    {
+      "name": "model",
+      "time": 2785.2000000029802
+    },
+    {
+      "name": "hint",
+      "time": 3599.5
+    }
+  ],
+  "logo": "/src/assets/hero/logo-lockup.png?t=1791662959582",
+  "initialLayoutOffset": {
+    "title": 0,
+    "model": 0
+  },
+  "retiredURLMatchesLanding": true,
+  "idleRendering": {
+    "before": 1575,
+    "after": 1575
+  },
+  "desktopHandoff": {
+    "hold": 320,
+    "holdDistance": 438,
+    "wheelHold": {
+      "scroll": 2286,
+      "top": 0,
+      "hinge": 90,
+      "titleOpacity": 1
+    },
+    "held": {
+      "top": 0,
+      "hinge": 90
+    },
+    "gap": 75.015625,
+    "eyebrowOpacity": 1,
+    "titleOpacity": 1,
+    "horizontalOverflow": false
+  },
+  "noPointerMotion": true,
+  "reverse": true,
+  "roomCta": true,
+  "unmount": true,
+  "roomBackToLanding": true,
+  "mobileHandoff": {
+    "hold": 240,
+    "holdDistance": 348.171875,
+    "wheelHold": {
+      "scroll": 2178,
+      "top": 0,
+      "hinge": 90,
+      "titleOpacity": 1
+    },
+    "held": {
+      "top": 0,
+      "hinge": 90
+    },
+    "gap": 72.796875,
+    "eyebrowOpacity": 1,
+    "titleOpacity": 1,
+    "horizontalOverflow": false
+  },
+  "shortMobileHandoff": {
+    "hold": 200,
+    "holdDistance": 308.171875,
+    "wheelHold": {
+      "scroll": 1324,
+      "top": 0,
+      "hinge": 90,
+      "titleOpacity": 1
+    },
+    "held": {
+      "top": 0,
+      "hinge": 90
+    },
+    "gap": 59.78125,
+    "eyebrowOpacity": 1,
+    "titleOpacity": 1,
+    "horizontalOverflow": false
+  },
+  "mainDebugDisabled": true,
+  "reducedMotion": true
+}
