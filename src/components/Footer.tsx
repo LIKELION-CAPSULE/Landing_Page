@@ -1,6 +1,7 @@
 import copyrightCircle from '../assets/story/copyright-circle.svg'
 import { useLegalDocument } from '../hooks/useLegalDocument.ts'
 import LegalDocumentDialog from './LegalDocumentDialog.tsx'
+import { INSTAGRAM_HANDLE, INSTAGRAM_URL } from '../data/social.ts'
 
 export default function Footer() {
   const { ref: legalRef, document: legalDocument, showDocument, close: closeLegal } = useLegalDocument()
@@ -9,7 +10,7 @@ export default function Footer() {
     <>
       <footer className="footer">
         <div className="footer__divider" aria-hidden="true" />
-        <a className="footer__insta" href="https://www.instagram.com/capsule_studywithme">인스타그램 @capsule_studywithme</a>
+        <a className="footer__insta" href={INSTAGRAM_URL}>인스타그램 @{INSTAGRAM_HANDLE}</a>
         <p className="footer__mail">문의 <a href="mailto:capsulestudywithme@gmail.com">capsulestudywithme@gmail.com</a></p>
         <p className="footer__copy">
           <span className="footer__c" aria-hidden="true"><img src={copyrightCircle} alt="" /><span>c</span></span>

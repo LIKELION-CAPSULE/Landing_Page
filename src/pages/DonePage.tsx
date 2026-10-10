@@ -1,10 +1,9 @@
 import { useEffect } from 'react'
 import type { Room } from '../data/rooms.ts'
 import type { PreorderReceipt } from '../data/preorder.ts'
+import { INSTAGRAM_URL } from '../data/social.ts'
 import FunnelHeader from '../components/FunnelHeader.tsx'
-import bubbleTail from '../assets/done/bubble-tail.svg'
-
-const INSTAGRAM_URL = 'https://www.instagram.com/capsule.studywithme/'
+import ReservationTicket from '../components/ReservationTicket.tsx'
 
 type Props = {
   receipt: PreorderReceipt | null
@@ -14,11 +13,6 @@ type Props = {
   onRestart: () => void
   onOpenSurvey: () => void
   surveySent: boolean
-}
-
-function maskEmail(email: string) {
-  const at = email.lastIndexOf('@')
-  return `${email.slice(0, Math.min(2, Math.max(1, at - 1)))}***${email.slice(at)}`
 }
 
 export default function DonePage({ receipt, votedRoom, onEdit, onOpenPreorder, onRestart, onOpenSurvey, surveySent }: Props) {
@@ -62,34 +56,14 @@ export default function DonePage({ receipt, votedRoom, onEdit, onOpenPreorder, o
         <p className="done__lead">출시되면 이메일로 가장 먼저 알려드릴게요.</p>
       </header>
 
-      <div className="done__email">
-        <p>출시 알림을 받을 이메일</p>
-        <strong><bdi>{maskEmail(receipt.email)}</bdi></strong>
-        <p className="done__email-note">{duplicate ? '기존 예약 정보와 혜택은 변경되지 않았어요.' : '이 주소로 출시 소식과 사전예약 혜택을 보내드려요.'}</p>
-        <button type="button" className="text-action" id="done-edit" onClick={onEdit}>다른 이메일로 사전예약하기</button>
-      </div>
-
-      {!duplicate && <div className="done__perk">
-        <p className="done__perk-label">사전예약 혜택 · 선택한 룸 무료 해금</p>
-        <p className="done__perk-room">선택한 룸: {votedRoom.name}</p>
-        <p className="done__perk-note">해당 룸이 출시될 경우 제공돼요.</p>
-      </div>}
-
-      {!duplicate && <div className="done__stage">
-        <div className="done__poster">
-          <img src={votedRoom.image} alt={votedRoom.name} />
-        </div>
-
-        <div className="done__bubble" aria-hidden="true">
-          <img className="done__bubble-tail" src={bubbleTail} alt="" width={26.8468} height={22.5} />
-          <span className="done__bubble-body"></span>
-          <p className="done__bubble-text">우리가 만날<br />미래에서 기다릴게</p>
-          <span className="done__bubble-haze"></span>
-        </div>
-      </div>}
+      <ReservationTicket key={receipt.email + ':' + receipt.roomId} receipt={receipt} room={votedRoom} />
 
       <div className="done__actions">
         {surveySent && <p className="done__survey-thanks" role="status">의견을 보내주셔서 고마워요!<br />다음 스터디룸 기획에 반영할게요.</p>}
+        <p className="done__actions-lead">기다리는 동안, 캡슐을 더 만나보세요.</p>
+        <a className="done__button done__button--primary" href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer">
+          인스타그램에서 캐릭터 구경하기
+        </a>
         <button
           type="button"
           className="done__button done__button--outline"
@@ -103,10 +77,7 @@ export default function DonePage({ receipt, votedRoom, onEdit, onOpenPreorder, o
         >
           나만의 세계 만들어보기
         </button>
-        <a className="done__button done__button--primary" href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer">
-          인스타그램에서 캐릭터 구경하기
-        </a>
-        <button type="button" className="done__button done__button--outline" onClick={onRestart}>
+        <button type="button" className="done__button done__button--quiet" onClick={onRestart}>
           처음으로 돌아가기
         </button>
       </div>
