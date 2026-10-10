@@ -10,6 +10,49 @@ const enabled = Boolean(BASE_URL && ANON_KEY)
 
 type PgError = { code?: string; message: string }
 
+// 첫 진입 때의 유입 정보. SPA 라 이후 화면에는 쿼리가 없으니 처음 한 번 잡아 세션 저장소에 둔다.
+// 투표·사전예약 행에 같이 저장해서 "인스타에서 온 사람 중 몇 명이 예약했나" 를 DB 에서 바로 본다.
+type Attribution = {
+  utm_source: string | null
+  utm_medium: string | null
+  utm_campaign: string | null
+  referrer: string | null   // 외부 도메인만. 같은 사이트 안 이동은 null
+  landing_path: string      // 처음 연 경로
+}
+
+const ATTRIBUTION_KEY = 'capsule_attribution'
+
+export function captureAttribution(): Attribution {
+  try {
+    const stored = sessionStorage.getItem(ATTRIBUTION_KEY)
+    if (stored) return JSON.parse(stored) as Attribution
+  } catch {
+    // 세션 저장소를 못 쓰면 매번 현재 값으로
+  }
+  const query = new URLSearchParams(window.location.search)
+  const cut = (value: string | null) => (value ? value.slice(0, 100) : null)
+  let referrer: string | null = null
+  try {
+    const host = document.referrer ? new URL(document.referrer).hostname : ''
+    referrer = host && host !== window.location.hostname ? host : null
+  } catch {
+    referrer = null
+  }
+  const attribution: Attribution = {
+    utm_source: cut(query.get('utm_source')),
+    utm_medium: cut(query.get('utm_medium')),
+    utm_campaign: cut(query.get('utm_campaign')),
+    referrer,
+    landing_path: window.location.pathname.slice(0, 100),
+  }
+  try {
+    sessionStorage.setItem(ATTRIBUTION_KEY, JSON.stringify(attribution))
+  } catch {
+    // 무시
+  }
+  return attribution
+}
+
 // 성공이면 null, 실패면 PostgREST 오류 본문({code, message}). 네트워크 오류는 code 없이 message 만.
 async function insert(table: string, row: Record<string, unknown>): Promise<PgError | null> {
   try {
@@ -42,7 +85,7 @@ function failed(table: string, error: PgError): SaveResult {
 // 방문자당 마지막 표만 센다 — anon 에 UPDATE 를 열지 않기 위해서다.
 export async function saveVote(roomId: string): Promise<SaveResult> {
   if (!enabled) return 'disabled'
-  const error = await insert('landing_vote', { room_id: roomId, visitor_id: visitorId() })
+  const error = await insert('landing_vote', { room_id: roomId, visitor_id: visitorId(), ...captureAttribution() })
   return error ? failed('landing_vote', error) : 'saved'
 }
 
@@ -66,6 +109,7 @@ export async function savePreorder(input: PreorderInput): Promise<SaveResult> {
     marketing_consent: input.marketingConsent,
     voted_room_id: input.votedRoomId,
     visitor_id: visitorId(),
+    ...captureAttribution(),
   })
   if (!error) return 'saved'
   // 23505 = unique_violation: 이미 등록된 이메일. 사용자에게는 완료로 보여주고 집계만 구분한다.
