@@ -1,0 +1,16 @@
+{
+  "source": "public/models/macbook_web_ready.glb",
+  "output": "public/models/macbook_web_optimized.glb",
+  "sourceBytes": 7895324,
+  "outputBytes": 5124096,
+  "reductionPercent": 35.1,
+  "sourceSHA256": "311d36de21ccf87117bbb2134bf344594c36d8bfac6e9ebd304aa0afbdf6a46e",
+  "outputSHA256": "3df6593d507d4fa62aea1291b4a5651b1321bd5c8d81c1ca459c60639dd2f5ff",
+  "extension": "EXT_meshopt_compression",
+  "compressedViews": 224,
+  "geometryByteEquality": true,
+  "embeddedImageByteEquality": true,
+  "hierarchyMaterialsUVAndAccessorsPreserved": true,
+  "quantization": false,
+  "simplification": false
+}

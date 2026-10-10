@@ -96,6 +96,9 @@ export default function ReservationTicket({ receipt, room }: Props) {
                   <div className="done__ticket-body">
                     <div className="done__ticket-art">
                       <img src={room.image} alt={room.name} width={268} height={351} draggable={false} />
+                      <div className="done__ticket-beams" aria-hidden="true">
+                        {Array.from({ length: 5 }, (_, index) => <span key={index} />)}
+                      </div>
                     </div>
                   </div>
                   <TicketStub />
