@@ -180,5 +180,5 @@ npm run assets:optimize # 원본에서 배포용 복사본 재생성
 
 ## 문의
 
-- 인스타그램 [@capsule.studywithme](https://www.instagram.com/capsule.studywithme/)
+- 인스타그램 [@capsule_studywithme](https://www.instagram.com/capsule_studywithme/)
 - 이메일 capsulestudywithme@gmail.com
