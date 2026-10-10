@@ -51,7 +51,7 @@ export default function DonePage({ receipt, votedRoom, onEdit, onOpenPreorder, o
       <FunnelHeader current={2} complete onBack={onEdit} backLabel="사전예약 화면으로 돌아가기" />
       <header className="done__header">
         <h1 className="done__title">
-          {duplicate ? <><span>이미 사전예약한</span><span>이메일이에요</span></> : <><span>사전예약이</span><span>완료됐어요!</span></>}
+          {duplicate ? <><span>이미 사전예약한</span><span>이메일이에요</span></> : <span>사전예약이 완료됐어요!</span>}
         </h1>
         <p className="done__lead">출시되면 이메일로 가장 먼저 알려드릴게요.</p>
       </header>
