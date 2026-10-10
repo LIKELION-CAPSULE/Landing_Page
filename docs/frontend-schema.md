@@ -56,6 +56,7 @@ type PreorderInput = {
 | --- | --- | --- | --- |
 | `room_id` | string | O | `smile` `lantern` `top` `fenesis` `cat` `baekdojun` `jurassic` `iljin` `lab` 중 하나. ⚠️ `rooms.ts` 에 룸을 추가하면 DB CHECK 도 같이 고쳐야 한다 |
 | `visitor_id` | string | O | 8~64자 |
+| `utm_source`, `utm_medium`, `utm_campaign`, `referrer`, `landing_path` | string \| null | | 첫 진입 때 자동으로 채움 (`captureAttribution`). 프론트가 넘길 필요 없음 |
 
 ### `landing_preorder`
 
@@ -68,6 +69,7 @@ type PreorderInput = {
 | `marketing_consent` | boolean | | 기본 `false` |
 | `voted_room_id` | string \| null | | 40자 이하 |
 | `visitor_id` | string | O | 8~64자 |
+| `utm_source`, `utm_medium`, `utm_campaign`, `referrer`, `landing_path` | string \| null | | 첫 진입 때 자동으로 채움. 프론트가 넘길 필요 없음 |
 
 서버가 채우는 것: `vote_id`/`preorder_id`(UUID), `created_at`.
 
@@ -112,3 +114,4 @@ anon 키로 GET/PATCH/DELETE 를 보내면 에러 없이 **0행**이 돌아온�
 | `landing_vote_summary` | `room_id`, `votes`(방문자당 마지막 표), `share_pct`, `raw_votes` |
 | `landing_preorder_summary` | `preorders`, `marketing_opt_in`, `with_vote`, `visitors`, `first_at`, `last_at` |
 | `landing_funnel_summary` | `voters`, `raw_votes`, `preorders` |
+| `landing_source_summary` | `source`(utm_source → referrer → 직접/메신저), `voters`, `preorders`, `preorder_rate_pct` |
