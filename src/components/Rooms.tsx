@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState, type CSSProperties, type MouseEvent } from 'react'
 import { ROUTES } from '../hooks/useRoute.ts'
 import { track } from '../lib/analytics.ts'
-import galleryTop from '../assets/optimized/story/gallery-col1-top.webp'
+import galleryIljin from '../assets/optimized/rooms/poster-8.webp'
 import galleryJurassic from '../assets/optimized/story/gallery-jurassic.webp'
 import galleryLantern from '../assets/optimized/hero/poster-2.webp'
 import galleryGirls from '../assets/optimized/story/gallery-three-girls.webp'
 import galleryMid from '../assets/optimized/story/gallery-mid-b.webp'
+import galleryJoseon from '../assets/optimized/rooms/joseon.webp'
 import galleryLab from '../assets/optimized/rooms/poster-9.webp'
 import galleryFenesis from '../assets/optimized/story/gallery-fenesis.webp'
 import galleryCat from '../assets/optimized/story/gallery-cat.webp'
@@ -26,8 +27,8 @@ type Lane = {
 
 // The first visible cards and crops follow Figma's landing gallery.
 const LANES: Lane[] = [
-  { side: 'left', cardHeight: 146, speed: 20, offset: 32, cards: [{ image: galleryTop }, { image: galleryJurassic, crop: 'jurassic' }, { image: galleryLantern, crop: 'lantern' }] },
-  { side: 'mid', cardHeight: 200, speed: 14, offset: 11, cards: [{ image: galleryGirls, height: 201 }, { image: galleryMid }] },
+  { side: 'left', cardHeight: 146, speed: 20, offset: 32, cards: [{ image: galleryIljin }, { image: galleryJurassic, crop: 'jurassic' }, { image: galleryLantern, crop: 'lantern' }] },
+  { side: 'mid', cardHeight: 200, speed: 14, offset: 11, cards: [{ image: galleryGirls, height: 201 }, { image: galleryJoseon, height: 201 }, { image: galleryMid }] },
   { side: 'right', cardHeight: 146, speed: 20, offset: 33, cards: [{ image: galleryLab, crop: 'lab' }, { image: galleryFenesis, crop: 'fenesis' }, { image: galleryCat, crop: 'cat' }] },
 ]
 
