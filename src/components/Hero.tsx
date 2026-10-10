@@ -1,7 +1,7 @@
 import { useRef, type MouseEvent } from 'react'
 import { useHeroExitFallback } from '../hooks/useHeroExitFallback.ts'
-import logo from '../assets/hero/logo.webp'
-import studyRoomPreview from '../assets/hero/study-room-preview.webp'
+import logo from '../assets/optimized/hero/logo.webp'
+import studyRoomPreview from '../assets/optimized/hero/study-room-preview.webp'
 import chevronDown from '../assets/hero/chevron-down.svg'
 
 export default function Hero() {
@@ -30,7 +30,7 @@ export default function Hero() {
           </h1>
 
           <figure className="hero__preview">
-            <img src={studyRoomPreview} alt="노트북 화면에서 AI 캐릭터들과 함께하는 캠스터디" width={364} height={225} />
+            <img src={studyRoomPreview} alt="노트북 화면에서 AI 캐릭터들과 함께하는 캠스터디" width={364} height={225} fetchPriority="high" decoding="async" />
             <figcaption>실제 스터디룸 화면 · 노트북 웹캠으로 함께 공부해요</figcaption>
           </figure>
 

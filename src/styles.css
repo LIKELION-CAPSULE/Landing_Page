@@ -18,17 +18,22 @@
 *::after { box-sizing: border-box; }
 
 html {
+  background-color: var(--bg);
   -webkit-text-size-adjust: 100%;
   /* Keep the scrollbar's space when a sheet locks scrolling, so the page
      doesn't jump sideways as it opens. */
   scrollbar-gutter: stable;
 }
 
+html.has-step-background {
+  background-image: var(--step-background);
+  background-repeat: no-repeat;
+}
+
 body {
   margin: 0;
-  background: var(--bg);
   color: #fff;
-  font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  font-family: "Capsule UI", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -webkit-tap-highlight-color: transparent;
   overflow-x: hidden;
@@ -177,7 +182,6 @@ main { overflow-x: clip; }
 .story {
   position: relative;
   z-index: 1;
-  background: var(--bg);
 }
 .story > * {
   width: calc(402 * var(--u));
@@ -343,9 +347,7 @@ main { overflow-x: clip; }
   display: flex;
   flex-direction: column;
   gap: var(--card-inset);
-  padding: var(--card-inset);
-  border-radius: calc(25 * var(--u));
-  background: #000;
+  padding: var(--card-inset) var(--card-inset) calc(40 * var(--u));
 }
 .step__text {
   display: flex;
@@ -647,19 +649,17 @@ main[tabindex="-1"]:focus { outline: none; }
 .vote__lead { font-size: max(0.875rem, calc(18 * var(--u))); font-weight: 500; line-height: 1.5; }
 .vote__condition { font-size: 0.8125rem; line-height: 1.5; color: var(--text-muted); }
 .vote__instructions { font-size: 0.875rem; line-height: 1.5; color: var(--text-muted); }
-.vote__selection {
-  display: flex;
-  align-items: flex-start;
-  gap: 6px;
+.vote__count {
+  width: fit-content;
+  max-width: 100%;
   padding: calc(8 * var(--u)) calc(12 * var(--u));
+  border: 1px solid var(--text-muted);
   border-radius: calc(8 * var(--u));
-  background: rgba(130, 130, 130, 0.2);
-  font-size: 0.875rem;
+  font-size: max(0.875rem, calc(17 * var(--u)));
   font-weight: 500;
   line-height: 1.5;
-  overflow-wrap: anywhere;
+  color: var(--text-muted);
 }
-.vote__selection svg { flex: none; margin-top: 2px; color: #d8c5ff; }
 
 .vote__grid {
   width: calc(366 * var(--u));
@@ -709,16 +709,6 @@ main[tabindex="-1"]:focus { outline: none; }
 .vote__card:focus-visible { outline-color: #fff; }
 @media (hover: hover) and (pointer: fine) {
   .vote__card:hover { filter: brightness(1.08); }
-}
-
-.vote__tags {
-  position: absolute;
-  left: 0;
-  top: calc(100% + 5 * var(--u));
-  font-size: calc(15 * var(--u));
-  font-weight: 700;
-  line-height: normal;
-  white-space: nowrap;
 }
 
 .vote__hint {
@@ -846,7 +836,7 @@ html:has(.room-sheet[open], .terms-sheet[open]) { overflow: hidden; }
   border: 0;
   border-radius: calc(10 * var(--u));
   background: var(--accent);
-  color: var(--bg);
+  color: #fff;
   font: inherit;
   font-size: max(1rem, calc(17 * var(--u)));
   font-weight: 600;
@@ -854,7 +844,6 @@ html:has(.room-sheet[open], .terms-sheet[open]) { overflow: hidden; }
   transition: transform 160ms var(--ease-out), filter 160ms ease;
 }
 .room-sheet__vote-arrow {
-  filter: brightness(0);
   flex: none;
   width: calc(24 * var(--u)); height: calc(24 * var(--u));
   rotate: 180deg;
@@ -875,14 +864,13 @@ html:has(.room-sheet[open], .terms-sheet[open]) { overflow: hidden; }
   left: auto; top: auto;
   margin-inline: auto;
   border: 0;
-  color: var(--bg);
+  color: #fff;
   font-size: max(1rem, calc(20 * var(--u)));
   font-family: inherit;
   cursor: pointer;
   transition: transform 160ms var(--ease-out), filter 160ms ease, background-color 240ms ease, color 240ms ease;
 }
 .form-submit__arrow {
-  filter: brightness(0);
   rotate: 180deg;
   transition: opacity 240ms ease;
 }
@@ -1106,10 +1094,6 @@ html:has(.room-sheet[open], .terms-sheet[open]) { overflow: hidden; }
   line-height: 1.5;
   text-align: center;
 }
-.preorder__survey-summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 0.8125rem; line-height: 1.5; }
-.preorder__survey-summary p { min-width: 0; }
-.preorder__survey-summary span { display: block; color: var(--text-muted); }
-.preorder__survey-summary .text-action { flex: none; min-width: 44px; }
 .preorder__preview-note { padding: var(--card-inset); border-radius: 8px; background: rgba(216, 197, 255, 0.08); color: var(--text-muted); font-size: 0.8125rem; line-height: 1.6; }
 .preorder__fields { border: 0; padding: 0; margin: 0; min-width: 0; }
 
@@ -1120,7 +1104,6 @@ html:has(.room-sheet[open], .terms-sheet[open]) { overflow: hidden; }
   width: calc(350 * var(--u));
   margin-inline: auto;
 }
-.field + .field { margin-top: calc(17 * var(--u)); }
 .field__label {
   display: block;
   font-size: max(1rem, calc(20 * var(--u)));
@@ -1154,52 +1137,10 @@ html:has(.room-sheet[open], .terms-sheet[open]) { overflow: hidden; }
   appearance: none;
   transition: border-color 160ms ease;
 }
-.field__control::placeholder,
-.field__control[data-empty] { color: rgba(255, 255, 255, 0.65); }
-.field__control option { color: #fff; background: var(--bg); }
+.field__control::placeholder { color: rgba(255, 255, 255, 0.65); }
 .field__control:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 .field__control[aria-invalid="true"] { border-color: var(--error); }
 .field__control[aria-invalid="true"]:focus-visible { outline-color: var(--error); }
-
-.field__select {
-  position: relative;
-  display: block;
-  margin-top: calc(9 * var(--u));
-}
-.field__select .field__control { margin-top: 0; padding-right: calc(40 * var(--u)); cursor: pointer; }
-.field__select-arrow {
-  position: absolute;
-  right: calc(14 * var(--u)); top: 50%;
-  width: calc(21 * var(--u)); height: calc(21 * var(--u));
-  rotate: -90deg;
-  translate: 0 -50%;
-  pointer-events: none;
-}
-
-.habits {
-  width: calc(350 * var(--u));
-  margin: calc(17 * var(--u)) auto 0;
-}
-.habits__head {
-  display: flex;
-  align-items: baseline;
-  gap: calc(7 * var(--u));
-  flex-wrap: wrap;
-}
-.habits__head .field__label { padding-left: 0; }
-.habits__note {
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: var(--text-muted);
-  line-height: 1.5;
-}
-.habits__list {
-  display: grid;
-  gap: 4px;
-  margin-top: calc(11 * var(--u));
-  font-size: max(0.875rem, calc(16 * var(--u)));
-}
-.habits__other { width: 100%; margin-top: 12px; }
 
 /* Checkbox row: Figma box icon + native input underneath */
 .check {

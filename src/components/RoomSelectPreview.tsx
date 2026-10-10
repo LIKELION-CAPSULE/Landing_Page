@@ -1,11 +1,11 @@
-import smile from '../assets/hero/poster-1.webp'
-import top from '../assets/story/room-select/top.webp'
-import lantern from '../assets/hero/poster-2.webp'
-import baekdojun from '../assets/hero/poster-6.webp'
-import fenesis from '../assets/hero/poster-4.webp'
-import jurassic from '../assets/story/gallery-jurassic.webp'
-import cat from '../assets/story/gallery-cat.webp'
-import lab from '../assets/rooms/poster-9.webp'
+import smile from '../assets/optimized/hero/poster-1.webp'
+import top from '../assets/optimized/hero/poster-3.webp'
+import lantern from '../assets/optimized/hero/poster-2.webp'
+import baekdojun from '../assets/optimized/hero/poster-6.webp'
+import fantasy from '../assets/optimized/story/room-select/fantasy.webp'
+import jurassic from '../assets/optimized/story/gallery-jurassic.webp'
+import cat from '../assets/optimized/story/gallery-cat.webp'
+import lab from '../assets/optimized/rooms/poster-9.webp'
 import capsule from '../assets/story/room-select/capsule.svg'
 import search from '../assets/story/room-select/search.svg'
 import check from '../assets/story/room-select/check.svg'
@@ -13,18 +13,18 @@ import camera from '../assets/story/room-select/camera.svg'
 import './RoomSelectPreview.css'
 
 const POSTERS = [
-  { image: smile, tags: '', selected: true },
-  { image: top, tags: '#라이벌 #시험기간' },
-  { image: lantern, tags: '#군대 #연등' },
-  { image: baekdojun, tags: '#여성향 #로맨스' },
-  { image: fenesis, tags: '#판타지 #마법학교' },
-  { image: jurassic, tags: '#공룡 #귀여움' },
-  { image: cat, tags: '#고양이 #힐링' },
-  { image: lab, tags: '#실험실 #귀여움' },
+  { image: smile, selected: true },
+  { image: lantern },
+  { image: baekdojun },
+  { image: jurassic },
+  { image: cat },
+  { image: lab },
+  { image: fantasy },
+  { image: top },
 ]
 
-// Figma 1:177. The parent demonstration owns the interaction and clock.
-export default function RoomSelectPreview({ selected = true }: { selected?: boolean }) {
+// Figma 23:2206. The parent demonstration owns the interaction and clock.
+export default function RoomSelectPreview({ selected = true, loadImages = true }: { selected?: boolean; loadImages?: boolean }) {
   return (
     <div className="room-preview" aria-hidden="true">
       <div className="room-preview__topbar">
@@ -48,7 +48,7 @@ export default function RoomSelectPreview({ selected = true }: { selected?: bool
         <div className="room-preview__grid">
           {POSTERS.map((poster) => (
             <div className={`room-preview__poster${poster.selected && selected ? ' room-preview__poster--selected' : ''}`} key={poster.image}>
-              <img src={poster.image} alt="" />
+              {loadImages && <img src={poster.image} alt="" decoding="async" />}
               <span className="room-preview__shade"></span>
               {poster.selected && selected ? (
                 <>
@@ -61,7 +61,7 @@ export default function RoomSelectPreview({ selected = true }: { selected?: bool
                     스터디룸 입장하기
                   </span>
                 </>
-              ) : <span className="room-preview__tags">{poster.tags}</span>}
+              ) : null}
             </div>
           ))}
         </div>
