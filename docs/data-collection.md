@@ -18,7 +18,7 @@
 ## 설정 (한 번)
 
 1. **Supabase** — CAPSULE 전용 프로젝트를 새로 만든다 (다른 제품 DB 와 섞지 않는다).
-   SQL Editor 에 `supabase/migrations/` 의 파일을 **날짜순으로** 붙여 넣어 실행한다 (`2026-10-10_landing_data.sql` → `2026-10-11_habit_other.sql` → `2026-10-11_insight_views.sql` → `2026-10-11_preorder_trim_and_vote_total.sql` → `2026-10-12_joseon_room.sql` → `2026-10-13_post_reservation_survey.sql`). 이미 main과 연결된 DB에는 새 포스터(12번)와 예약 이후 설문(13번) 파일을 추가 적용한다. 12번까지 적용했다면 13번만 실행한다. 이전 스키마를 만드는 파일들을 처음부터 재실행하지 않는다.
+   SQL Editor 에 `supabase/migrations/` 의 파일을 다음 순서로 붙여 넣어 실행한다 (`2026-10-10_landing_data.sql` → `2026-10-11_habit_other.sql` → `2026-10-11_insight_views.sql` → `2026-10-11_preorder_trim_and_vote_total.sql` → `2026-10-12_attribution.sql` → `2026-10-12_joseon_room.sql` → `2026-10-13_post_reservation_survey.sql`). 기존 DB에는 아직 적용하지 않은 파일만 추가 실행한다. 10월 12일 파일은 유입 정보(`attribution`)와 새 포스터(`joseon_room`) 두 개이며 별도로 적용해야 한다. 두 파일까지 적용했다면 예약 이후 설문(`2026-10-13_post_reservation_survey.sql`)만 실행한다. 이전 스키마를 만드는 파일들을 처음부터 재실행하지 않는다.
    프로젝트 설정 → API 에서 URL 과 **anon(public)** 키를 복사한다. `service_role` 키는 어디에도 넣지 않는다.
 2. **Mixpanel** — 프로젝트를 만들고 Settings → Project Settings 의 Project Token 을 복사한다. 언어는 우측 상단 프로필 → 한국어. EU 리전으로 만들었으면 `VITE_MIXPANEL_API_HOST=https://api-eu.mixpanel.com`.
 3. **Vercel** → 프로젝트 Settings → Environment Variables 에 `.env.example` 의 값 3개(`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_MIXPANEL_TOKEN`)를 Production·Preview 둘 다에 넣고 **Redeploy**. 빌드 설정은 Vite 기본(`npm run build`, 출력 `dist`)이면 된다. `/rooms` 같은 주소를 새로고침해도 열리도록 `vercel.json` 에 SPA 리라이트를 넣어 뒀다. 로컬은 `.env.local` 에 넣는다 (git 무시됨).
@@ -74,6 +74,7 @@
 | 랜딩에서 투표 페이지로 넘어가는 비율 | CTA CTR | Mixpanel Insights (수식) |
 | 방문 → 투표 → 사전예약, 어느 단계에서 빠지나 | 단계별 전환·이탈률 | Mixpanel Funnels |
 | 유입 경로별로 전환율이 다른가 (인스타 vs 직접 방문) | 퍼널을 `utm_source` 로 Breakdown | Mixpanel Funnels |
+| **어디서 온 사람이 이메일을 남겼나** | 유입별 투표자·예약자·예약률 | DB `landing_source_summary` |
 | 어느 룸이 인기인가 | 룸별 유효표·비율 | DB `landing_vote_summary` |
 | 어느 룸이 "관심"을 넘어 "이메일"까지 끌어내나 | 룸별 투표 대비 사전예약률 | DB `landing_room_funnel_summary` |
 | 어떤 캐릭터(관계·성격·세계관)를 원하나 | 선택지별 비율 | DB `landing_survey_summary` |
@@ -129,6 +130,7 @@ Mixpanel 은 사람 수를 브라우저 기준(`distinct_id`)으로 세므로 �
 | `landing_vote_summary` | 룸별 유효표(`votes`), 비율(`share_pct`), 재투표 포함 전체(`raw_votes`) |
 | `landing_preorder_summary` | 총계, 마케팅 동의 수, 투표 포함 수, 처음·마지막 등록 시각 |
 | `landing_funnel_summary` | 투표자 수, 전체 표 수, 사전예약 수 한 줄 |
+| `landing_source_summary` | 유입 경로(utm_source → referrer → 직접/메신저)별 투표자·예약자·예약률. 투표·예약 행에 첫 진입 때의 utm·referrer 가 같이 저장된다 |
 | `landing_room_funnel_summary` | 룸별 유효표 → 그 룸으로 사전예약한 수, 전환율 |
 | `landing_survey_summary` | 관계·성격·세계관 선택지별 방문자 수·비율. 분모는 선택 응답이 있는 방문자 수이며, 방문자별 최신 응답만 반영 |
 | `landing_free_text` | 방문자별 최신 자유 서술 원문 (캐릭터 희망) |

@@ -59,12 +59,15 @@ type SurveyInput = {
 `POST {VITE_SUPABASE_URL}/rest/v1/{table}`
 헤더 `apikey`, `Content-Type: application/json`, `Prefer: return=minimal`. 기존 anon JWT에는 `Authorization: Bearer <anon>`도 사용하고, publishable key는 `apikey`에만 보낸다. [Supabase API keys](https://supabase.com/docs/guides/getting-started/api-keys#known-limitations)
 
+투표·사전예약에는 첫 진입 때의 유입 정보도 자동으로 포함된다. DB에 [`2026-10-12_attribution.sql`](../supabase/migrations/2026-10-12_attribution.sql)이 적용되어 있어야 한다. 같은 날짜의 `2026-10-12_joseon_room.sql`과는 별도 파일이다.
+
 ### `landing_vote`
 
 | 필드 | 타입 | 필수 | 제약 |
 | --- | --- | --- | --- |
 | `room_id` | string | O | `smile` `lantern` `top` `fenesis` `cat` `iljin` `jurassic` `lab` `joseon` 중 하나. DB는 과거 데이터용 `baekdojun`도 허용한다. 새 포스터 사용 전 `2026-10-12_joseon_room.sql` 적용 필요. ⚠️ `rooms.ts` 에 룸을 추가하면 DB CHECK 도 같이 고쳐야 한다 |
 | `visitor_id` | string | O | 8~64자 |
+| `utm_source`, `utm_medium`, `utm_campaign`, `referrer`, `landing_path` | string \| null | | 첫 진입 때 자동으로 채움 (`captureAttribution`). 프론트가 넘길 필요 없음 |
 
 ### `landing_preorder`
 
@@ -77,6 +80,7 @@ type SurveyInput = {
 | `marketing_consent` | boolean | | 기본 `false` |
 | `voted_room_id` | string \| null | | 40자 이하. 기존 필드명을 유지하며 **예약 시 선택한 룸**을 보낸다. 처음 투표한 `landing_vote.room_id`와 다를 수 있다 |
 | `visitor_id` | string | O | 8~64자 |
+| `utm_source`, `utm_medium`, `utm_campaign`, `referrer`, `landing_path` | string \| null | | 첫 진입 때 자동으로 채움. 프론트가 넘길 필요 없음 |
 
 ### `landing_survey` (예약 이후 응답)
 
@@ -137,6 +141,7 @@ type SurveyInput = {
 | `landing_vote_summary` | `room_id`, `votes`(방문자당 마지막 표), `share_pct`, `raw_votes` |
 | `landing_preorder_summary` | `preorders`, `marketing_opt_in`, `with_vote`, `visitors`, `first_at`, `last_at` |
 | `landing_funnel_summary` | `voters`, `raw_votes`, `preorders` |
+| `landing_source_summary` | `source`(utm_source → referrer → 직접/메신저), `voters`, `preorders`, `preorder_rate_pct` |
 | `landing_survey_latest` | 익명 방문자별 최신 응답. 기존 예약에 포함된 과거 설문도 합침 |
 | `landing_survey_summary` | `group_id`, `label`, `picks`, `share_pct` (선택 응답을 한 방문자 수가 분모) |
 | `landing_free_text` | `created_at`, `text`, `voted_room_id` (방문자별 최신 자유 입력) |
