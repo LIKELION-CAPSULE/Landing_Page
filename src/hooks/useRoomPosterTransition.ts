@@ -37,6 +37,9 @@ export function useRoomPosterTransition() {
     const sheet = ref.current
     if (!sheet || sheet.open) return
     sourceRef.current = source
+    // Safari pointer activation doesn't focus buttons. Restore focus to the
+    // poster on close, and focus the card on open instead of the close control.
+    source.focus({ preventScroll: true })
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     if (reduced || !sheet.animate) {
       showModal()
@@ -118,9 +121,11 @@ export function useRoomPosterTransition() {
     })
     // Keep the retracting footer attached to the moving poster on exit.
     const footer = sheet.querySelector<HTMLElement>('.room-sheet__content')
+    // The footer overlaps the poster by 1px to cover its rasterized edge.
+    const footerOffset = footer ? footer.getBoundingClientRect().top - base.top : base.height
     const attached = footer?.animate([
-      { transformOrigin: `0px ${-base.height}px`, transform: transformBetween(current, base) },
-      { transformOrigin: `0px ${-base.height}px`, transform: transformBetween(to, base) },
+      { transformOrigin: `0px ${-footerOffset}px`, transform: transformBetween(current, base) },
+      { transformOrigin: `0px ${-footerOffset}px`, transform: transformBetween(to, base) },
     ], {
       duration: 200, easing: getComputedStyle(sheet).getPropertyValue('--ease-in-out').trim(), fill: 'both',
     })
@@ -134,18 +139,19 @@ export function useRoomPosterTransition() {
     }).catch(() => {})
   }, [ref, fadeClose, cancelFlight])
 
+  const settle = useCallback(() => {
+    if (!flightRef.current) return
+    const sheet = ref.current
+    const closing = sheet?.dataset.posterTransition === 'closing'
+    cancelFlight()
+    if (!sheet) return
+    if (closing) sheet.close()
+    delete sheet.dataset.posterTransition
+    delete sheet.dataset.closing
+  }, [ref, cancelFlight])
+
   // A resize invalidates the measured rectangles; settle at the live layout.
   useEffect(() => {
-    const settle = () => {
-      if (!flightRef.current) return
-      const sheet = ref.current
-      const closing = sheet?.dataset.posterTransition === 'closing'
-      cancelFlight()
-      if (!sheet) return
-      if (closing) sheet.close()
-      delete sheet.dataset.posterTransition
-      delete sheet.dataset.closing
-    }
     window.addEventListener('resize', settle)
     const preference = window.matchMedia('(prefers-reduced-motion: reduce)')
     const onMotion = () => { if (preference.matches) settle() }
@@ -154,7 +160,7 @@ export function useRoomPosterTransition() {
       window.removeEventListener('resize', settle)
       preference.removeEventListener('change', onMotion)
     }
-  }, [ref, cancelFlight])
+  }, [settle])
 
-  return { ref, open, close }
+  return { ref, open, close, settle }
 }

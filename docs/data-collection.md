@@ -1,0 +1,179 @@
+# 수요 검증 데이터 수집 — 연동 안내
+
+랜딩 페이지에서 일어나는 행동(Mixpanel)과 투표·사전예약·설문 원본(Supabase)을 어디에 어떻게 남기는지 정리한다.
+현재 UI는 저장 결과에 맞춰 사전예약 완료·중복·실패를 안내한다. 환경변수가 비어 있으면 화면 실행은 가능하지만 예약을 완료했다고 표시하지 않는다.
+
+## 구성
+
+| 역할 | 도구 | 키 | 비고 |
+| --- | --- | --- | --- |
+| 행동 분석 (방문·클릭·전환) | Mixpanel | `VITE_MIXPANEL_TOKEN` (공개 프로젝트 토큰) | 분석용. 사업계획서의 투표 수·이메일 수 원본이 아니다 |
+| 투표·사전예약·설문 원본 저장 | Supabase (Postgres) | `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` | anon 키는 INSERT 만 된다 (RLS) |
+| 관리자 조회·CSV | Supabase 대시보드 | 대시보드 로그인 | 별도 관리자 화면 없음 |
+
+별도 서버는 없다. 브라우저가 Supabase REST 로 직접 INSERT 하고, 검증은 CHECK 제약·UNIQUE·RLS 가 맡는다.
+코드: [`src/lib/analytics.ts`](../src/lib/analytics.ts), [`src/lib/api.ts`](../src/lib/api.ts),
+스키마: [`supabase/migrations/2026-10-10_landing_data.sql`](../supabase/migrations/2026-10-10_landing_data.sql).
+
+## 설정 (한 번)
+
+1. **Supabase** — CAPSULE 전용 프로젝트를 새로 만든다 (다른 제품 DB 와 섞지 않는다).
+   SQL Editor 에 `supabase/migrations/` 의 파일을 **날짜순으로** 붙여 넣어 실행한다 (`2026-10-10_landing_data.sql` → `2026-10-11_habit_other.sql` → `2026-10-11_insight_views.sql` → `2026-10-11_preorder_trim_and_vote_total.sql` → `2026-10-12_joseon_room.sql` → `2026-10-13_post_reservation_survey.sql`). 이미 main과 연결된 DB에는 새 포스터(12번)와 예약 이후 설문(13번) 파일을 추가 적용한다. 12번까지 적용했다면 13번만 실행한다. 이전 스키마를 만드는 파일들을 처음부터 재실행하지 않는다.
+   프로젝트 설정 → API 에서 URL 과 **anon(public)** 키를 복사한다. `service_role` 키는 어디에도 넣지 않는다.
+2. **Mixpanel** — 프로젝트를 만들고 Settings → Project Settings 의 Project Token 을 복사한다. 언어는 우측 상단 프로필 → 한국어. EU 리전으로 만들었으면 `VITE_MIXPANEL_API_HOST=https://api-eu.mixpanel.com`.
+3. **Vercel** → 프로젝트 Settings → Environment Variables 에 `.env.example` 의 값 3개(`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_MIXPANEL_TOKEN`)를 Production·Preview 둘 다에 넣고 **Redeploy**. 빌드 설정은 Vite 기본(`npm run build`, 출력 `dist`)이면 된다. `/rooms` 같은 주소를 새로고침해도 열리도록 `vercel.json` 에 SPA 리라이트를 넣어 뒀다. 로컬은 `.env.local` 에 넣는다 (git 무시됨).
+
+`VITE_` 값은 빌드 결과물에 그대로 들어가므로 공개해도 되는 키만 쓴다.
+
+## Mixpanel 이벤트
+
+| 이벤트 | 언제 | 속성 | 위치 |
+| --- | --- | --- | --- |
+| `$mp_web_page_view` | 경로가 바뀔 때마다 SDK 가 자동 전송 (`track_pageview: 'url-with-path'`) | `current_url_path`, `$current_url` | `src/lib/analytics.ts` |
+| `cta_clicked` | 랜딩의 "다른 스터디룸 구경하고 투표하기", 히어로 "스크롤해서 더 알아보기" 클릭 | `cta`: `open_rooms` \| `scroll_hint`, `path` | `Rooms.tsx`, `Hero.tsx` |
+| `artwork_vote_submitted` | "이 스터디룸 투표하기" 클릭 후 **DB 저장이 성공했을 때만** | `room_id` | `App.tsx` |
+| `presign_cta_clicked` | 투표 저장 성공 후 `/preorder` 진입 | `source`: `vote` | `App.tsx` |
+| `survey_cta_clicked` | 완료 후 "나만의 세계 만들어보기" 클릭 | `room_id` | `App.tsx` |
+| `survey_completed` | 예약 이후 설문 저장 성공 | `room_id` | `App.tsx` |
+| `presign_completed` | 사전예약 "사전예약하기" 후 **DB 저장이 성공했을 때만** | `voted_room_id`, `marketing_consent` | `App.tsx` `submitPreorder` |
+| `presign_duplicate` | 이미 등록된 이메일로 제출 (DB UNIQUE 위반) | `voted_room_id` | `App.tsx` `submitPreorder` |
+| `landing_api_failed` | INSERT 가 실패 (중복 제외) | `table`, `code` (Postgres 에러 코드) | `src/lib/api.ts` |
+
+- 수동 `landing_view` 는 보내지 않는다. `$mp_web_page_view` 의 `current_url_path = /` 가 랜딩 방문이다. 자동 클릭 수집(autocapture)은 꺼서 CTA 이벤트와 중복되지 않는다.
+- 이메일, 자유 서술, 나이 등 식별 가능한 값은 어떤 이벤트에도 넣지 않는다.
+- `distinct_id` 는 Mixpanel 익명 ID 이고, DB 행의 `visitor_id` 와 같은 값이다. 둘을 이어 볼 수 있다.
+- 페이지뷰의 `current_page_title` 은 직전 페이지 제목이 찍힐 수 있다 (제목은 페이지가 그려진 뒤 바뀐다). 경로는 `current_url_path` 로 보면 된다.
+- 유입 경로·캠페인은 Mixpanel 이 `$referrer`, `utm_*` 를 자동으로 붙인다. 공유 링크에 `?utm_source=instagram&utm_campaign=…` 를 달면 된다.
+
+## 지표 정의 (사업계획서용)
+
+분모와 분자를 섞지 않는다. 이벤트 횟수 ≠ 사람 수다.
+
+| 지표 | 정의 | 출처 |
+| --- | --- | --- |
+| 방문자 수 | `$mp_web_page_view` 의 고유 `distinct_id` 수 | Mixpanel |
+| 페이지뷰 | `$mp_web_page_view` 이벤트 수 | Mixpanel |
+| CTA CTR | `cta_clicked`(cta=open_rooms) 고유 distinct_id ÷ `/` 를 본 고유 distinct_id | Mixpanel |
+| 투표자 수 | `landing_vote` 의 고유 `visitor_id` 수 (`landing_funnel_summary.voters`) | DB |
+| 작품별 투표 수·비율 | 방문자당 **마지막** 표만 센 `landing_vote_summary.votes`, `share_pct` | DB |
+| 투표 전환율 | 투표자 수 ÷ 방문자 수 | DB ÷ Mixpanel |
+| 사전예약 시작 수 | `presign_cta_clicked` 고유 distinct_id | Mixpanel |
+| 사전예약 완료 수 | `landing_preorder` 행 수 (`landing_preorder_summary.preorders`) | DB |
+| 사전예약 전환율 | 사전예약 완료 수 ÷ 방문자 수 | DB ÷ Mixpanel |
+
+- 로그인이 없다. `visitor_id` 는 브라우저 저장소의 익명 ID 라 기기·브라우저를 바꾸면 다른 사람으로 센다. **1인 1표가 보장되지 않는다**고 적는다.
+- 사전예약 이메일은 출시 알림 수요다. 유료 구매 의향이 검증된 수치로 쓰지 않는다.
+
+## 질문 → 어디서 답을 보나
+
+원본(Events 목록, 테이블)은 숫자가 아니다. 아래 질문 단위로 보면 의미가 생긴다. 표본이 쌓인 뒤(최소 수십 명) 읽는다.
+
+| 질문 | 답 | 출처 |
+| --- | --- | --- |
+| 사람이 오긴 하나, 어디서 오나 | 일별 방문자, `utm_source`·`$referring_domain` 별 방문자 | Mixpanel Insights |
+| 랜딩에서 투표 페이지로 넘어가는 비율 | CTA CTR | Mixpanel Insights (수식) |
+| 방문 → 투표 → 사전예약, 어느 단계에서 빠지나 | 단계별 전환·이탈률 | Mixpanel Funnels |
+| 유입 경로별로 전환율이 다른가 (인스타 vs 직접 방문) | 퍼널을 `utm_source` 로 Breakdown | Mixpanel Funnels |
+| 어느 룸이 인기인가 | 룸별 유효표·비율 | DB `landing_vote_summary` |
+| 어느 룸이 "관심"을 넘어 "이메일"까지 끌어내나 | 룸별 투표 대비 사전예약률 | DB `landing_room_funnel_summary` |
+| 어떤 캐릭터(관계·성격·세계관)를 원하나 | 선택지별 비율 | DB `landing_survey_summary` |
+| 자유 서술에서 뭘 원한다고 하나 | 원문 목록 | DB `landing_free_text` |
+| 사람들이 실제로 어떻게 움직이나 (어디서 멈칫하나) | 세션 재생 | Mixpanel Session Replay |
+
+DB 뷰는 SQL Editor 에서 `select * from <뷰 이름>;` 한 줄이다. 결과 창의 Download 로 CSV 가 된다.
+
+## Mixpanel 에서 숫자 보는 법
+
+mixpanel.com 로그인 → 왼쪽 메뉴. 처음 한 번 우측 상단 프로필 → 언어 → 한국어.
+
+| 보고 싶은 것 | 메뉴 | 설정 |
+| --- | --- | --- |
+| 지금 이벤트가 들어오는지 | **Events** (이벤트) | 실시간 목록. 랜딩을 열고 새로고침하면 `$mp_web_page_view` 가 몇 초 안에 떠야 한다 |
+| 방문자 수 | **Insights** → 이벤트 `$mp_web_page_view` | 집계를 **Unique users** 로. `Total` 이면 페이지뷰 |
+| 랜딩 방문자만 | 위와 같음 + 필터 | `current_url_path` = `/` |
+| 유입 경로 | 위와 같음 + Breakdown | `utm_source` 또는 `$referring_domain` |
+| CTA CTR | Insights 에 이벤트 2개: A `$mp_web_page_view`(필터 `/`), B `cta_clicked`(필터 `cta` = `open_rooms`) | 둘 다 Unique users → 상단 **Formula** 에 `B/A` |
+| 방문 → 투표 → 사전예약 전환율 | **Funnels** | 단계: `$mp_web_page_view` → `artwork_vote_submitted` → `presign_completed`. 전환 기간 7일 |
+| 룸별 투표 (대략) | Insights → `artwork_vote_submitted` | Breakdown `room_id`. ⚠️ 정확한 수치는 DB `landing_vote_summary` |
+| 사전예약 시작 vs 완료 | Funnels | `presign_cta_clicked` → `presign_completed` |
+
+### 데이터가 들어오는지 정확히 확인하는 순서
+
+1. 랜딩을 연다 (배포 주소 또는 `npm run dev` 후 localhost:5173). 투표까지 한 번 눌러 본다.
+2. Mixpanel → 왼쪽 **Events** → 상단이 **Live view** 인지 확인. 몇 초 안에 `$mp_web_page_view`, `cta_clicked`, `artwork_vote_submitted` 가 위에서부터 쌓인다. 안 보이면 새로고침.
+3. 이벤트 한 줄을 클릭하면 속성이 펼쳐진다. `room_id`, `current_url_path`, `distinct_id` 가 보이면 정상. 이메일이 어디에도 없어야 한다.
+4. 같은 `distinct_id` 가 Supabase `landing_vote.visitor_id` 에 있는지 대조하면 두 쪽이 연결된 것이다.
+5. 숫자가 Insights 에 반영되는 데는 보통 1~2분 걸린다. Live view 는 즉시다.
+
+### 세션 재생 (Session Replay)
+
+웹에서 된다. `record_sessions_percent: 100` 으로 전부 녹화한다 (무료 플랜 월 1만 건, 출시 전엔 충분).
+- 보는 곳: 왼쪽 **Session Replay** 메뉴, 또는 Events 에서 이벤트 클릭 → **View Replay**.
+- 녹화기(rrweb)는 번들에 없고 사용자가 들어온 뒤 Mixpanel CDN(`cdn.mxpnl.com`)에서 받는다. 랜딩 로딩 속도에 영향 없음.
+- 입력창은 전부 가려진다(기본값 `record_mask_inputs`). 이메일·자유 서술은 재생에 나오지 않는다.
+- 녹화를 끄려면 `analytics.ts` 의 `record_sessions_percent` 를 0 으로.
+
+만든 리포트는 **Boards** 에 저장해 두면 사업계획서 쓸 때 그대로 캡처할 수 있다.
+
+Mixpanel 은 사람 수를 브라우저 기준(`distinct_id`)으로 세므로 같은 사람이 폰과 노트북으로 오면 2명이다. 정확한 투표·사전예약 수는 항상 DB 쪽 숫자를 쓴다.
+
+## DB
+
+| 테이블 / 뷰 | 내용 |
+| --- | --- |
+| `landing_vote` | 투표 원본. `room_id`(rooms.ts 의 id, CHECK), `visitor_id`, `created_at`. 화면에서 예약 룸을 바꿔도 기존 투표를 유지한다 |
+| `landing_preorder` | 사전예약 원본. `email`(소문자, UNIQUE, 형식 CHECK), `privacy_consent`(반드시 true), `marketing_consent`, `voted_room_id`(예약할 룸), `visitor_id`, `created_at`. 처음 투표한 룸과 예약할 룸이 다를 수 있다 |
+| `landing_survey` | 예약 이후 설문. `visitor_id`, `room_id`, `survey_picks`, `survey_wish`, `privacy_consent`, `created_at`. 이메일은 보내지 않음 |
+| `landing_survey_latest` | 브라우저별 최신 설문. 과거 예약에 포함된 설문도 합쳐 보존 |
+| `landing_vote_total()` | 함수. 투표한 고유 방문자 수 정수 하나. **anon 호출 허용** — 투표 페이지 "현재까지 N명" 용 |
+| `landing_vote_summary` | 룸별 유효표(`votes`), 비율(`share_pct`), 재투표 포함 전체(`raw_votes`) |
+| `landing_preorder_summary` | 총계, 마케팅 동의 수, 투표 포함 수, 처음·마지막 등록 시각 |
+| `landing_funnel_summary` | 투표자 수, 전체 표 수, 사전예약 수 한 줄 |
+| `landing_room_funnel_summary` | 룸별 유효표 → 그 룸으로 사전예약한 수, 전환율 |
+| `landing_survey_summary` | 관계·성격·세계관 선택지별 방문자 수·비율. 분모는 선택 응답이 있는 방문자 수이며, 방문자별 최신 응답만 반영 |
+| `landing_free_text` | 방문자별 최신 자유 서술 원문 (캐릭터 희망) |
+
+중복 정책: 같은 이메일은 두 번 저장되지 않는다(UNIQUE). 이미 사전예약한 이메일이라는 별도 안내를 보여주고 `presign_duplicate` 이벤트를 보낸다. 기존 예약의 룸·동의는 바뀌지 않으므로 새 선택에 대한 혜택 안내는 표시하지 않는다.
+화면에서 처음 투표가 저장된 뒤에는 예약 초안의 룸만 바꾸고, 투표 INSERT와 `artwork_vote_submitted`를 다시 보내지 않는다. DB 자체는 기존처럼 추가 투표 INSERT를 허용하며 여러 표가 있으면 마지막 표만 집계한다. 설문 재제출도 원본은 보존하고 집계에는 방문자별 최신 응답만 사용한다. 과거 예약의 `survey_picks`·`survey_wish`는 그대로 남지만 새 예약 요청에서는 보내지 않는다.
+
+예약 완료 → 선택 설문 → 완료 화면으로 돌아오는 흐름이다. 설문 제출은 `landing_survey`에 INSERT하며 기존 예약의 이메일·룸·동의를 수정하지 않는다. 공개 키로 기존 예약을 UPDATE할 필요가 없다. 익명 방문자 ID는 인증 수단이 아니므로 다른 브라우저의 예약을 찾아 수정하는 기능은 제공하지 않는다.
+
+### 관리자 조회
+
+Supabase 대시보드 → Table Editor 에서 `landing_preorder` 를 열면 목록이 보이고 **Export → CSV** 로 내려받을 수 있다. 집계는 SQL Editor 에서:
+
+```sql
+select * from landing_vote_summary;
+select * from landing_preorder_summary;
+select * from landing_funnel_summary;
+-- 사전예약자 목록 (CSV 는 결과 창의 Download)
+select email, marketing_consent, voted_room_id, created_at from landing_preorder order by created_at;
+```
+
+"현재까지 N명이 투표했어요" 의 N 은 `landing_vote_total()` 함수로 받는다 (`RoomsPage.tsx`). 테이블은 여전히 anon 이 못 읽고, 이 함수만 정수 하나를 돌려준다.
+
+### 개인정보
+
+- `landing_preorder.email` 은 개인정보다. 약관대로 사전예약 혜택 지급을 마친 뒤 6개월이 지나면 삭제하고, 출시 취소 시 30일 안에 삭제한다.
+- 대시보드 접근 권한이 곧 개인정보 접근 권한이다. 필요한 사람에게만 준다.
+- 수신 동의 철회 요청이 오면 `marketing_consent` 를 false 로 바꾼다.
+
+## 알려진 한계
+
+- **속도 제한 없음.** anon 키로 INSERT 가 열려 있어 스크립트로 쓰레기 행을 넣을 수 있다. 형식 CHECK 와 UNIQUE 가 거를 뿐이다. 실제로 당하면 INSERT 를 Edge Function 하나로 옮기고 IP 당 제한을 건다.
+- 투표 저장 실패 시 상세 카드에 재시도를 표시하며 성공 안내·예약 화면으로 이동하지 않는다. 예약·설문 저장 실패도 입력을 유지하고 재시도를 제공한다.
+- 환경변수가 없거나 저장이 실패하면 입력을 유지하고 재시도를 안내한다. 완료 화면 정보는 탭의 메모리에만 있어 새로고침하면 사라지지만, 접수한 예약은 DB에 유지된다.
+- 최초 투표·예약 룸의 구분도 현재 탭의 메모리에 있다. 새로고침·다른 탭·API 직접 호출까지 재투표를 막는 DB 제약은 없다. 룸별 예약 수는 변경한 예약 룸 기준이므로 처음 투표한 룸의 표 수와 일치하지 않을 수 있다.
+- 룸을 추가하면 `landing_vote.room_id` CHECK와 집계 뷰를 같이 고쳐야 한다. 조선시대 포스터용 `2026-10-12_joseon_room.sql`을 적용하기 전에는 `joseon` 투표 저장이 거부된다. 기존 데이터는 삭제하지 않는다.
+- `mixpanel-browser`는 async modules 엔트리로 넣었다. 녹화기는 녹화가 시작될 때 별도로 로드한다. 앱 JS는 gzip 약 135KB이며, 더 줄여야 하면 분석 SDK의 동적 import를 검토한다.
+- Mixpanel은 브라우저 저장소(localStorage)에 익명 ID를 둔다. 푸터의 개인정보처리방침은 전문 오버레이를 연다. 문서의 `[대괄호]`로 남은 실제 위탁·이전 정보는 운영 내용에 맞춰 확정해야 한다.
+
+## 검증 기록 (2026-10-10)
+
+아래는 이전 흐름의 연결 검증 기록이다. 예약 이후 설문 흐름의 최신 검증은 [화면 흐름 검토](funnel-review.md)의 첫 절을 참고한다. 운영 DB에는 추가 SQL 적용이 필요하다.
+
+- 마이그레이션을 PGlite(Postgres 17 WASM)에서 실행해 확인: anon INSERT 허용, 잘못된 `room_id`·대문자 이메일·형식 오류·동의 없음은 23514 로 거부, 중복 이메일은 23505, anon SELECT/UPDATE/DELETE 는 0행, anon 의 집계 뷰 조회는 42501, 재투표 시 마지막 표만 집계, 두 번 적용해도 오류 없음.
+- 모의 Supabase/Mixpanel 서버에 붙여 전체 흐름(랜딩 → 투표 → 수요조사 → 사전예약 → 완료)을 돌려 확인: 경로당 `$mp_web_page_view` 1건, 이벤트 순서대로 전송, 이메일은 소문자로 INSERT, `visitor_id` = Mixpanel `distinct_id`, Mixpanel 본문 어디에도 이메일 없음.
+- 환경변수를 비운 상태에서 기존 흐름이 그대로 동작하고 외부 요청이 나가지 않음.
+- **2026-10-11, 최신 main(#22) 위에서 재검증**: 마이그레이션 4개 적용 후 실제 흐름 실행. 투표·사전예약 INSERT 201, 중복 이메일 409, 삭제한 `age` 컬럼은 PGRST204 로 거부, `landing_vote_total()` 이 anon 에게 정수 반환, 투표 페이지에 "현재까지 3명이 투표했어요" 표시 확인. Mixpanel `/track`·`/record` 전송 확인.
+- **실제 Supabase 프로젝트(idviltrngwmvyanxbben)와 Mixpanel 에 붙여 확인**: publishable 키로 curl 11개 항목(INSERT 201, 잘못된 room_id·대문자 이메일·동의 없음 400/23514, 중복 이메일 409/23505, anon SELECT/UPDATE/DELETE 0행, 집계 뷰 401/42501) 통과. 브라우저로 랜딩 → 투표 → 수요조사 → 사전예약 → 완료를 돌려 `landing_vote`·`landing_preorder` INSERT 와 Mixpanel `/track` 전송 확인, 콘솔 오류 없음. 테스트 행(`*@example.com`, visitor `curl-check-*`)은 대시보드에서 지우면 된다.

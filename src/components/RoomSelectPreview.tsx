@@ -1,7 +1,7 @@
 import smile from '../assets/optimized/hero/poster-1.webp'
 import top from '../assets/optimized/hero/poster-3.webp'
 import lantern from '../assets/optimized/hero/poster-2.webp'
-import baekdojun from '../assets/optimized/hero/poster-6.webp'
+import iljin from '../assets/optimized/rooms/poster-8.webp'
 import fantasy from '../assets/optimized/story/room-select/fantasy.webp'
 import jurassic from '../assets/optimized/story/gallery-jurassic.webp'
 import cat from '../assets/optimized/story/gallery-cat.webp'
@@ -15,7 +15,7 @@ import './RoomSelectPreview.css'
 const POSTERS = [
   { image: smile, selected: true },
   { image: lantern },
-  { image: baekdojun },
+  { image: iljin },
   { image: jurassic },
   { image: cat },
   { image: lab },

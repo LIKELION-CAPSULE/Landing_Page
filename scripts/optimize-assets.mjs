@@ -11,7 +11,7 @@ async function sourceFiles(directory) {
     : /\.tsx?$/.test(entry.name) ? [join(directory, entry.name)] : []))).flat()
 }
 
-// Keep the lossless Figma originals; only imports use these delivery copies.
+// Keep source images unchanged; only imports use these delivery copies.
 const images = new Set()
 for (const file of await sourceFiles(join(root, 'src'))) {
   const source = await readFile(file, 'utf8')
@@ -20,7 +20,8 @@ for (const file of await sourceFiles(join(root, 'src'))) {
 let originalBytes = 0
 let deliveryBytes = 0
 for (const image of [...images].sort()) {
-  const original = join(root, 'src/assets', image)
+  // The newly supplied poster is kept in its original JPEG format.
+  const original = join(root, 'src/assets', image === 'rooms/joseon.webp' ? 'rooms/joseon.jpeg' : image)
   const delivery = join(root, 'src/assets/optimized', image)
   await mkdir(dirname(delivery), { recursive: true })
   const options = ['-quiet', '-m', '6', '-sharp_yuv', '-alpha_q', '100', '-metadata', 'icc', '-exact']
