@@ -1,6 +1,6 @@
 import type { Box3, Mesh, MeshBasicMaterial, Object3D, Texture } from 'three'
 
-export const MACBOOK_MODEL_URL = '/models/macbook_web_ready.glb'
+export const MACBOOK_MODEL_URL = '/models/macbook_web_optimized.glb'
 export const MACBOOK_PREVIEW_URL = '/images/website-preview.webp'
 export const MACBOOK_OPEN_ROTATION = -Math.PI / 2
 export const MACBOOK_FRONT_VIEW = {
