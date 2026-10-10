@@ -534,7 +534,19 @@ main { overflow-x: clip; }
   background: #fff;
   rotate: 90deg;
 }
-.footer a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.footer__links button {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.footer__links .footer__privacy { font-weight: 700; }
+.footer a:focus-visible, .footer button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 /* ---------- 3. Room vote (Figma 273:356) ---------- */
 
@@ -680,6 +692,7 @@ main[tabindex="-1"]:focus { outline: none; }
   display: block;
   padding: 0;
   border: 0;
+  border-radius: calc(9 * var(--u));
   background: none;
   font: inherit;
   color: inherit;
@@ -724,7 +737,7 @@ main[tabindex="-1"]:focus { outline: none; }
 
 /* ---------- 4. Room detail (Figma 161:756) ---------- */
 
-html:has(.room-sheet[open], .terms-sheet[open]) { overflow: hidden; }
+html:has(.room-sheet[open], .terms-sheet[open], .legal-dialog[open]) { overflow: hidden; }
 
 .room-sheet {
   width: calc(320 * var(--u));
@@ -767,6 +780,7 @@ html:has(.room-sheet[open], .terms-sheet[open]) { overflow: hidden; }
   display: flex;
   flex-direction: column;
   line-height: normal;
+  outline: none;
 }
 .room-sheet__content { display: flex; flex-direction: column; gap: var(--card-inset); padding: calc(20 * var(--u)); border-radius: 0 0 calc(10 * var(--u)) calc(10 * var(--u)); background: #444; clip-path: inset(0); transition: clip-path 200ms var(--ease-out); }
 /* Reveal down from the poster edge. Moving/fading the entire footer leaves
@@ -1094,7 +1108,6 @@ html:has(.room-sheet[open], .terms-sheet[open]) { overflow: hidden; }
   line-height: 1.5;
   text-align: center;
 }
-.preorder__preview-note { padding: var(--card-inset); border-radius: 8px; background: rgba(216, 197, 255, 0.08); color: var(--text-muted); font-size: 0.8125rem; line-height: 1.6; }
 .preorder__fields { border: 0; padding: 0; margin: 0; min-width: 0; }
 
 .preorder__form { margin-top: calc(17 * var(--u)); }
@@ -1231,6 +1244,19 @@ html:has(.room-sheet[open], .terms-sheet[open]) { overflow: hidden; }
   line-height: 1.6;
   text-wrap: pretty;
 }
+
+.preorder__policy {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-position: from-font;
+  cursor: pointer;
+}
+.preorder__policy:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 .preorder .form-submit { margin-top: calc(11 * var(--u)); }
 

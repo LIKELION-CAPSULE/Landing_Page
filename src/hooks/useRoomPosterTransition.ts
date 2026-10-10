@@ -37,6 +37,9 @@ export function useRoomPosterTransition() {
     const sheet = ref.current
     if (!sheet || sheet.open) return
     sourceRef.current = source
+    // Safari pointer activation doesn't focus buttons. Restore focus to the
+    // poster on close, and focus the card on open instead of the close control.
+    source.focus({ preventScroll: true })
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     if (reduced || !sheet.animate) {
       showModal()

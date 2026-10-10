@@ -2,8 +2,10 @@ import { useEffect, useRef, useState, type Dispatch, type FormEvent, type SetSta
 import { flushSync } from 'react-dom'
 import Checkbox from '../components/Checkbox.tsx'
 import TermsSheet from '../components/TermsSheet.tsx'
+import LegalDocumentDialog from '../components/LegalDocumentDialog.tsx'
 import FunnelHeader from '../components/FunnelHeader.tsx'
 import { useAnimatedDialog } from '../hooks/useAnimatedDialog.ts'
+import { useLegalDocument } from '../hooks/useLegalDocument.ts'
 import { CONSENTS, type Consent, type PreorderDraft } from '../data/preorder.ts'
 import type { Room } from '../data/rooms.ts'
 import arrow from '../assets/story/cta-arrow.svg'
@@ -20,21 +22,22 @@ type Props = {
   votedRoom: Room | null
   draft: PreorderDraft
   onDraftChange: Dispatch<SetStateAction<PreorderDraft>>
-  onReview: (draft: PreorderDraft) => Promise<void>
+  onSubmitDraft: (draft: PreorderDraft) => Promise<void>
   onChangeRoom: () => void
   onBack: () => void
 }
 
-export default function PreorderPage({ votedRoom, draft, onDraftChange, onReview, onChangeRoom, onBack }: Props) {
+export default function PreorderPage({ votedRoom, draft, onDraftChange, onSubmitDraft, onChangeRoom, onBack }: Props) {
+  const { ref: legalRef, document: legalDocument, showDocument, close: closeLegal } = useLegalDocument()
   const [emailTouched, setEmailTouched] = useState(false)
   const [showPrivacyError, setShowPrivacyError] = useState(false)
   const [showRoomError, setShowRoomError] = useState(false)
-  const [checking, setChecking] = useState(false)
-  const [reviewError, setReviewError] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState('')
   const emailRef = useRef<HTMLInputElement>(null)
   const privacyRef = useRef<HTMLInputElement>(null)
   const changeRoomRef = useRef<HTMLButtonElement>(null)
-  const checkingRef = useRef(false)
+  const submittingRef = useRef(false)
   const mountedRef = useRef(true)
   const { email, consents } = draft
 
@@ -81,34 +84,34 @@ export default function PreorderPage({ votedRoom, draft, onDraftChange, onReview
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    if (checkingRef.current) return
+    if (submittingRef.current) return
     flushSync(() => {
       setEmailTouched(true)
       setShowPrivacyError(true)
       setShowRoomError(true)
-      setReviewError('')
+      setSubmitError('')
     })
 
     if (!votedRoom) { changeRoomRef.current?.focus(); return }
     if (emailError(email)) { emailRef.current?.focus(); return }
     if (!consents.privacy) { privacyRef.current?.focus(); return }
 
-    checkingRef.current = true
-    setChecking(true)
+    submittingRef.current = true
+    setSubmitting(true)
     try {
-      await onReview({ ...draft, email: email.trim() })
+      await onSubmitDraft({ ...draft, email: email.trim() })
     } catch {
-      if (mountedRef.current) setReviewError('입력 내용을 확인하지 못했어요. 내용은 유지되니 다시 확인해주세요.')
+      if (mountedRef.current) setSubmitError('사전예약을 접수하지 못했어요. 입력 내용은 유지되니 다시 시도해주세요.')
     } finally {
-      checkingRef.current = false
-      if (mountedRef.current) setChecking(false)
+      submittingRef.current = false
+      if (mountedRef.current) setSubmitting(false)
     }
   }
 
   return (
     <main className="preorder">
       {/* 6. Pre-registration (Figma 161:514) */}
-      <FunnelHeader current={3} onBack={onBack} disabled={checking} />
+      <FunnelHeader current={3} onBack={onBack} disabled={submitting} />
 
       <header className="preorder__header">
         <div className="preorder__intro">
@@ -122,7 +125,7 @@ export default function PreorderPage({ votedRoom, draft, onDraftChange, onReview
         <div className="preorder__room-card" data-empty={!votedRoom || undefined}>
           <div className="preorder__room-head">
             <p className="preorder__room-label">선택한 룸</p>
-            <button type="button" className="text-action preorder__room-change" id="preorder-change-room" ref={changeRoomRef} disabled={checking} aria-describedby={roomMessage ? 'room-error' : undefined} onClick={onChangeRoom}>
+            <button type="button" className="text-action preorder__room-change" id="preorder-change-room" ref={changeRoomRef} disabled={submitting} aria-describedby={roomMessage ? 'room-error' : undefined} onClick={onChangeRoom}>
               {votedRoom ? '룸 변경' : '룸 선택'}
             </button>
           </div>
@@ -135,11 +138,10 @@ export default function PreorderPage({ votedRoom, draft, onDraftChange, onReview
           <p className="perk__note">사전예약 후, 해당 룸 출시 시 무료 해금</p>
         </div>
         <p className="field__error" id="room-error">{roomMessage}</p>
-        <p className="preorder__preview-note">지금은 입력 내용만 확인할 수 있어요.<br />예약 정보는 전송되지 않아요.</p>
       </header>
 
-      <form className="preorder__form" onSubmit={handleSubmit} noValidate aria-busy={checking}>
-        <fieldset className="preorder__fields" disabled={checking}>
+      <form className="preorder__form" onSubmit={handleSubmit} noValidate aria-busy={submitting}>
+        <fieldset className="preorder__fields" disabled={submitting}>
           <label className="field">
             <span className="field__label">이메일 <span className="field__requirement">필수</span></span>
             <input
@@ -186,15 +188,16 @@ export default function PreorderPage({ votedRoom, draft, onDraftChange, onReview
           <p className="preorder__fine">
             이메일은 출시 알림과 사전예약 혜택 지급에 사용해요.
             이벤트·혜택 정보는 선택 동의한 경우에만 보내요.
-            서비스 출시 후 6개월 뒤 파기해요.
+            혜택 지급 후 6개월이 지나면 파기해요. 자세한 내용은{' '}
+            <button type="button" className="preorder__policy" aria-haspopup="dialog" onClick={(event) => showDocument('privacy', event.currentTarget)}>개인정보처리방침</button>을 확인해 주세요.
           </p>
 
-          <button type="submit" className="cta form-submit" id="preorder-review" disabled={checking}>
-            <span>{checking ? '입력 확인 중…' : reviewError ? '다시 확인하기' : '입력 내용 확인하기'}</span>
+          <button type="submit" className="cta form-submit" id="preorder-submit" disabled={submitting}>
+            <span>{submitting ? '사전예약 접수 중…' : submitError ? '다시 시도하기' : '사전예약하기'}</span>
             <img className="cta__arrow form-submit__arrow" src={arrow} alt="" width={24} height={24} />
           </button>
         </fieldset>
-        <p className="form-feedback" role="status">{reviewError}</p>
+        <p className="form-feedback" role="status">{submitError}</p>
       </form>
 
       <TermsSheet
@@ -204,6 +207,7 @@ export default function PreorderPage({ votedRoom, draft, onDraftChange, onReview
         onAgree={agreeToTerms}
         onClose={closeTerms}
       />
+      <LegalDocumentDialog ref={legalRef} document={legalDocument} onClose={closeLegal} />
     </main>
   )
 }

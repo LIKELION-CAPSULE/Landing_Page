@@ -20,12 +20,16 @@ export default function RoomsPage({ votedRoomId, isEditing, onVote, onBack }: Pr
   const [activeId, setActiveId] = useState<string | null>(null)
   const { ref: sheetRef, open: showRoom, close: closeRoom } = useRoomPosterTransition()
 
-  // 투표한 사람 수. 백엔드가 없거나 실패하면 null 이라 디자인 자리표시자(N)를 그대로 둔다.
-  // 처음엔 직전에 받아 둔 값으로 시작해, 돌아올 때 N 으로 깜빡이지 않는다.
+  // Retain the verified previous count while the next request is loading.
   const [voteTotal, setVoteTotal] = useState<number | null>(lastKnownVoteTotal)
+  const [loadingVoteTotal, setLoadingVoteTotal] = useState(true)
   useEffect(() => {
     let cancelled = false
-    fetchVoteTotal().then((total) => { if (!cancelled && total !== null) setVoteTotal(total) })
+    fetchVoteTotal().then((total) => {
+      if (cancelled) return
+      if (total !== null) setVoteTotal(total)
+      setLoadingVoteTotal(false)
+    })
     return () => { cancelled = true }
   }, [])
 
@@ -66,7 +70,9 @@ export default function RoomsPage({ votedRoomId, isEditing, onVote, onBack }: Pr
           <p className="vote__condition">해당 룸이 출시되는 경우 제공돼요.</p>
         </div>
         <p className="vote__instructions">포스터를 눌러 자세히 보고, 룸 1개를 선택해주세요.</p>
-        <p className="vote__count">현재까지 {voteTotal === null ? 'N' : voteTotal.toLocaleString('ko-KR')}명이 투표했어요</p>
+        <p className="vote__count" role="status">
+          {voteTotal !== null ? `현재까지 ${voteTotal.toLocaleString('ko-KR')}명이 투표했어요` : loadingVoteTotal ? '투표 수를 불러오는 중…' : '투표 수를 불러오지 못했어요.'}
+        </p>
       </header>
 
       <ul className="vote__grid" aria-label="스터디룸">

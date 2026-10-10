@@ -1,8 +1,8 @@
 import { track, visitorId } from './analytics.ts'
 
 // Supabase REST(PostgREST)에 anon 키로 직접 INSERT 한다. 검증·중복 제한·읽기 차단은 DB 제약과 RLS 가
-// 맡는다 (supabase/migrations/2026-10-10_landing_data.sql). 둘 다 비어 있으면 저장을 건너뛰고
-// 화면 흐름만 진행한다 — 연동 전과 같은 동작.
+// 맡는다 (supabase/migrations/). 연결이 없으면 disabled 를 반환한다.
+// 사전예약 완료 화면은 실제 저장 성공 또는 중복 확인 응답이 있어야 열린다.
 // ponytail: supabase-js 대신 fetch 두 번. INSERT 외에 쓰는 기능이 없어 SDK(약 40 kB gzip)가 값을 못 한다.
 const BASE_URL = import.meta.env.VITE_SUPABASE_URL as string | undefined
 const ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined
@@ -10,15 +10,22 @@ const enabled = Boolean(BASE_URL && ANON_KEY)
 
 type PgError = { code?: string; message: string }
 
+function requestHeaders(): Record<string, string> {
+  // Publishable keys aren't JWTs; use apikey alone. Legacy anon JWTs also use Bearer.
+  return {
+    apikey: ANON_KEY!,
+    'Content-Type': 'application/json',
+    ...(ANON_KEY?.startsWith('sb_publishable_') ? {} : { Authorization: `Bearer ${ANON_KEY}` }),
+  }
+}
+
 // 성공이면 null, 실패면 PostgREST 오류 본문({code, message}). 네트워크 오류는 code 없이 message 만.
 async function insert(table: string, row: Record<string, unknown>): Promise<PgError | null> {
   try {
     const res = await fetch(`${BASE_URL}/rest/v1/${table}`, {
       method: 'POST',
       headers: {
-        apikey: ANON_KEY!,
-        Authorization: `Bearer ${ANON_KEY}`,
-        'Content-Type': 'application/json',
+        ...requestHeaders(),
         Prefer: 'return=minimal', // SELECT 정책이 없으므로 행을 돌려받지 않는다
       },
       body: JSON.stringify(row),
@@ -68,7 +75,7 @@ export async function savePreorder(input: PreorderInput): Promise<SaveResult> {
     visitor_id: visitorId(),
   })
   if (!error) return 'saved'
-  // 23505 = unique_violation: 이미 등록된 이메일. 사용자에게는 완료로 보여주고 집계만 구분한다.
+  // 23505 = unique_violation: show the existing-email state without claiming an update.
   if (error.code === '23505') return 'duplicate'
   return failed('landing_preorder', error)
 }
@@ -77,7 +84,7 @@ export async function savePreorder(input: PreorderInput): Promise<SaveResult> {
 // anon 은 테이블을 못 읽지만 이 함수는 숫자 하나만 돌려주므로 열어 뒀다. 실패·미설정이면 null.
 //
 // 마지막으로 받은 값을 기억해 둔다. 투표 페이지를 나갔다 돌아올 때마다 다시 요청하는데, 응답이
-// 오기 전 첫 화면이 "N명" 으로 깜빡이지 않게 그동안 직전 숫자를 보여준다.
+// 오기 전에는 직전 숫자를 보여준다. 처음 요청의 로딩·실패 문구는 RoomsPage 가 처리한다.
 let lastVoteTotal: number | null = null
 export function lastKnownVoteTotal(): number | null {
   return lastVoteTotal
@@ -88,12 +95,12 @@ export async function fetchVoteTotal(): Promise<number | null> {
   try {
     const res = await fetch(`${BASE_URL}/rest/v1/rpc/landing_vote_total`, {
       method: 'POST',
-      headers: { apikey: ANON_KEY!, Authorization: `Bearer ${ANON_KEY}`, 'Content-Type': 'application/json' },
+      headers: requestHeaders(),
       body: '{}',
     })
     if (!res.ok) return null
-    const total = Number(await res.json())
-    if (!Number.isFinite(total)) return null
+    const total: unknown = await res.json()
+    if (typeof total !== 'number' || !Number.isSafeInteger(total) || total < 0) return null
     lastVoteTotal = total
     return total
   } catch {

@@ -1,7 +1,7 @@
 # 프론트 연동 스키마
 
 랜딩 페이지가 데이터를 저장·전송하는 규격. 프론트는 아래 함수 3개만 부르면 되고, 직접 HTTP 를 만들 일은 없다.
-구현: [`src/lib/api.ts`](../src/lib/api.ts), [`src/lib/analytics.ts`](../src/lib/analytics.ts). 전체 배경은 [`data-collection.md`](./data-collection.md).
+구현: [`src/lib/api.ts`](../src/lib/api.ts), [`src/lib/analytics.ts`](../src/lib/analytics.ts). 전체 배경은 [`data-collection.md`](./data-collection.md). UI는 저장 성공·중복·실패에 맞춰 완료 안내를 구분한다.
 
 ## 1. 환경변수
 
@@ -28,12 +28,12 @@ type SaveResult = 'saved' | 'duplicate' | 'failed' | 'disabled'
 | `saveVote(roomId: string)` | "이 스터디룸 투표하기" 클릭 | `saved` \| `failed` \| `disabled` |
 | `savePreorder(input: PreorderInput)` | 사전예약 제출 | `saved` \| `duplicate`(이미 등록된 이메일) \| `failed` \| `disabled` |
 | `track(event, props?)` | 아래 4절의 이벤트 | 없음 |
-| `fetchVoteTotal()` | 투표 페이지 진입 시 ("현재까지 N명") | `number` \| `null`(미설정·실패 → 자리표시자 유지) |
+| `fetchVoteTotal()` | 투표 페이지 진입 시 ("현재까지 N명") | `number` \| `null`(초기 로딩·실패 안내, 이전 집계가 있으면 캐시 유지) |
 | `visitorId()` | 필요할 때 | 브라우저 익명 ID 문자열 |
 
 둘 다 **절대 throw 하지 않는다.** 실패는 반환값으로만 알린다.
 - 투표(`App.handleVote`): 결과와 무관하게 다음 화면으로 간다.
-- 사전예약(`App.reviewPreorder`): `'failed'` 면 throw → `PreorderPage` 의 기존 오류 안내("입력 내용을 확인하지 못했어요…")가 뜬다. `'duplicate'` 는 완료로 취급한다.
+- 사전예약(`App.submitPreorder`): `'failed'`·`'disabled'`면 오류 안내 후 입력을 유지한다. `'saved'`일 때 예약 완료를 표시하고, `'duplicate'`는 이미 등록한 이메일이라는 별도 안내를 표시한다. 중복 응답으로 기존 룸·동의가 수정됐다고 안내하지 않는다.
 
 ```ts
 type PreorderInput = {
@@ -48,13 +48,13 @@ type PreorderInput = {
 ## 3. Supabase REST 규격 (함수 안에서 일어나는 일)
 
 `POST {VITE_SUPABASE_URL}/rest/v1/{table}`
-헤더 `apikey`, `Authorization: Bearer <anon>`, `Content-Type: application/json`, `Prefer: return=minimal`
+헤더 `apikey`, `Content-Type: application/json`, `Prefer: return=minimal`. 기존 anon JWT에는 `Authorization: Bearer <anon>`도 사용하고, publishable key는 `apikey`에만 보낸다. [Supabase API keys](https://supabase.com/docs/guides/getting-started/api-keys#known-limitations)
 
 ### `landing_vote`
 
 | 필드 | 타입 | 필수 | 제약 |
 | --- | --- | --- | --- |
-| `room_id` | string | O | `smile` `lantern` `top` `fenesis` `cat` `baekdojun` `jurassic` `iljin` `lab` 중 하나. ⚠️ `rooms.ts` 에 룸을 추가하면 DB CHECK 도 같이 고쳐야 한다 |
+| `room_id` | string | O | `smile` `lantern` `top` `fenesis` `cat` `iljin` `jurassic` `lab` `joseon` 중 하나. DB는 과거 데이터용 `baekdojun`도 허용한다. 새 포스터 사용 전 `2026-10-12_joseon_room.sql` 적용 필요. ⚠️ `rooms.ts` 에 룸을 추가하면 DB CHECK 도 같이 고쳐야 한다 |
 | `visitor_id` | string | O | 8~64자 |
 
 ### `landing_preorder`
@@ -86,7 +86,7 @@ anon 키로 GET/PATCH/DELETE 를 보내면 에러 없이 **0행**이 돌아온�
 ### 투표 수 (읽기 예외 하나)
 
 `POST {VITE_SUPABASE_URL}/rest/v1/rpc/landing_vote_total` (본문 `{}`) → `123` 같은 정수 하나. 투표한 고유 방문자 수다.
-`RoomsPage` 가 진입 시 한 번 부르고, 못 받으면 `N` 을 그대로 보여준다.
+`RoomsPage`가 진입 시 한 번 부른다. 첫 요청 중에는 로딩 안내, 실패 시에는 조회 실패 안내를 표시한다. 이전 집계가 있으면 다시 요청하는 동안 그 값을 유지한다. null·음수·소수 응답을 0명으로 바꾸지 않는다.
 
 ## 4. Mixpanel 이벤트
 
@@ -96,8 +96,8 @@ anon 키로 GET/PATCH/DELETE 를 보내면 에러 없이 **0행**이 돌아온�
 | `cta_clicked` | `cta`: `open_rooms` \| `scroll_hint`, `path` | `Rooms.tsx`, `Hero.tsx` |
 | `artwork_vote_submitted` | `room_id` | `App.tsx` — `saveVote` 가 `saved` 일 때만 |
 | `presign_cta_clicked` | `source`: `answered` \| `skipped` (SurveyStatus) | `App.tsx` — SurveyPage `onNext` |
-| `presign_completed` | `voted_room_id`, `marketing_consent` | `App.tsx` `reviewPreorder` — `saved` 일 때만 |
-| `presign_duplicate` | `voted_room_id` | `App.tsx` `reviewPreorder` — `duplicate` 일 때 |
+| `presign_completed` | `voted_room_id`, `marketing_consent` | `App.tsx` `submitPreorder` — `saved` 일 때만 |
+| `presign_duplicate` | `voted_room_id` | `App.tsx` `submitPreorder` — `duplicate` 일 때 |
 | `landing_api_failed` | `table`, `code` | `api.ts` 내부 |
 
 새 이벤트를 추가하려면 `analytics.ts` 의 `EventName` 유니온에 이름을 넣고 `track()` 을 부른다.
@@ -105,7 +105,7 @@ anon 키로 GET/PATCH/DELETE 를 보내면 에러 없이 **0행**이 돌아온�
 
 ## 5. 관리자 집계 (프론트에서 호출 불가)
 
-대시보드 SQL Editor 전용. anon 키로 부르면 401. 나중에 "현재까지 N명" 같은 숫자를 화면에 띄우려면 서버 함수 하나가 필요하다(이번 범위 밖).
+집계 뷰는 대시보드 SQL Editor 전용이다. 공개 화면의 투표 수는 anon 호출을 허용한 `landing_vote_total()` 함수에서 정수 하나만 받는다.
 
 | 뷰 | 컬럼 |
 | --- | --- |

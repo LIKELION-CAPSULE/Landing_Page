@@ -35,7 +35,7 @@ export default function RoomSheet({ ref, room, voteLabel = '이 스터디룸 투
       onClick={handleClick}
     >
       {room && (
-        <div className="room-sheet__card">
+        <div className="room-sheet__card" tabIndex={-1} autoFocus>
           <div className="room-sheet__art">
             <img src={room.image} alt="" />
             <div className="room-sheet__fade" aria-hidden="true"></div>

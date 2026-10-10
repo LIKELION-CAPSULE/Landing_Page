@@ -1,7 +1,7 @@
 # 수요 검증 데이터 수집 — 연동 안내
 
 랜딩 페이지에서 일어나는 행동(Mixpanel)과 투표·사전예약 원본(Supabase)을 어디에 어떻게 남기는지 정리한다.
-화면·문구·흐름은 바꾸지 않았다. 환경변수가 비어 있으면 수집을 건너뛰고 연동 전과 똑같이 동작한다.
+현재 UI는 저장 결과에 맞춰 사전예약 완료·중복·실패를 안내한다. 환경변수가 비어 있으면 화면 실행은 가능하지만 예약을 완료했다고 표시하지 않는다.
 
 ## 구성
 
@@ -18,7 +18,7 @@
 ## 설정 (한 번)
 
 1. **Supabase** — CAPSULE 전용 프로젝트를 새로 만든다 (다른 제품 DB 와 섞지 않는다).
-   SQL Editor 에 `supabase/migrations/` 의 파일을 **날짜순으로** 붙여 넣어 실행한다 (`2026-10-10_landing_data.sql` → `2026-10-11_habit_other.sql` → `2026-10-11_insight_views.sql` → `2026-10-11_preorder_trim_and_vote_total.sql`). 두 번 실행해도 안전하다.
+   SQL Editor 에 `supabase/migrations/` 의 파일을 **날짜순으로** 붙여 넣어 실행한다 (`2026-10-10_landing_data.sql` → `2026-10-11_habit_other.sql` → `2026-10-11_insight_views.sql` → `2026-10-11_preorder_trim_and_vote_total.sql` → `2026-10-12_joseon_room.sql`). 이미 main과 연결된 DB에는 마지막 조선시대 포스터 파일만 추가 적용한다. 이전 스키마를 만드는 파일들을 처음부터 재실행하지 않는다.
    프로젝트 설정 → API 에서 URL 과 **anon(public)** 키를 복사한다. `service_role` 키는 어디에도 넣지 않는다.
 2. **Mixpanel** — 프로젝트를 만들고 Settings → Project Settings 의 Project Token 을 복사한다. 언어는 우측 상단 프로필 → 한국어. EU 리전으로 만들었으면 `VITE_MIXPANEL_API_HOST=https://api-eu.mixpanel.com`.
 3. **Vercel** → 프로젝트 Settings → Environment Variables 에 `.env.example` 의 값 3개(`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_MIXPANEL_TOKEN`)를 Production·Preview 둘 다에 넣고 **Redeploy**. 빌드 설정은 Vite 기본(`npm run build`, 출력 `dist`)이면 된다. `/rooms` 같은 주소를 새로고침해도 열리도록 `vercel.json` 에 SPA 리라이트를 넣어 뒀다. 로컬은 `.env.local` 에 넣는다 (git 무시됨).
@@ -33,8 +33,8 @@
 | `cta_clicked` | 랜딩의 "다른 스터디룸 구경하고 투표하기", 히어로 "스크롤해서 더 알아보기" 클릭 | `cta`: `open_rooms` \| `scroll_hint`, `path` | `Rooms.tsx`, `Hero.tsx` |
 | `artwork_vote_submitted` | "이 스터디룸 투표하기" 클릭 후 **DB 저장이 성공했을 때만** | `room_id` | `App.tsx` |
 | `presign_cta_clicked` | 수요조사 "다음" 또는 "건너뛰기"로 `/preorder` 에 진입할 때 | `source`: `answered` \| `skipped` | `App.tsx` (SurveyPage `onNext`) |
-| `presign_completed` | 사전예약 "입력 내용 확인하기" 후 **DB 저장이 성공했을 때만** | `voted_room_id`, `marketing_consent` | `App.tsx` `reviewPreorder` |
-| `presign_duplicate` | 이미 등록된 이메일로 제출 (DB UNIQUE 위반) | `voted_room_id` | `App.tsx` `reviewPreorder` |
+| `presign_completed` | 사전예약 "사전예약하기" 후 **DB 저장이 성공했을 때만** | `voted_room_id`, `marketing_consent` | `App.tsx` `submitPreorder` |
+| `presign_duplicate` | 이미 등록된 이메일로 제출 (DB UNIQUE 위반) | `voted_room_id` | `App.tsx` `submitPreorder` |
 | `landing_api_failed` | INSERT 가 실패 (중복 제외) | `table`, `code` (Postgres 에러 코드) | `src/lib/api.ts` |
 
 - 수동 `landing_view` 는 보내지 않는다. `$mp_web_page_view` 의 `current_url_path = /` 가 랜딩 방문이다. 자동 클릭 수집(autocapture)은 꺼서 CTA 이벤트와 중복되지 않는다.
@@ -129,7 +129,7 @@ Mixpanel 은 사람 수를 브라우저 기준(`distinct_id`)으로 세므로 �
 | `landing_survey_summary` | 관계·성격·세계관 선택지별 사전예약자 수·비율 |
 | `landing_free_text` | 자유 서술 원문 (캐릭터 희망) |
 
-중복 정책: 같은 이메일은 두 번 저장되지 않는다(UNIQUE). 사용자에게는 완료 화면을 그대로 보여주고 `presign_duplicate` 로만 구분한다.
+중복 정책: 같은 이메일은 두 번 저장되지 않는다(UNIQUE). 이미 사전예약한 이메일이라는 별도 안내를 보여주고 `presign_duplicate` 이벤트를 보낸다. 기존 예약의 룸·동의는 바뀌지 않으므로 새 선택에 대한 혜택 안내는 표시하지 않는다.
 같은 방문자의 재투표는 저장은 되지만 집계에서는 마지막 표만 센다.
 
 ### 관리자 조회
@@ -141,25 +141,25 @@ select * from landing_vote_summary;
 select * from landing_preorder_summary;
 select * from landing_funnel_summary;
 -- 사전예약자 목록 (CSV 는 결과 창의 Download)
-select email, age, marketing_consent, voted_room_id, created_at from landing_preorder order by created_at;
+select email, marketing_consent, voted_room_id, created_at from landing_preorder order by created_at;
 ```
 
 "현재까지 N명이 투표했어요" 의 N 은 `landing_vote_total()` 함수로 받는다 (`RoomsPage.tsx`). 테이블은 여전히 anon 이 못 읽고, 이 함수만 정수 하나를 돌려준다.
 
 ### 개인정보
 
-- `landing_preorder.email` 은 개인정보다. 약관대로 서비스 출시 후 6개월이 지나면 삭제한다.
+- `landing_preorder.email` 은 개인정보다. 약관대로 사전예약 혜택 지급을 마친 뒤 6개월이 지나면 삭제하고, 출시 취소 시 30일 안에 삭제한다.
 - 대시보드 접근 권한이 곧 개인정보 접근 권한이다. 필요한 사람에게만 준다.
 - 수신 동의 철회 요청이 오면 `marketing_consent` 를 false 로 바꾼다.
 
 ## 알려진 한계
 
 - **속도 제한 없음.** anon 키로 INSERT 가 열려 있어 스크립트로 쓰레기 행을 넣을 수 있다. 형식 CHECK 와 UNIQUE 가 거를 뿐이다. 실제로 당하면 INSERT 를 Edge Function 하나로 옮기고 IP 당 제한을 건다.
-- **투표 저장 실패는 사용자에게 알리지 않는다.** 실패해도 다음 화면으로 넘어가고 콘솔과 `landing_api_failed` 에만 남는다. 사전예약은 다르다 — 저장 실패 시 `reviewPreorder` 가 throw 해서 PreorderPage 의 기존 오류 문구가 뜨고 입력은 유지된다.
-- **사전예약 화면 문구가 연동 전 상태다.** "지금은 입력 내용만 확인할 수 있어요. 예약 정보는 전송되지 않아요." 안내와 "입력 내용 확인하기" 버튼은 이제 사실과 다르다(실제로 저장된다). 문구는 프론트 소관이라 손대지 않았다 — 프론트에서 고쳐야 한다.
-- 룸을 추가하면 `landing_vote.room_id` CHECK 도 같이 고쳐야 한다. 안 고치면 그 룸 투표는 저장이 실패한다.
-- `mixpanel-browser` 는 core 엔트리(`src/loaders/loader-module-core`, 세션 녹화·autocapture 제외)로 넣었다. 전체 번들 약 120 kB(gzip). 더 줄여야 하면 `initAnalytics` 안에서 동적 `import()` 로 바꾼다.
-- Mixpanel 은 브라우저 저장소(localStorage)에 익명 ID 를 둔다. 푸터의 개인정보처리방침 링크(지금은 `#`)에 분석 도구 사용을 적어야 한다.
+- **투표 저장 실패는 사용자에게 알리지 않는다.** 실패해도 다음 화면으로 넘어가고 콘솔과 `landing_api_failed` 에만 남는다. 사전예약은 다르다 — 저장 실패 시 `submitPreorder` 가 throw 해서 PreorderPage 의 기존 오류 문구가 뜨고 입력은 유지된다.
+- 환경변수가 없거나 저장이 실패하면 입력을 유지하고 재시도를 안내한다. 완료 화면 정보는 탭의 메모리에만 있어 새로고침하면 사라지지만, 접수한 예약은 DB에 유지된다.
+- 룸을 추가하면 `landing_vote.room_id` CHECK와 집계 뷰를 같이 고쳐야 한다. 조선시대 포스터용 `2026-10-12_joseon_room.sql`을 적용하기 전에는 `joseon` 투표 저장이 거부된다. 기존 데이터는 삭제하지 않는다.
+- `mixpanel-browser`는 async modules 엔트리로 넣었다. 녹화기는 녹화가 시작될 때 별도로 로드한다. 앱 JS는 gzip 약 134KB이며, 더 줄여야 하면 분석 SDK의 동적 import를 검토한다.
+- Mixpanel은 브라우저 저장소(localStorage)에 익명 ID를 둔다. 푸터의 개인정보처리방침은 전문 오버레이를 연다. 문서의 `[대괄호]`로 남은 실제 위탁·이전 정보는 운영 내용에 맞춰 확정해야 한다.
 
 ## 검증 기록 (2026-10-10)
 
