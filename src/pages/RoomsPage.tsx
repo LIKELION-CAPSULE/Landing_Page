@@ -5,7 +5,7 @@ import CheckIcon from '../components/CheckIcon.tsx'
 import FunnelHeader from '../components/FunnelHeader.tsx'
 import { ROOMS } from '../data/rooms.ts'
 import { useRoomPosterTransition } from '../hooks/useRoomPosterTransition.ts'
-import { fetchVoteTotal } from '../lib/api.ts'
+import { fetchVoteTotal, lastKnownVoteTotal } from '../lib/api.ts'
 
 type Props = {
   // Local selection is held by App; vote persistence belongs to the backend.
@@ -21,10 +21,11 @@ export default function RoomsPage({ votedRoomId, isEditing, onVote, onBack }: Pr
   const { ref: sheetRef, open: showRoom, close: closeRoom } = useRoomPosterTransition()
 
   // 투표한 사람 수. 백엔드가 없거나 실패하면 null 이라 디자인 자리표시자(N)를 그대로 둔다.
-  const [voteTotal, setVoteTotal] = useState<number | null>(null)
+  // 처음엔 직전에 받아 둔 값으로 시작해, 돌아올 때 N 으로 깜빡이지 않는다.
+  const [voteTotal, setVoteTotal] = useState<number | null>(lastKnownVoteTotal)
   useEffect(() => {
     let cancelled = false
-    fetchVoteTotal().then((total) => { if (!cancelled) setVoteTotal(total) })
+    fetchVoteTotal().then((total) => { if (!cancelled && total !== null) setVoteTotal(total) })
     return () => { cancelled = true }
   }, [])
 
