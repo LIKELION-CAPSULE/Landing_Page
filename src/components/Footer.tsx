@@ -13,7 +13,7 @@ export default function Footer() {
         <a className="footer__insta" href={INSTAGRAM_URL}>인스타그램 @{INSTAGRAM_HANDLE}</a>
         <p className="footer__mail">문의 <a href="mailto:capsulestudywithme@gmail.com">capsulestudywithme@gmail.com</a></p>
         <p className="footer__copy">
-          <span className="footer__c" aria-hidden="true"><img src={copyrightCircle} alt="" /><span>c</span></span>
+          <span className="footer__c" aria-hidden="true"><img draggable={false} src={copyrightCircle} alt="" /><span>c</span></span>
           <span className="sr-only">©</span> 2026 capsule
         </p>
         <nav className="footer__links" aria-label="약관">

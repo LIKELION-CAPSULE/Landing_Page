@@ -14,7 +14,7 @@ export default function FunnelHeader({ current, onBack, disabled = false, backLa
   return (
     <div className="funnel-header">
       <button type="button" className="page-back" aria-label={backLabel} disabled={disabled} onClick={onBack}>
-        <img src={arrow} alt="" width={24} height={24} />
+        <img draggable={false} src={arrow} alt="" width={24} height={24} />
       </button>
       {showProgress && <FunnelProgress current={current} complete={complete} />}
     </div>

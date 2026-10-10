@@ -23,7 +23,7 @@ export default function Hero() {
       <div className="hero__inner" ref={innerRef}>
         <header className="hero__header">
           <div className="logo">
-            <img src={logo} alt="캡슐 CAPSULE" width={2170} height={725} />
+            <img draggable={false} src={logo} alt="캡슐 CAPSULE" width={2170} height={725} />
           </div>
         </header>
 
@@ -34,7 +34,7 @@ export default function Hero() {
           </h1>
 
           <figure className="hero__preview">
-            <img src={studyRoomPreview} alt="노트북 화면에서 AI 캐릭터들과 함께하는 캠스터디" width={364} height={225} fetchPriority="high" decoding="async" />
+            <img draggable={false} src={studyRoomPreview} alt="노트북 화면에서 AI 캐릭터들과 함께하는 캠스터디" width={364} height={225} fetchPriority="high" decoding="async" />
             <figcaption>실제 스터디룸 화면 · 노트북 웹캠으로 함께 공부해요</figcaption>
           </figure>
 
@@ -46,7 +46,7 @@ export default function Hero() {
 
         <a className="scroll-hint" href="#problem" ref={hintRef} onClick={handleHintClick}>
           <span>스크롤해서 캡슐 더 알아보기</span>
-          <span className="scroll-hint__arrow" aria-hidden="true"><img src={chevronDown} alt="" /></span>
+          <span className="scroll-hint__arrow" aria-hidden="true"><img draggable={false} src={chevronDown} alt="" /></span>
         </a>
       </div>
     </section>

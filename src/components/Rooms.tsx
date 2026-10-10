@@ -92,6 +92,10 @@ export default function Rooms({ onOpenRooms }: Props) {
 
   return (
     <section className="rooms" aria-label="다른 스터디룸" ref={sectionRef} data-paused={paused || undefined} data-reveal>
+      <div className="rooms__intro">
+        <h2>같이 공부할<br /><span className="accent">스터디룸을 찾아보세요</span></h2>
+        <p>같이 공부하고 싶은 룸을 골라주세요.<br />사전예약하면 해당 룸 출시 시 무료로 열어드려요.</p>
+      </div>
       {LANES.map((lane) => {
         const { style, copies } = laneStyle(lane)
         return (
@@ -100,7 +104,7 @@ export default function Rooms({ onOpenRooms }: Props) {
               {Array.from({ length: copies }, (_, copy) =>
                 lane.cards.map((card, i) => (
                   <div className={`rooms__card${card.crop ? ` rooms__card--${card.crop}` : ''}`} key={`${copy}-${i}`} style={{ height: `calc(${card.height ?? lane.cardHeight} * var(--u))` }}>
-                    {loadImages && <img src={card.image} alt="" decoding="async" />}
+                    {loadImages && <img draggable={false} src={card.image} alt="" decoding="async" />}
                   </div>
                 )),
               )}
@@ -108,7 +112,7 @@ export default function Rooms({ onOpenRooms }: Props) {
           </div>
         )
       })}
-      <img className="rooms__shade" src={shade} alt="" aria-hidden="true" />
+      <img draggable={false} className="rooms__shade" src={shade} alt="" aria-hidden="true" />
       <div className="rooms__fade" aria-hidden="true"></div>
       <button type="button" className="rooms__motion-toggle" aria-label={paused ? '포스터 애니메이션 재생' : '포스터 애니메이션 일시정지'} onClick={() => setPaused(current => !current)}>
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true">
@@ -117,7 +121,7 @@ export default function Rooms({ onOpenRooms }: Props) {
       </button>
       <a className="cta" href={ROUTES.rooms} onClick={handleCtaClick}>
         <span>다른 스터디룸 구경하고 투표하기</span>
-        <img className="cta__arrow" src={ctaArrow} alt="" width={24} height={24} />
+        <img draggable={false} className="cta__arrow" src={ctaArrow} alt="" width={24} height={24} />
       </a>
     </section>
   )

@@ -62,7 +62,7 @@ export default function RoomsPage({ selectedRoomId, onOpenRoom, onBack }: Props)
               data-selected={selectedRoomId === room.id || undefined}
               onClick={(event) => onOpenRoom(room.id, event.currentTarget)}
             >
-              <img src={room.image} alt={room.name} loading="lazy" decoding="async" width={1096} height={1440} />
+              <img draggable={false} src={room.image} alt={room.name} loading="lazy" decoding="async" width={1096} height={1440} />
               {selectedRoomId === room.id && <span className="vote__badge"><CheckIcon />선택<span className="sr-only">한 룸</span></span>}
             </button>
           </li>

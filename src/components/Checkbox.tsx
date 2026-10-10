@@ -34,7 +34,7 @@ export default function Checkbox({ checked, onChange, children, ref, id, name, v
         onChange={(event) => onChange(event.target.checked)}
       />
       <span className="check__box" aria-hidden="true">
-        <img src={box} alt="" width={24} height={24} />
+        <img draggable={false} src={box} alt="" width={24} height={24} />
         <svg className="check__mark" viewBox="0 0 24 24" width="24" height="24">
           <rect x="4" y="4" width="16" height="16" rx="1.6" fill="currentColor" />
           <path d="m8 12.2 2.7 2.7 5.5-5.5" fill="none" stroke="#292929" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
