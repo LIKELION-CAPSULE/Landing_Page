@@ -12,7 +12,7 @@ export default function Problem() {
       </h2>
 
       <div className="problem__character" aria-hidden="true">
-        <img src={introCharacter} alt="" loading="lazy" decoding="async" width={1024} height={1536} />
+        <img draggable={false} src={introCharacter} alt="" loading="lazy" decoding="async" width={1024} height={1536} />
       </div>
       <div className="problem__fade problem__fade--bottom" aria-hidden="true"></div>
       <div className="problem__fade problem__fade--top" aria-hidden="true"></div>
@@ -25,7 +25,7 @@ export default function Problem() {
 
       <div className="speech" data-reveal>
         <span className="speech__glow" aria-hidden="true"></span>
-        <span className="speech__tail" aria-hidden="true"><img src={bubbleTail} alt="" /></span>
+        <span className="speech__tail" aria-hidden="true"><img draggable={false} src={bubbleTail} alt="" /></span>
         <span className="speech__body" aria-hidden="true"></span>
         <p className="speech__text">괜찮아!<br />이제 나랑 같이 하자.</p>
       </div>

@@ -57,12 +57,12 @@ export default function RoomSheet({ ref, room, voteLabel = '이 스터디룸 투
       ) : room && (
         <div className="room-sheet__card" tabIndex={-1} autoFocus>
           <div className="room-sheet__art">
-            <img src={room.image} alt="" />
+            <img draggable={false} src={room.image} alt="" />
             <div className="room-sheet__fade" aria-hidden="true"></div>
           </div>
 
           <button type="button" className="room-sheet__close" aria-label="닫기" onClick={onClose}>
-            <img src={arrow} alt="" width={24} height={24} />
+            <img draggable={false} src={arrow} alt="" width={24} height={24} />
           </button>
 
           <div className="room-sheet__content">
@@ -70,7 +70,7 @@ export default function RoomSheet({ ref, room, voteLabel = '이 스터디룸 투
             {error && <p className="room-sheet__error" role="alert">{error}</p>}
             <button type="button" className="room-sheet__vote" disabled={pending} aria-busy={pending} onClick={onVote}>
               <span>{pending ? '투표하는 중…' : error ? '다시 투표하기' : voteLabel}</span>
-              <img className="room-sheet__vote-arrow" src={arrow} alt="" width={24} height={24} />
+              <img draggable={false} className="room-sheet__vote-arrow" src={arrow} alt="" width={24} height={24} />
             </button>
           </div>
         </div>

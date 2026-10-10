@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import './styles.css'
 import './font.css'
 import App from './App.tsx'
+import './styles/responsive.css'
 import { initAnalytics } from './lib/analytics.ts'
 import { captureAttribution } from './lib/api.ts'
 

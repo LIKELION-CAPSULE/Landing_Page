@@ -43,7 +43,7 @@ export default function StepDemo({ step }: { step: 1 | 2 | 3 }) {
                 <div className="demo__entered" aria-hidden="true"><StudySessionPreview mode="study" phase={phase} progress={progress} loadedImages={loadedImages} /></div>
               </>
             ) : <StudySessionPreview mode={step === 2 ? 'reaction' : 'affection'} phase={phase} progress={progress} loadedImages={loadedImages} />}
-            {step === 1 && phase < 3 && <><span className="demo__cursor" aria-hidden="true"><img src={cursor} alt="" /></span><span className="demo__click" aria-hidden="true"></span></>}
+            {step === 1 && phase < 3 && <><span className="demo__cursor" aria-hidden="true"><img draggable={false} src={cursor} alt="" /></span><span className="demo__click" aria-hidden="true"></span></>}
           </div>
         </div>
       </button>

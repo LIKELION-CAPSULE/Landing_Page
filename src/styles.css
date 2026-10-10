@@ -40,6 +40,12 @@ body {
 }
 
 img { display: block; max-width: none; }
+/* Avoid accidental selection of artwork and interactive previews. Keep
+   ordinary copy, contact details, legal documents and form fields selectable. */
+:is(img, .chip, .speech, .rooms__lane, .step__media) {
+  -webkit-user-select: none;
+  user-select: none;
+}
 p, h1, h2, h3 { margin: 0; font-weight: inherit; }
 a { color: inherit; text-decoration: none; }
 .accent { color: var(--accent); }
