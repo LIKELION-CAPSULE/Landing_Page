@@ -42,6 +42,8 @@ npm run dev
 | src/components/macbook/macbook-config.ts | 정면 구도, 열림 각도와 스크롤 구간 |
 | src/components/macbook/MacbookModel.tsx | GLB 인스턴스와 화면 Material·Texture |
 | src/components/macbook/MacbookScene.tsx | 별도 지연 로딩하는 투명 Canvas, 조명, 로딩 오류 처리 |
+| src/hooks/useHeroVisibleViewport.ts | 실제 보이는 화면 높이를 따라 스크롤 안내 위치 조정 |
+| src/hooks/useStepBackground.ts | STEP 위치에 맞춘 가로 전체 폭의 세로 그라데이션 |
 | src/styles/macbook-landing.css | 맥북 Hero와 본문 연결에 한정된 스타일 |
 | public/models/macbook_web_ready.glb | 원본과 바이트가 같은 모델 복사본 |
 | public/models/macbook_web_optimized.glb | 형상·재질·텍스처·UV를 유지한 Meshopt 무손실 압축본 |
@@ -53,6 +55,8 @@ npm run dev
 | docs/macbook-landing-browser-report.json | 개발 서버 동작 검증 결과 |
 | docs/macbook-display-quality-report.json | 고밀도 화면의 DPR·텍스처 필터링·유휴 렌더링 검증 결과 (90도 제한 전) |
 | docs/macbook-landing-production-report.json | 메인 적용 후 프로덕션 프리뷰 검증 결과 |
+| docs/hero-viewport-step-background-report.json | 짧은 화면·VisualViewport 모사와 STEP 배경 렌더링 검증 |
+| docs/step-gradient-progression-report.json | STEP 문구부터 데모 중간까지의 점진적인 음영과 약한 하단 광 검증 |
 
 테스트 페이지·디버그 패널·이전 DOM 전환 실험 컴포넌트와 관련 스타일을 제거했습니다. 스타일과 브라우저 검증 스크립트·보고서도 랜딩페이지 이름으로 정리했습니다.
 
@@ -63,6 +67,12 @@ MACBOOK_TIMING의 시작점·길이는 0–1의 스크롤 진행률입니다. op
 macbook-landing.css의 --macbook-content-offset이 첫 문구·모델과 아래 문구의 위치를 조정합니다. --macbook-story-overlap은 160 디자인 px에서 이 이동량을 빼서 다음 제목과의 간격을 유지하며, 뷰포트가 원래 Hero보다 높은 경우 추가 빈 공간도 줄입니다. 다음 섹션의 제목·그림·컴포넌트는 수정하지 않습니다. ScrollTrigger는 추가 유지 구간에 들어오기 전에 끝나므로 기존 열림 속도는 유지됩니다. CSS sticky가 해제될 때까지 마지막 자세와 문구를 유지합니다. 높이가 짧은 뷰포트에서는 장면의 실제 높이를 기준으로 하여, 고정이 풀리기 전에 맥북 연출을 완료합니다. 모션 줄이기 설정에서는 추가 유지 구간을 생략합니다.
 
 모델 전체 회전은 X=0, Y=0, Z=0으로 고정합니다. 하판 경계상자의 최저 높이를 기준으로 수평 위치를 한 번 설정하고, 카메라는 +Z 방향에서 수평으로 바라봅니다. 하판과 모델 전체 Transform에는 스크롤 Tween을 적용하지 않습니다.
+
+스크롤 안내는 Hero의 최소 디자인 높이가 아니라 실제 보이는 화면 하단에 맞춥니다. VisualViewport의 height+offsetTop과 innerHeight 중 작은 값을 사용하고, 하단에 24px 또는 safe-area-inset-bottom 중 큰 값만큼 여백을 둡니다. 앱 내 브라우저의 보이는 영역이 바뀌면 resize·scroll 이벤트로 안내 위치만 갱신하며, Canvas 크기와 맥북 구도·타임라인 길이는 유지합니다. 실제 Instagram 앱의 iOS·Android 기기 검증은 아직 하지 않았습니다. [VisualViewport](https://developer.mozilla.org/en-US/docs/Web/API/VisualViewport), [WebKit safe area](https://webkit.org/blog/7929/designing-websites-for-iphone-x/)
+
+STEP 배경은 가로 전체 폭에서 같은 밝기를 유지하는 linear-gradient입니다. 검은 음영은 설명 문구와 데모 사이에서 가장 짙어집니다. 이 지점을 기준으로 STEP 라벨 위쪽까지의 증가 구간과 데모 높이의 50% 위치까지의 감소 구간을 각각 1.5625배(1.25 × 1.25) 늘려, 더 위에서 시작하고 더 아래에서 투명해집니다. 배율은 useStepBackground.ts의 DARK_GRADIENT_SCALE로 조정합니다. 흰빛은 데모 높이의 80% 위치에서 가장 밝으며, 이 지점에서 데모 높이의 50% 위치까지의 증가 구간과 데모 아래 56 디자인 px까지의 감소 구간을 각각 1.2배 넓혔습니다. 흰빛의 범위와 세기는 WHITE_GRADIENT_SCALE과 WHITE_GRADIENT_OPACITY로 조정합니다. 검정의 최대 알파는 0.92, 흰색은 0.1입니다. 각각의 증가·감소 구간에 코사인 곡선을 사용해 불투명도가 점진적으로 바뀌며, 평평한 색 띠나 급격한 기울기 전환을 줄였습니다. 글꼴·콘텐츠 크기가 달라지면 기존 ResizeObserver가 위치를 다시 계산합니다.
+
+배경 범위·세기 조정 전에는 데스크톱·모바일의 STEP 1–3을 렌더링해 문구 시작과 데모 중간의 배경색이 원래 #292929로 돌아오는지, 중간 음영이 연속적으로 짙어지고 밝아지는지, 흰빛이 매우 약한지 확인했습니다. 가로 방향의 색상 차이는 렌더링 반올림 범위인 RGB 1 이내였으며, 페이지 이동 후 배경 정리와 가로 넘침도 확인했습니다. 당시 결과는 docs/step-gradient-progression-report.json에 기록했습니다.
 
 3. 서비스 이미지 교체
 
