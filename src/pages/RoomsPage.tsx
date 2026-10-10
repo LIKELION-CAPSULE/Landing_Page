@@ -5,6 +5,7 @@ import CheckIcon from '../components/CheckIcon.tsx'
 import FunnelHeader from '../components/FunnelHeader.tsx'
 import { ROOMS } from '../data/rooms.ts'
 import { useRoomPosterTransition } from '../hooks/useRoomPosterTransition.ts'
+import { fetchVoteTotal } from '../lib/api.ts'
 
 type Props = {
   // Local selection is held by App; vote persistence belongs to the backend.
@@ -18,6 +19,14 @@ export default function RoomsPage({ votedRoomId, isEditing, onVote, onBack }: Pr
   // Keep the selected content in place while the sheet fades out.
   const [activeId, setActiveId] = useState<string | null>(null)
   const { ref: sheetRef, open: showRoom, close: closeRoom } = useRoomPosterTransition()
+
+  // 투표한 사람 수. 백엔드가 없거나 실패하면 null 이라 디자인 자리표시자(N)를 그대로 둔다.
+  const [voteTotal, setVoteTotal] = useState<number | null>(null)
+  useEffect(() => {
+    let cancelled = false
+    fetchVoteTotal().then((total) => { if (!cancelled) setVoteTotal(total) })
+    return () => { cancelled = true }
+  }, [])
 
   const activeRoom = ROOMS.find((room) => room.id === activeId) ?? null
   const selectedRoom = ROOMS.find((room) => room.id === votedRoomId) ?? null
@@ -56,8 +65,7 @@ export default function RoomsPage({ votedRoomId, isEditing, onVote, onBack }: Pr
           <p className="vote__condition">해당 룸이 출시되는 경우 제공돼요.</p>
         </div>
         <p className="vote__instructions">포스터를 눌러 자세히 보고, 룸 1개를 선택해주세요.</p>
-        {/* Replace N with the verified total when vote counting is connected. */}
-        <p className="vote__count">현재까지 N명이 투표했어요</p>
+        <p className="vote__count">현재까지 {voteTotal === null ? 'N' : voteTotal.toLocaleString('ko-KR')}명이 투표했어요</p>
       </header>
 
       <ul className="vote__grid" aria-label="스터디룸">

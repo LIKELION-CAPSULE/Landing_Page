@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type CSSProperties, type MouseEvent } from 'react'
 import { ROUTES } from '../hooks/useRoute.ts'
+import { track } from '../lib/analytics.ts'
 import galleryTop from '../assets/optimized/story/gallery-col1-top.webp'
 import galleryJurassic from '../assets/optimized/story/gallery-jurassic.webp'
 import galleryLantern from '../assets/optimized/hero/poster-2.webp'
@@ -82,6 +83,7 @@ export default function Rooms({ onOpenRooms }: Props) {
   }, [])
   // Let modified clicks (new tab, etc.) fall through to the real link.
   const handleCtaClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    track('cta_clicked', { cta: 'open_rooms', path: '/' })
     if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return
     event.preventDefault()
     onOpenRooms()
