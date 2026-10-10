@@ -1,4 +1,4 @@
-import introCharacter from '../assets/story/intro-character.webp'
+import introCharacter from '../assets/optimized/story/intro-character.webp'
 import bubbleTail from '../assets/story/bubble-tail.svg'
 
 export default function Problem() {
@@ -12,7 +12,7 @@ export default function Problem() {
       </h2>
 
       <div className="problem__character" aria-hidden="true">
-        <img src={introCharacter} alt="" />
+        <img src={introCharacter} alt="" loading="lazy" decoding="async" width={1024} height={1536} />
       </div>
       <div className="problem__fade problem__fade--bottom" aria-hidden="true"></div>
       <div className="problem__fade problem__fade--top" aria-hidden="true"></div>

@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState, type CSSProperties, type MouseEvent } from 'react'
 import { ROUTES } from '../hooks/useRoute.ts'
-import galleryTop from '../assets/story/gallery-col1-top.webp'
-import galleryJurassic from '../assets/story/gallery-jurassic.webp'
-import galleryLantern from '../assets/hero/poster-2.webp'
-import galleryGirls from '../assets/story/gallery-three-girls.webp'
-import galleryMid from '../assets/story/gallery-mid-b.webp'
-import galleryLab from '../assets/rooms/poster-9.webp'
-import galleryFenesis from '../assets/story/gallery-fenesis.webp'
-import galleryCat from '../assets/story/gallery-cat.webp'
+import galleryTop from '../assets/optimized/story/gallery-col1-top.webp'
+import galleryJurassic from '../assets/optimized/story/gallery-jurassic.webp'
+import galleryLantern from '../assets/optimized/hero/poster-2.webp'
+import galleryGirls from '../assets/optimized/story/gallery-three-girls.webp'
+import galleryMid from '../assets/optimized/story/gallery-mid-b.webp'
+import galleryLab from '../assets/optimized/rooms/poster-9.webp'
+import galleryFenesis from '../assets/optimized/story/gallery-fenesis.webp'
+import galleryCat from '../assets/optimized/story/gallery-cat.webp'
 import shade from '../assets/story/gallery-shade.svg'
 import ctaArrow from '../assets/story/cta-arrow.svg'
 
@@ -53,6 +53,7 @@ type Props = {
 export default function Rooms({ onOpenRooms }: Props) {
   const sectionRef = useRef<HTMLElement>(null)
   const [paused, setPaused] = useState(false)
+  const [loadImages, setLoadImages] = useState(() => typeof IntersectionObserver === 'undefined')
 
   useEffect(() => {
     const section = sectionRef.current
@@ -65,9 +66,17 @@ export default function Rooms({ onOpenRooms }: Props) {
     })
     if (observer) observer.observe(section)
     else { visible = true; update() }
+    const preparation = typeof IntersectionObserver === 'undefined' ? null : new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        setLoadImages(true)
+        preparation?.disconnect()
+      }
+    }, { rootMargin: '300px' })
+    preparation?.observe(section)
     document.addEventListener('visibilitychange', update)
     return () => {
       observer?.disconnect()
+      preparation?.disconnect()
       document.removeEventListener('visibilitychange', update)
     }
   }, [])
@@ -88,7 +97,7 @@ export default function Rooms({ onOpenRooms }: Props) {
               {Array.from({ length: copies }, (_, copy) =>
                 lane.cards.map((card, i) => (
                   <div className={`rooms__card${card.crop ? ` rooms__card--${card.crop}` : ''}`} key={`${copy}-${i}`} style={{ height: `calc(${card.height ?? lane.cardHeight} * var(--u))` }}>
-                    <img src={card.image} alt="" />
+                    {loadImages && <img src={card.image} alt="" decoding="async" />}
                   </div>
                 )),
               )}

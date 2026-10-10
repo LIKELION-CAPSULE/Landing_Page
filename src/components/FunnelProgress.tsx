@@ -1,6 +1,6 @@
 import CheckIcon from './CheckIcon.tsx'
 
-const STEPS = ['룸 선택', '취향 조사', '사전예약']
+const STEPS = ['룸 선택', '설문조사', '사전예약']
 
 export default function FunnelProgress({ current }: { current: 1 | 2 | 3 }) {
   return (

@@ -52,11 +52,12 @@ export default function RoomsPage({ votedRoomId, isEditing, onVote, onBack }: Pr
             <span>같이 공부하고 싶은</span>
             <span className="accent">룸을 골라주세요</span>
           </h1>
-          <p className="vote__lead">사전예약하면 투표한 룸을 무료로 열어드려요.</p>
+          <p className="vote__lead">사전예약을 하면 투표한 룸을 무료로 제공해드려요!</p>
           <p className="vote__condition">해당 룸이 출시되는 경우 제공돼요.</p>
         </div>
         <p className="vote__instructions">포스터를 눌러 자세히 보고, 룸 1개를 선택해주세요.</p>
-        {selectedRoom && <p className="vote__selection"><CheckIcon />선택한 룸: {selectedRoom.name}</p>}
+        {/* Replace N with the verified total when vote counting is connected. */}
+        <p className="vote__count">현재까지 N명이 투표했어요</p>
       </header>
 
       <ul className="vote__grid" aria-label="스터디룸">
@@ -70,10 +71,9 @@ export default function RoomsPage({ votedRoomId, isEditing, onVote, onBack }: Pr
               data-voted={votedRoomId === room.id || undefined}
               onClick={(event) => openRoom(room.id, event.currentTarget)}
             >
-              <img src={room.image} alt={room.name} />
+              <img src={room.image} alt={room.name} loading="lazy" decoding="async" width={1096} height={1440} />
               {votedRoomId === room.id && <span className="vote__badge"><CheckIcon />선택<span className="sr-only">한 룸</span></span>}
             </button>
-            {room.tags && <p className="vote__tags">{room.tags}</p>}
           </li>
         ))}
       </ul>

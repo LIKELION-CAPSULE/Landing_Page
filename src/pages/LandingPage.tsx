@@ -6,6 +6,7 @@ import Rooms from '../components/Rooms.tsx'
 import Notice from '../components/Notice.tsx'
 import Footer from '../components/Footer.tsx'
 import { useReveal } from '../hooks/useReveal.ts'
+import { useStepBackground } from '../hooks/useStepBackground.ts'
 
 type Props = {
   onOpenRooms: () => void
@@ -14,6 +15,7 @@ type Props = {
 export default function LandingPage({ onOpenRooms }: Props) {
   const mainRef = useRef<HTMLElement>(null)
   useReveal(mainRef)
+  useStepBackground(mainRef)
 
   return (
     <main ref={mainRef}>
