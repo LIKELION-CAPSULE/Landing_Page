@@ -75,6 +75,14 @@ export async function savePreorder(input: PreorderInput): Promise<SaveResult> {
 
 // "현재까지 N명이 투표했어요" 의 N. 투표한 고유 방문자 수를 DB 함수(landing_vote_total)로 받는다.
 // anon 은 테이블을 못 읽지만 이 함수는 숫자 하나만 돌려주므로 열어 뒀다. 실패·미설정이면 null.
+//
+// 마지막으로 받은 값을 기억해 둔다. 투표 페이지를 나갔다 돌아올 때마다 다시 요청하는데, 응답이
+// 오기 전 첫 화면이 "N명" 으로 깜빡이지 않게 그동안 직전 숫자를 보여준다.
+let lastVoteTotal: number | null = null
+export function lastKnownVoteTotal(): number | null {
+  return lastVoteTotal
+}
+
 export async function fetchVoteTotal(): Promise<number | null> {
   if (!enabled) return null
   try {
@@ -85,7 +93,9 @@ export async function fetchVoteTotal(): Promise<number | null> {
     })
     if (!res.ok) return null
     const total = Number(await res.json())
-    return Number.isFinite(total) ? total : null
+    if (!Number.isFinite(total)) return null
+    lastVoteTotal = total
+    return total
   } catch {
     return null
   }
