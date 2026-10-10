@@ -256,7 +256,22 @@
   ],
   "errors": [],
   "warnings": [
-    "The resource http://localhost:4174/models/macbook_web_optimized.glb was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally."
+    "THREE.Clock: This module has been deprecated. Please use THREE.Timer instead.",
+    "The resource http://localhost:5173/src/assets/fonts/capsule-ui.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.",
+    "THREE.Clock: This module has been deprecated. Please use THREE.Timer instead.",
+    "The resource http://localhost:5173/src/assets/fonts/capsule-ui.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.",
+    "The resource http://localhost:5173/src/assets/fonts/capsule-ui.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.",
+    "The resource http://localhost:5173/src/assets/fonts/capsule-ui.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.",
+    "THREE.Clock: This module has been deprecated. Please use THREE.Timer instead.",
+    "The resource http://localhost:5173/src/assets/fonts/capsule-ui.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.",
+    "The resource http://localhost:5173/models/macbook_web_optimized.glb was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.",
+    "THREE.Clock: This module has been deprecated. Please use THREE.Timer instead.",
+    "The resource http://localhost:5173/src/assets/fonts/capsule-ui.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.",
+    "The resource http://localhost:5173/src/assets/fonts/capsule-ui.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.",
+    "THREE.Clock: This module has been deprecated. Please use THREE.Timer instead.",
+    "The resource http://localhost:5173/src/assets/fonts/capsule-ui.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.",
+    "The resource http://localhost:5173/src/assets/fonts/capsule-ui.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally.",
+    "THREE.Clock: This module has been deprecated. Please use THREE.Timer instead."
   ],
   "analyticsStubbed": true,
   "retiredTestRedirect": true,
@@ -264,30 +279,30 @@
   "introOrder": [
     {
       "name": "logo",
-      "time": 141.20000000298023
+      "time": 194.09999999403954
     },
     {
       "name": "title",
-      "time": 508
+      "time": 627.5
     },
     {
       "name": "model",
-      "time": 2441.7999999970198
+      "time": 2564.0999999940395
     },
     {
       "name": "hint",
-      "time": 3259.7999999970198
+      "time": 3377.8999999910593
     }
   ],
-  "logo": "/assets/logo-lockup-plzuOVte.png",
+  "logo": "/src/assets/hero/logo-lockup.png?t=1791662959582",
   "initialLayoutOffset": {
     "title": 0,
     "model": 0
   },
   "retiredURLMatchesLanding": true,
   "idleRendering": {
-    "before": 1491,
-    "after": 1491
+    "before": 1575,
+    "after": 1575
   },
   "desktopHandoff": {
     "animationScrollDistance": 2170,

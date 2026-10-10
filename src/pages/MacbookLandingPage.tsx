@@ -8,6 +8,7 @@ import Notice from '../components/Notice.tsx'
 import Footer from '../components/Footer.tsx'
 import { useReveal } from '../hooks/useReveal.ts'
 import { useStepBackground } from '../hooks/useStepBackground.ts'
+import { useHeroVisibleViewport } from '../hooks/useHeroVisibleViewport.ts'
 import { track } from '../lib/analytics.ts'
 import { INITIAL_MACBOOK_SNAPSHOT, MACBOOK_MODEL_URL, MACBOOK_PREVIEW_URL, type MacbookLoadStatus } from '../components/macbook/macbook-config.ts'
 import logo from '../assets/hero/logo-lockup.png'
@@ -44,6 +45,7 @@ export default function MacbookLandingPage({ onOpenRooms }: Props) {
   const { complete: introComplete, titleReady } = useMacbookIntro(scrollRef, introReady, status, reducedMotion)
   useReveal(mainRef)
   useStepBackground(mainRef)
+  useHeroVisibleViewport(scrollRef)
   const onTypingComplete = useCallback(() => setIntroReady(true), [])
 
   return (
