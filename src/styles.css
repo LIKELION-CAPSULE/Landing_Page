@@ -328,6 +328,7 @@ main { overflow-x: clip; }
 /* Steps */
 .steps {
   padding-top: calc(46 * var(--u));
+  padding-bottom: calc(39 * var(--u));
 }
 .steps__title {
   text-align: center;
@@ -366,15 +367,8 @@ main { overflow-x: clip; }
 .step--2 .step__media { height: calc(247 * var(--u)); }
 .step--3 .step__media { height: calc(242 * var(--u)); }
 
-/* Draw thin rules in CSS: subpixel-height SVG images can fail to decode in WebKit. */
-.divider {
-  width: calc(360 * var(--u));
-  height: calc(0.5 * var(--u));
-  background: #fff;
-  margin: calc(29 * var(--u)) auto calc(32.5 * var(--u));
-}
-.step--2 + .divider { margin-top: calc(14 * var(--u)); margin-bottom: calc(34.5 * var(--u)); }
-.steps .divider:last-child { margin-top: calc(16 * var(--u)); margin-bottom: calc(22.5 * var(--u)); }
+.step + .step { margin-top: calc(62 * var(--u)); }
+.step--2 + .step { margin-top: calc(49 * var(--u)); }
 
 /* Rooms gallery (Figma y 2310–2836) */
 .rooms {

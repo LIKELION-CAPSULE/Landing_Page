@@ -1,4 +1,3 @@
-import { Fragment } from 'react'
 import StepDemo from './StepDemo.tsx'
 
 type Step = {
@@ -31,17 +30,14 @@ export default function Steps() {
       <h2 className="steps__title" id="steps-title" data-reveal><span className="accent">캡슐</span>은 이렇게 돌아가요</h2>
 
       {STEPS.map((step, index) => (
-        <Fragment key={step.label}>
-          <article className={`step step--${index + 1}`} data-reveal>
-            <div className="step__text">
-              <p className="step__label">{step.label}</p>
-              <h3 className="step__name">{step.name}</h3>
-              <p className="step__desc">{step.desc[0]}<br />{step.desc[1]}</p>
-            </div>
-            <StepDemo step={(index + 1) as 1 | 2 | 3} />
-          </article>
-          <div className="divider" aria-hidden="true" />
-        </Fragment>
+        <article className={`step step--${index + 1}`} key={step.label} data-reveal>
+          <div className="step__text">
+            <p className="step__label">{step.label}</p>
+            <h3 className="step__name">{step.name}</h3>
+            <p className="step__desc">{step.desc[0]}<br />{step.desc[1]}</p>
+          </div>
+          <StepDemo step={(index + 1) as 1 | 2 | 3} />
+        </article>
       ))}
     </section>
   )
