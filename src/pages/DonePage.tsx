@@ -51,7 +51,7 @@ export default function DonePage({ receipt, votedRoom, onEdit, onOpenPreorder, o
       <FunnelHeader current={2} complete onBack={onEdit} backLabel="사전예약 화면으로 돌아가기" />
       <header className="done__header">
         <h1 className="done__title">
-          {duplicate ? <><span>이미 사전예약한</span><span>이메일이에요</span></> : <><span>사전예약이</span><span>완료됐어요!</span></>}
+          {duplicate ? <><span>이미 사전예약한</span><span>이메일이에요</span></> : <span>사전예약이 완료됐어요!</span>}
         </h1>
         <p className="done__lead">출시되면 이메일로 가장 먼저 알려드릴게요.</p>
       </header>
@@ -62,7 +62,7 @@ export default function DonePage({ receipt, votedRoom, onEdit, onOpenPreorder, o
         {surveySent && <p className="done__survey-thanks" role="status">의견을 보내주셔서 고마워요!<br />다음 스터디룸 기획에 반영할게요.</p>}
         <p className="done__actions-lead">기다리는 동안, 캡슐을 더 만나보세요.</p>
         <a className="done__button done__button--primary" href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer">
-          인스타그램에서 캐릭터 구경하기
+          인스타그램 구경하기
         </a>
         <button
           type="button"

@@ -1,0 +1,50 @@
+{
+  "targetRoute": "/",
+  "errors": [],
+  "analyticsStubbed": true,
+  "desktop": {
+    "hinge": 90,
+    "brightness": 1,
+    "frontView": true,
+    "debugPanels": 0,
+    "canvasWidth": 2720,
+    "cssWidth": 1360,
+    "overflow": false,
+    "titleOpacity": 1,
+    "landingCopy": [
+      1,
+      1
+    ],
+    "storySections": [
+      "problem",
+      "steps",
+      "rooms",
+      "notice",
+      "footer"
+    ]
+  },
+  "mobile": {
+    "hinge": 90,
+    "brightness": 1,
+    "frontView": true,
+    "debugPanels": 0,
+    "canvasWidth": 780,
+    "cssWidth": 390,
+    "overflow": false,
+    "titleOpacity": 1,
+    "landingCopy": [
+      1,
+      1
+    ],
+    "storySections": [
+      "problem",
+      "steps",
+      "rooms",
+      "notice",
+      "footer"
+    ]
+  },
+  "roomsDirectWithout3D": true,
+  "retiredTestRedirect": true,
+  "testChunkAbsent": true
+}
