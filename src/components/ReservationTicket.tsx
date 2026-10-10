@@ -116,9 +116,9 @@ export default function ReservationTicket({ receipt, room }: Props) {
               <span className="sr-only">티켓 뒤집기</span>
             </button>
           </div>
-          <p className="done__ticket-hint" id={hintId}>
-            <svg viewBox="0 0 24 24" width={16} height={16} fill="none" aria-hidden="true">
-              <path d="M4 10a8 8 0 0 1 13.5-5.5L20 7M20 7V2m0 5h-5M20 14a8 8 0 0 1-13.5 5.5L4 17M4 17v5m0-5h5" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
+          <p className="done__ticket-hint" id={hintId} data-flipped={flipped}>
+            <svg viewBox="0 0 24 24" width={20} height={20} fill="none" aria-hidden="true">
+              <path d="M4 10a8 8 0 0 1 13.5-5.5L20 7M20 7V2m0 5h-5M20 14a8 8 0 0 1-13.5 5.5L4 17M4 17v5m0-5h5" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round" />
             </svg>
             {flipped ? '터치해서 포스터 보기' : '터치해서 예약 정보 보기'}
           </p>
