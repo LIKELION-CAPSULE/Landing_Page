@@ -44,4 +44,7 @@ export type SurveyAnswers = {
   wish: string
 }
 
+export type SurveyStatus = 'unanswered' | 'answered' | 'skipped'
+export const SURVEY_WISH_LIMIT = 500
+
 export const EMPTY_SURVEY: SurveyAnswers = { picks: {}, wish: '' }
