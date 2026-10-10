@@ -62,7 +62,7 @@ export default function DonePage({ receipt, votedRoom, onEdit, onOpenPreorder, o
         {surveySent && <p className="done__survey-thanks" role="status">의견을 보내주셔서 고마워요!<br />다음 스터디룸 기획에 반영할게요.</p>}
         <p className="done__actions-lead">기다리는 동안, 캡슐을 더 만나보세요.</p>
         <a className="done__button done__button--primary" href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer">
-          인스타그램에서 캐릭터 구경하기
+          인스타그램 구경하기
         </a>
         <button
           type="button"
