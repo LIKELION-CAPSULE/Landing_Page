@@ -328,6 +328,7 @@ main { overflow-x: clip; }
 /* Steps */
 .steps {
   padding-top: calc(46 * var(--u));
+  padding-bottom: calc(39 * var(--u));
 }
 .steps__title {
   text-align: center;
@@ -366,13 +367,8 @@ main { overflow-x: clip; }
 .step--2 .step__media { height: calc(247 * var(--u)); }
 .step--3 .step__media { height: calc(242 * var(--u)); }
 
-.divider {
-  width: calc(360 * var(--u));
-  height: auto;
-  margin: calc(29 * var(--u)) auto calc(32.5 * var(--u));
-}
-.step--2 + .divider { margin-top: calc(14 * var(--u)); margin-bottom: calc(34.5 * var(--u)); }
-.steps .divider:last-child { margin-top: calc(16 * var(--u)); margin-bottom: calc(22.5 * var(--u)); }
+.step + .step { margin-top: calc(62 * var(--u)); }
+.step--2 + .step { margin-top: calc(49 * var(--u)); }
 
 /* Rooms gallery (Figma y 2310–2836) */
 .rooms {
@@ -497,7 +493,8 @@ main { overflow-x: clip; }
 .footer > * { position: absolute; }
 .footer__divider {
   left: calc(14 * var(--u)); top: calc(29 * var(--u));
-  width: calc(374 * var(--u)); height: auto;
+  width: calc(374 * var(--u)); height: calc(0.5 * var(--u));
+  background: var(--text-muted);
 }
 .footer__insta { left: var(--page-inset); top: calc(54 * var(--u)); color: var(--accent); }
 .footer__mail { left: var(--page-inset); top: calc(74 * var(--u)); color: var(--text-muted); }
@@ -529,7 +526,12 @@ main { overflow-x: clip; }
   font-size: calc(10 * var(--u));
   font-weight: 300;
 }
-.footer__links img { width: calc(9 * var(--u)); height: auto; rotate: 90deg; }
+.footer__link-separator {
+  flex: none;
+  width: calc(9 * var(--u)); height: calc(0.5 * var(--u));
+  background: #fff;
+  rotate: 90deg;
+}
 .footer a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 /* ---------- 3. Room vote (Figma 273:356) ---------- */
@@ -1245,6 +1247,7 @@ html:has(.room-sheet[open], .terms-sheet[open]) { overflow: hidden; }
   display: block;
   width: calc(350 * var(--u));
   height: 0.5px;
+  background: #fff;
   margin: calc(10 * var(--u)) auto 0;
 }
 
