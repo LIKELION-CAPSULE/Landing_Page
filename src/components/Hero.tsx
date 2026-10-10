@@ -1,7 +1,7 @@
 import { useRef, type MouseEvent } from 'react'
 import { useHeroExitFallback } from '../hooks/useHeroExitFallback.ts'
 import { track } from '../lib/analytics.ts'
-import logo from '../assets/optimized/hero/logo.webp'
+import logo from '../assets/hero/logo-lockup.png'
 import studyRoomPreview from '../assets/optimized/hero/study-room-preview.webp'
 import chevronDown from '../assets/hero/chevron-down.svg'
 
@@ -22,7 +22,9 @@ export default function Hero() {
     <section className="hero" aria-labelledby="hero-title">
       <div className="hero__inner" ref={innerRef}>
         <header className="hero__header">
-          <img className="logo" src={logo} alt="CAPSULE" width={94} height={31} />
+          <div className="logo">
+            <img src={logo} alt="캡슐 CAPSULE" width={2170} height={725} />
+          </div>
         </header>
 
         <div className="hero__content">

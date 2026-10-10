@@ -57,7 +57,6 @@ export default function DonePage({ receipt, votedRoom, onEdit, onOpenPreorder, o
       </header>
 
       <ReservationTicket key={receipt.email + ':' + receipt.roomId} receipt={receipt} room={votedRoom} />
-      <button type="button" className="text-action done__edit" id="done-edit" onClick={onEdit}>다른 이메일로 사전예약하기</button>
 
       <div className="done__actions">
         {surveySent && <p className="done__survey-thanks" role="status">의견을 보내주셔서 고마워요!<br />다음 스터디룸 기획에 반영할게요.</p>}
