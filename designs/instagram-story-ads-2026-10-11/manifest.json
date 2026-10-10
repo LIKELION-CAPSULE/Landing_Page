@@ -1,0 +1,27 @@
+{
+  "figmaFileKey": "HpoEbOqfoDUwPq4zvYa6LL",
+  "pageId": "120:125",
+  "sectionId": "475:215",
+  "sectionUrl": "https://www.figma.com/design/HpoEbOqfoDUwPq4zvYa6LL/?node-id=475-215",
+  "dimensions": {
+    "width": 1080,
+    "height": 1920,
+    "aspectRatio": "9:16"
+  },
+  "deliverables": [
+    {
+      "frameId": "475:220",
+      "file": "exports/01-gyaru-relationship.png"
+    },
+    {
+      "frameId": "475:223",
+      "file": "exports/02-study-unlocks-story.png"
+    },
+    {
+      "frameId": "475:226",
+      "file": "exports/03-choose-your-world.png"
+    }
+  ],
+  "mode": "built-in image_gen key arts and editable Figma typography",
+  "verified": true
+}
