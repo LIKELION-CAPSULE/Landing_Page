@@ -21,12 +21,14 @@ export default function App() {
   const [preorderReview, setPreorderReview] = useState<PreorderReview | null>(null)
   const editingRoom = path === ROUTES.rooms && returnTo === ROUTES.preorder
 
-  // 저장 결과와 무관하게 다음 화면으로 간다. 투표 완료 이벤트는 DB 저장이 성공했을 때만.
-  const handleVote = async (roomId: string) => {
+  // 저장을 기다리지 않고 바로 다음 화면으로 간다 (탭 반응이 느려지지 않게).
+  // 투표 완료 이벤트는 DB 저장이 성공했을 때만, 저장이 끝난 뒤 보낸다.
+  const handleVote = (roomId: string) => {
     setVotedRoomId(roomId)
     setPreorderReview(null)
-    const result = await saveVote(roomId)
-    if (result === 'saved') track('artwork_vote_submitted', { room_id: roomId })
+    void saveVote(roomId).then((result) => {
+      if (result === 'saved') track('artwork_vote_submitted', { room_id: roomId })
+    })
     if (editingRoom) {
       goBack(ROUTES.preorder)
     } else {

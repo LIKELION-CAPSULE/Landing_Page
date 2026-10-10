@@ -4,16 +4,16 @@ import { track, visitorId } from './analytics.ts'
 // 맡는다 (supabase/migrations/2026-10-10_landing_data.sql). 둘 다 비어 있으면 저장을 건너뛰고
 // 화면 흐름만 진행한다 — 연동 전과 같은 동작.
 // ponytail: supabase-js 대신 fetch 두 번. INSERT 외에 쓰는 기능이 없어 SDK(약 40 kB gzip)가 값을 못 한다.
-const URL = import.meta.env.VITE_SUPABASE_URL as string | undefined
+const BASE_URL = import.meta.env.VITE_SUPABASE_URL as string | undefined
 const ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined
-const enabled = Boolean(URL && ANON_KEY)
+const enabled = Boolean(BASE_URL && ANON_KEY)
 
 type PgError = { code?: string; message: string }
 
 // 성공이면 null, 실패면 PostgREST 오류 본문({code, message}). 네트워크 오류는 code 없이 message 만.
 async function insert(table: string, row: Record<string, unknown>): Promise<PgError | null> {
   try {
-    const res = await fetch(`${URL}/rest/v1/${table}`, {
+    const res = await fetch(`${BASE_URL}/rest/v1/${table}`, {
       method: 'POST',
       headers: {
         apikey: ANON_KEY!,
@@ -78,7 +78,7 @@ export async function savePreorder(input: PreorderInput): Promise<SaveResult> {
 export async function fetchVoteTotal(): Promise<number | null> {
   if (!enabled) return null
   try {
-    const res = await fetch(`${URL}/rest/v1/rpc/landing_vote_total`, {
+    const res = await fetch(`${BASE_URL}/rest/v1/rpc/landing_vote_total`, {
       method: 'POST',
       headers: { apikey: ANON_KEY!, Authorization: `Bearer ${ANON_KEY}`, 'Content-Type': 'application/json' },
       body: '{}',

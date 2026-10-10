@@ -21,7 +21,7 @@
    SQL Editor 에 `supabase/migrations/` 의 파일을 **날짜순으로** 붙여 넣어 실행한다 (`2026-10-10_landing_data.sql` → `2026-10-11_habit_other.sql` → `2026-10-11_insight_views.sql` → `2026-10-11_preorder_trim_and_vote_total.sql`). 두 번 실행해도 안전하다.
    프로젝트 설정 → API 에서 URL 과 **anon(public)** 키를 복사한다. `service_role` 키는 어디에도 넣지 않는다.
 2. **Mixpanel** — 프로젝트를 만들고 Settings → Project Settings 의 Project Token 을 복사한다. 언어는 우측 상단 프로필 → 한국어. EU 리전으로 만들었으면 `VITE_MIXPANEL_API_HOST=https://api-eu.mixpanel.com`.
-3. 호스팅(Vercel 등)의 환경변수에 `.env.example` 의 값을 넣고 다시 빌드한다. 로컬은 `.env.local` 에 넣는다 (git 무시됨).
+3. **Vercel** → 프로젝트 Settings → Environment Variables 에 `.env.example` 의 값 3개(`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_MIXPANEL_TOKEN`)를 Production·Preview 둘 다에 넣고 **Redeploy**. 빌드 설정은 Vite 기본(`npm run build`, 출력 `dist`)이면 된다. `/rooms` 같은 주소를 새로고침해도 열리도록 `vercel.json` 에 SPA 리라이트를 넣어 뒀다. 로컬은 `.env.local` 에 넣는다 (git 무시됨).
 
 `VITE_` 값은 빌드 결과물에 그대로 들어가므로 공개해도 되는 키만 쓴다.
 
