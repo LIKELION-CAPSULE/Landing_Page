@@ -46,5 +46,6 @@
   },
   "roomsDirectWithout3D": true,
   "retiredTestRedirect": true,
-  "testChunkAbsent": true
+  "testChunkAbsent": true,
+  "typingWorksBefore3DCode": true
 }

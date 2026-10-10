@@ -57,6 +57,7 @@ async function handoff(page, prefix) {
       unit: Math.min(innerWidth, 402) / 402,
       stageHeight: stage.getBoundingClientRect().height,
       viewportHeight: innerHeight,
+      viewportWidth: innerWidth,
       hold: Number.parseFloat(getComputedStyle(hero).getPropertyValue('--macbook-exit-hold')) || 0,
       animationEnd: story.getBoundingClientRect().top + scrollY - Math.max(innerHeight, stage.getBoundingClientRect().height)
         - (Number.parseFloat(getComputedStyle(hero).getPropertyValue('--macbook-exit-hold')) || 0),
@@ -64,7 +65,11 @@ async function handoff(page, prefix) {
     }
   })
   assert.ok(layout.release > layout.animationEnd)
-  assert.ok(layout.hold >= 200)
+  assert.ok(layout.hold >= 80)
+  if (layout.viewportWidth <= 767) {
+    assert.equal(layout.hold, layout.viewportHeight <= 700 ? 80 : 120)
+    assert.ok(layout.animationEnd > 0 && layout.animationEnd <= layout.viewportHeight * 1.25)
+  }
   assert.ok(layout.release - layout.animationEnd >= layout.hold)
   await page.evaluate(y => scrollTo(0, y), layout.animationEnd + 16)
   await page.waitForTimeout(600)
@@ -110,7 +115,7 @@ async function handoff(page, prefix) {
   assert.equal(transition.titleOpacity, 1)
   assert.equal(transition.horizontalOverflow, false)
   await page.screenshot({ path: directory + '/' + prefix + 'handoff.png' })
-  return { hold: layout.hold, holdDistance: layout.release - layout.animationEnd, wheelHold, held, ...transition }
+  return { animationScrollDistance: layout.animationEnd, hold: layout.hold, holdDistance: layout.release - layout.animationEnd, wheelHold, held, ...transition }
 }
 async function story(page) {
   return page.locator('.story').evaluate(element => [...element.children]
@@ -252,7 +257,8 @@ try {
     if (name === 'fully-open') assert.equal(value.hinge, 90)
     await page.screenshot({ path: directory + '/' + name + '.png' })
   }
-  assert.equal(requests.filter(url => url.includes('macbook_web_ready.glb')).length, 1)
+  assert.equal(requests.filter(url => url.includes('macbook_web_optimized.glb')).length, 1)
+  assert.equal(requests.filter(url => url.includes('macbook_web_ready.glb')).length, 0)
   report.desktopHandoff = await handoff(page, '')
   const reverseOpening = await sample(page, 0.5)
   assert.ok(Math.abs(reverseOpening.hinge - report.desktop.find(item => item.name === 'half-open').hinge) < 1)

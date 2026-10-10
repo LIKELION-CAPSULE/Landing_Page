@@ -4,12 +4,16 @@ import { useThree } from '@react-three/fiber'
 import { Box3, Group, Mesh, MeshBasicMaterial, SRGBColorSpace } from 'three'
 import { MACBOOK_MODEL_URL, MACBOOK_PREVIEW_URL, type MacbookRig } from './macbook-config.ts'
 
+// Begin both cached loads together instead of waiting for the GLB before its screen texture.
+useGLTF.preload(MACBOOK_MODEL_URL, false)
+useTexture.preload(MACBOOK_PREVIEW_URL)
+
 type Props = { onReady: (rig: MacbookRig | null) => void }
 
 export default function MacbookModel({ onReady }: Props) {
   const gl = useThree(state => state.gl)
   // Drei caches the source assets. Only transforms and the display material belong to this instance.
-  const gltf = useGLTF(MACBOOK_MODEL_URL)
+  const gltf = useGLTF(MACBOOK_MODEL_URL, false)
   const sourceTexture = useTexture(MACBOOK_PREVIEW_URL)
   const rig = useMemo<MacbookRig>(() => {
     const scene = gltf.scene.clone(true)

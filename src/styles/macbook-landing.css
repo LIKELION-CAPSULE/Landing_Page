@@ -1,5 +1,6 @@
 .macbook-landing-page {
   --macbook-content-offset: calc(48 * var(--u));
+  --macbook-scroll-length: 360svh;
   --macbook-exit-hold: 320px;
   --macbook-story-overlap: calc(max(0px, calc(100svh - 874 * var(--u))) + 160 * var(--u) - var(--macbook-content-offset));
 }
@@ -10,7 +11,7 @@
   width: 100%;
 }
 
-.macbook-landing__scroll { height: calc(360svh + var(--macbook-exit-hold)); }
+.macbook-landing__scroll { height: calc(var(--macbook-scroll-length) + var(--macbook-exit-hold)); }
 .macbook-landing__stage {
   position: sticky;
   top: 0;
@@ -101,13 +102,19 @@
 }
 
 @media (max-width: 767px) {
-  .macbook-landing-page { --macbook-exit-hold: 240px; }
+  .macbook-landing-page {
+    --macbook-scroll-length: 220svh;
+    --macbook-exit-hold: 120px;
+  }
 }
 @media (max-height: 700px) {
   .macbook-landing-page {
     --macbook-content-offset: calc(24 * var(--u));
     --macbook-exit-hold: 200px;
   }
+}
+@media (max-width: 767px) and (max-height: 700px) {
+  .macbook-landing-page { --macbook-exit-hold: 80px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .macbook-landing__cursor, .macbook-landing .scroll-hint__arrow { animation: none; }

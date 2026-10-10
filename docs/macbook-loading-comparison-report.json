@@ -1,0 +1,142 @@
+{
+  "conditions": {
+    "viewport": "390x844",
+    "downloadMbps": 4,
+    "latencyMs": 80,
+    "cpuSlowdown": 4,
+    "browser": "headless Chrome",
+    "coldCache": true,
+    "runsPerVersion": 1
+  },
+  "before": {
+    "label": "before",
+    "viewport": "390x844",
+    "downloadMbps": 4,
+    "latencyMs": 80,
+    "cpuSlowdown": 4,
+    "errors": [],
+    "eventsMs": {
+      "hero": 2011.5,
+      "firstTypedCharacter": 2402.2999999970198,
+      "modelReady": 18866.39999999106,
+      "introComplete": 20348.89999999106
+    },
+    "resources": [
+      {
+        "name": "index-M4JDDzfY.js",
+        "startMs": 103.8999999910593,
+        "endMs": 678,
+        "bytes": 122370,
+        "initiatorType": "script"
+      },
+      {
+        "name": "mixpanel-recorder-Cbb3yyAg.js",
+        "startMs": 724.2999999970198,
+        "endMs": 1536.7999999970198,
+        "bytes": 0,
+        "initiatorType": "script"
+      },
+      {
+        "name": "MacbookLandingPage-CxoT4Ty8.js",
+        "startMs": 743.5999999940395,
+        "endMs": 1819.5,
+        "bytes": 334831,
+        "initiatorType": "script"
+      },
+      {
+        "name": "macbook_web_ready.glb",
+        "startMs": 2176.3999999910593,
+        "endMs": 18221.89999999106,
+        "bytes": 7895324,
+        "initiatorType": "fetch"
+      },
+      {
+        "name": "website-preview.webp",
+        "startMs": 18358.89999999106,
+        "endMs": 18799.89999999106,
+        "bytes": 186862,
+        "initiatorType": "img"
+      }
+    ],
+    "scroll": {
+      "animationEnd": 2081.828125,
+      "release": 2430,
+      "hold": 240
+    },
+    "final": {
+      "hinge": 90,
+      "brightness": 1,
+      "frontView": "true",
+      "canvasWidth": 780
+    }
+  },
+  "after": {
+    "label": "after",
+    "viewport": "390x844",
+    "downloadMbps": 4,
+    "latencyMs": 80,
+    "cpuSlowdown": 4,
+    "errors": [],
+    "eventsMs": {
+      "hero": 908.1000000089407,
+      "firstTypedCharacter": 1285.7000000029802,
+      "modelReady": 17705.60000000894,
+      "introComplete": 19180.80000001192
+    },
+    "resources": [
+      {
+        "name": "index-BrWVKAVh.js",
+        "startMs": 97.1000000089407,
+        "endMs": 759.6000000089407,
+        "bytes": 165008,
+        "initiatorType": "script"
+      },
+      {
+        "name": "mixpanel-recorder-Cbb3yyAg.js",
+        "startMs": 816.7000000029802,
+        "endMs": 3080.1000000089407,
+        "bytes": 0,
+        "initiatorType": "script"
+      },
+      {
+        "name": "macbook_web_optimized.glb",
+        "startMs": 849.6000000089407,
+        "endMs": 17542.30000001192,
+        "bytes": 5124096,
+        "initiatorType": "link"
+      },
+      {
+        "name": "website-preview.webp",
+        "startMs": 850,
+        "endMs": 3166,
+        "bytes": 186862,
+        "initiatorType": "link"
+      },
+      {
+        "name": "MacbookScene-B9SeEGxi.js",
+        "startMs": 908.1000000089407,
+        "endMs": 4069.800000011921,
+        "bytes": 292896,
+        "initiatorType": "script"
+      }
+    ],
+    "scroll": {
+      "animationEnd": 900.234375,
+      "release": 1129,
+      "hold": 120
+    },
+    "final": {
+      "hinge": 90,
+      "brightness": 1,
+      "frontView": "true",
+      "canvasWidth": 780
+    }
+  },
+  "changes": {
+    "scrollReductionPercent": 56.8,
+    "heroReleaseReductionPercent": 53.5,
+    "firstCharacterReductionPercent": 46.5,
+    "modelReadyReductionPercent": 6.2
+  },
+  "limitations": "Single simulated Chrome run per version, not physical iOS or Android. Captures the model compression, code splitting, and parallel load changes, before the final fetchPriority hint. Hosting compression and cache may change timings."
+}

@@ -1501,15 +1501,93 @@ html:has(.room-sheet[open], .terms-sheet[open], .legal-dialog[open]) { overflow:
     radial-gradient(circle at 100% 100%, transparent var(--ticket-notch), #000 calc(var(--ticket-notch) + 0.5px)) right / 51% 100% no-repeat;
 }
 .done__ticket-art {
+  position: relative;
   display: flex;
   align-items: center;
   flex: 1;
+  overflow: hidden;
+  isolation: isolate;
 }
 .done__ticket-face--front img {
   width: 100%;
   height: auto;
   outline: 1px solid rgba(255, 255, 255, 0.1);
   outline-offset: -1px;
+}
+/* Soft diagonal light, inspired by the Beams reference. Screen blending
+   keeps the poster visible; the isolated art clips light before the stub. */
+.done__ticket-beams {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  opacity: 0.8;
+}
+.done__ticket-beams > span {
+  --beam-color: 179, 136, 255;
+  --beam-duration: 18s;
+  --beam-delay: -7s;
+  position: absolute;
+  top: -65%;
+  left: -18%;
+  width: 13%;
+  height: 230%;
+  border-radius: 50%;
+  background: linear-gradient(180deg,
+    rgba(var(--beam-color), 0) 0%,
+    rgba(var(--beam-color), 0.08) 15%,
+    rgba(var(--beam-color), 0.62) 42%,
+    rgba(var(--beam-color), 0.28) 65%,
+    rgba(var(--beam-color), 0) 100%);
+  filter: blur(calc(8 * var(--u)));
+  transform: rotate(-32deg);
+  opacity: 0.65;
+}
+.done__ticket-beams > span:nth-child(2) {
+  --beam-color: 216, 185, 255;
+  --beam-duration: 22s;
+  --beam-delay: -14s;
+  left: 8%;
+  width: 9%;
+}
+.done__ticket-beams > span:nth-child(3) {
+  --beam-color: 255, 216, 230;
+  --beam-duration: 20s;
+  --beam-delay: -3s;
+  left: 36%;
+  width: 16%;
+}
+.done__ticket-beams > span:nth-child(4) {
+  --beam-color: 243, 232, 255;
+  --beam-duration: 26s;
+  --beam-delay: -19s;
+  left: 62%;
+  width: 8%;
+}
+.done__ticket-beams > span:nth-child(5) {
+  --beam-duration: 24s;
+  --beam-delay: -11s;
+  left: 87%;
+  width: 14%;
+}
+@keyframes ticket-beam-drift {
+  0% {
+    transform: translate3d(calc(-36 * var(--u)), calc(64 * var(--u)), 0) rotate(-32deg);
+    opacity: 0.45;
+  }
+  50% { opacity: 0.9; }
+  100% {
+    transform: translate3d(calc(36 * var(--u)), calc(-64 * var(--u)), 0) rotate(-32deg);
+    opacity: 0.6;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .done__ticket-beams > span {
+    animation: ticket-beam-drift var(--beam-duration) ease-in-out var(--beam-delay) infinite alternate;
+  }
+  .done__ticket-inner[data-flipped="true"] .done__ticket-beams > span {
+    animation-play-state: paused;
+  }
 }
 .done__ticket-face--back {
   opacity: 0;

@@ -1,6 +1,4 @@
-import { lazy, Suspense } from 'react'
-
-const MacbookLandingPage = lazy(() => import('./MacbookLandingPage.tsx'))
+import MacbookLandingPage from './MacbookLandingPage.tsx'
 
 type Props = {
   onOpenRooms: () => void
@@ -8,8 +6,6 @@ type Props = {
 
 export default function LandingPage({ onOpenRooms }: Props) {
   return (
-    <Suspense fallback={<main role="status" style={{ padding: 32 }}>캡슐을 불러오는 중…</main>}>
-      <MacbookLandingPage onOpenRooms={onOpenRooms} />
-    </Suspense>
+    <MacbookLandingPage onOpenRooms={onOpenRooms} />
   )
 }

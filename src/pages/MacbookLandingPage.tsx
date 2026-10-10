@@ -1,5 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
-import MacbookScene from '../components/macbook/MacbookScene.tsx'
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react'
 import MacbookHeroTitle from '../components/macbook/MacbookHeroTitle.tsx'
 import { useMacbookIntro } from '../components/macbook/useMacbookIntro.ts'
 import Problem from '../components/Problem.tsx'
@@ -10,10 +9,13 @@ import Footer from '../components/Footer.tsx'
 import { useReveal } from '../hooks/useReveal.ts'
 import { useStepBackground } from '../hooks/useStepBackground.ts'
 import { track } from '../lib/analytics.ts'
-import { INITIAL_MACBOOK_SNAPSHOT, type MacbookLoadStatus } from '../components/macbook/macbook-config.ts'
+import { INITIAL_MACBOOK_SNAPSHOT, MACBOOK_MODEL_URL, MACBOOK_PREVIEW_URL, type MacbookLoadStatus } from '../components/macbook/macbook-config.ts'
 import logo from '../assets/hero/logo-lockup.png'
 import chevronDown from '../assets/hero/chevron-down.svg'
 import '../styles/macbook-landing.css'
+
+// Show the branding and start typing while the 3D code loads independently.
+const MacbookScene = lazy(() => import('../components/macbook/MacbookScene.tsx'))
 
 function useMediaQuery(query: string) {
   const [matches, setMatches] = useState(() => window.matchMedia(query).matches)
@@ -46,6 +48,8 @@ export default function MacbookLandingPage({ onOpenRooms }: Props) {
 
   return (
     <main ref={mainRef} className="macbook-landing-page" data-macbook-page="landing">
+      <link rel="preload" href={MACBOOK_MODEL_URL} as="fetch" crossOrigin="anonymous" fetchPriority="high" />
+      <link rel="preload" href={MACBOOK_PREVIEW_URL} as="image" crossOrigin="anonymous" />
       <section
         className="hero macbook-landing macbook-landing__scroll" ref={scrollRef}
         data-reduced-motion={reducedMotion} data-model-status={status}
@@ -59,11 +63,13 @@ export default function MacbookLandingPage({ onOpenRooms }: Props) {
       >
         <div className="macbook-landing__stage">
           <div className="macbook-landing__scene">
-            <MacbookScene
-              scrollRef={scrollRef} copyRef={copyRef} anchorRef={anchorRef}
-              onSnapshot={setSnapshot} onStatusChange={setStatus}
-              introReady={introReady} reducedMotion={reducedMotion} mobile={mobile}
-            />
+            <Suspense fallback={null}>
+              <MacbookScene
+                scrollRef={scrollRef} copyRef={copyRef} anchorRef={anchorRef}
+                onSnapshot={setSnapshot} onStatusChange={setStatus}
+                introReady={introReady} reducedMotion={reducedMotion} mobile={mobile}
+              />
+            </Suspense>
           </div>
           <div className="hero__inner macbook-landing__branding">
             <header className="hero__header">
