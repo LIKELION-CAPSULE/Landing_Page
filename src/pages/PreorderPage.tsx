@@ -9,7 +9,6 @@ import type { Room } from '../data/rooms.ts'
 import type { SurveyAnswers, SurveyStatus } from '../data/survey.ts'
 import arrow from '../assets/story/cta-arrow.svg'
 import selectArrow from '../assets/preorder/select-arrow.svg'
-import divider from '../assets/preorder/divider.svg'
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
@@ -224,7 +223,7 @@ export default function PreorderPage({ votedRoom, draft, onDraftChange, surveyAn
             )}
           </div>
 
-          <img className="preorder__divider" src={divider} alt="" width={359} height={0.5} />
+          <div className="preorder__divider" aria-hidden="true" />
 
           <div className="consents">
             {CONSENTS.map((consent) => (
