@@ -30,12 +30,12 @@ export default function RoomSelectPreview({ selected = true, loadImages = true }
       <div className="room-preview__topbar">
         <div className="room-preview__brand">
           <span className="room-preview__brand-mark">
-            <span className="room-preview__capsule"><img src={capsule} alt="" /></span>
+            <span className="room-preview__capsule"><img draggable={false} src={capsule} alt="" /></span>
           </span>
           <span>CAPSULE</span>
         </div>
         <div className="room-preview__search">
-          <span className="room-preview__icon room-preview__icon--search"><img src={search} alt="" /></span>
+          <span className="room-preview__icon room-preview__icon--search"><img draggable={false} src={search} alt="" /></span>
           <span>캐릭터, 세계관 검색</span>
         </div>
       </div>
@@ -48,16 +48,16 @@ export default function RoomSelectPreview({ selected = true, loadImages = true }
         <div className="room-preview__grid">
           {POSTERS.map((poster) => (
             <div className={`room-preview__poster${poster.selected && selected ? ' room-preview__poster--selected' : ''}`} key={poster.image}>
-              {loadImages && <img src={poster.image} alt="" decoding="async" />}
+              {loadImages && <img draggable={false} src={poster.image} alt="" decoding="async" />}
               <span className="room-preview__shade"></span>
               {poster.selected && selected ? (
                 <>
                   <span className="room-preview__badge">
-                    <span className="room-preview__icon room-preview__icon--check"><img src={check} alt="" /></span>
+                    <span className="room-preview__icon room-preview__icon--check"><img draggable={false} src={check} alt="" /></span>
                     선택됨
                   </span>
                   <span className="room-preview__enter">
-                    <span className="room-preview__icon room-preview__icon--camera"><img src={camera} alt="" /></span>
+                    <span className="room-preview__icon room-preview__icon--camera"><img draggable={false} src={camera} alt="" /></span>
                     스터디룸 입장하기
                   </span>
                 </>

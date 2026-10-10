@@ -136,7 +136,7 @@ export default function SurveyPage({ answers, onAnswersChange, reservationReady,
 
           <button type="submit" className="cta form-submit" id="survey-submit" disabled={!hasAnswer || submitting}>
             <span>{submitting ? '의견 보내는 중…' : submitError ? '다시 시도하기' : '의견 보내기'}</span>
-            <img className="cta__arrow form-submit__arrow" src={arrow} alt="" width={24} height={24} />
+            <img draggable={false} className="cta__arrow form-submit__arrow" src={arrow} alt="" width={24} height={24} />
           </button>
 
           <button type="button" className="survey__skip" id="survey-skip" onClick={onBack}>

@@ -76,7 +76,7 @@ export default function MacbookLandingPage({ onOpenRooms }: Props) {
           <div className="hero__inner macbook-landing__branding">
             <header className="hero__header">
               <div className="logo" data-intro-item="logo">
-                <img src={logo} alt="캡슐 CAPSULE" width={2170} height={725} />
+                <img draggable={false} src={logo} alt="캡슐 CAPSULE" width={2170} height={725} />
               </div>
             </header>
             <div className="hero__content">
@@ -106,13 +106,13 @@ export default function MacbookLandingPage({ onOpenRooms }: Props) {
                 }
               }}>
                 <span>스크롤해서 캡슐 더 알아보기</span>
-                <span className="scroll-hint__arrow" aria-hidden="true"><img src={chevronDown} alt="" /></span>
+                <span className="scroll-hint__arrow" aria-hidden="true"><img draggable={false} src={chevronDown} alt="" /></span>
               </a>
             </div>
           </div>
           {status === 'loading' && introReady && <div className="macbook-landing__loading" role="status">맥북을 불러오는 중</div>}
           <small className="macbook-landing__credit" data-intro-item="credit">
-            MacBook by <a href="https://sketchfab.com/jackbaeten" target="_blank" rel="noreferrer">jackbaeten</a> · CC BY 4.0 · modified
+            <a href="https://sketchfab.com/3d-models/macbook-pro-m3-16-inch-2024-8e34fc2b303144f78490007d91ff57c4" target="_blank" rel="noreferrer" aria-label="원본 MacBook Pro M3 16 inch 2024 3D 모델">MacBook</a> by <a href="https://sketchfab.com/jackbaeten" target="_blank" rel="noreferrer">jackbaeten</a> · <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer">CC BY 4.0</a> · <span title="웹용 압축, 화면 교체 및 열림 애니메이션 적용">modified</span>
           </small>
         </div>
       </section>

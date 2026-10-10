@@ -49,9 +49,16 @@ export function useStepBackground(mainRef: RefObject<HTMLElement | null>) {
         const mediaTop = layoutTop(media)
         const mediaHeight = media.offsetHeight
         const mediaBottom = mediaTop + mediaHeight
-        const darkPeak = textBottom + (mediaTop - textBottom) / 2
-        const darkStart = darkPeak - (darkPeak - textTop) * DARK_GRADIENT_SCALE
-        const darkEnd = darkPeak + (mediaTop + mediaHeight * 0.5 - darkPeak) * DARK_GRADIENT_SCALE
+        // Desktop places the copy beside the demo. Keep the fade's stops in
+        // document order even when the demo starts above the copy's bottom.
+        const stacked = mediaTop >= textBottom
+        const darkPeak = stacked ? textBottom + (mediaTop - textBottom) / 2 : (textTop + textBottom) / 2
+        const darkStart = stacked
+          ? darkPeak - (darkPeak - textTop) * DARK_GRADIENT_SCALE
+          : Math.min(textTop, mediaTop) - mediaHeight * 0.5
+        const darkEnd = stacked
+          ? darkPeak + (mediaTop + mediaHeight * 0.5 - darkPeak) * DARK_GRADIENT_SCALE
+          : Math.max(textBottom, mediaBottom) + mediaHeight * 0.45
         const whitePeak = mediaTop + mediaHeight * 0.8
         const whiteStart = whitePeak - mediaHeight * 0.3 * WHITE_GRADIENT_SCALE
         const whiteEnd = whitePeak + (mediaBottom + 56 * unit - whitePeak) * WHITE_GRADIENT_SCALE

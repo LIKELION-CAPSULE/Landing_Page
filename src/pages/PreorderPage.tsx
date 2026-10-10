@@ -126,7 +126,7 @@ export default function PreorderPage({ votedRoom, draft, onDraftChange, onSubmit
           <div className="preorder__room-body">
             {votedRoom && (
               <div className="preorder__room-art">
-                <img className="preorder__room-thumb" src={votedRoom.image} alt="" width={200} height={275} />
+                <img draggable={false} className="preorder__room-thumb" src={votedRoom.image} alt="" width={200} height={275} />
                 <p className="perk__note"><span>사전 예약 후, 해당 룸 출시 시 무료 해금</span></p>
               </div>
             )}
@@ -194,7 +194,7 @@ export default function PreorderPage({ votedRoom, draft, onDraftChange, onSubmit
 
           <button type="submit" className="cta form-submit" id="preorder-submit" disabled={submitting}>
             <span>{submitting ? '사전예약 접수 중…' : submitError ? '다시 시도하기' : '사전예약하기'}</span>
-            <img className="cta__arrow form-submit__arrow" src={arrow} alt="" width={24} height={24} />
+            <img draggable={false} className="cta__arrow form-submit__arrow" src={arrow} alt="" width={24} height={24} />
           </button>
         </fieldset>
         <p className="form-feedback" role="status">{submitError}</p>
