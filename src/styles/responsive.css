@@ -190,11 +190,12 @@
     --u: 1px;
     --problem-art-width: clamp(440px, 44vw, 560px);
     width: min(var(--content-width), calc(100% - 2 * var(--desktop-gutter)));
-    height: calc(var(--problem-art-width) * 536 / 475 + 148px);
-    min-height: 700px;
+    min-height: max(700px, calc(var(--problem-art-width) * 536 / 475 + 148px));
+    padding: 200px 0 88px;
   }
-  .problem__eyebrow { left: 0; top: 200px; }
-  .problem__title { left: 0; top: 236px; line-height: 1.3; }
+  .problem__intro { width: 44%; min-height: 0; margin: 0; }
+  .problem__title { line-height: 1.3; }
+  .problem__visual { position: absolute; inset: 0; height: 100%; pointer-events: none; }
   .problem__blur { display: none; }
   .problem__character {
     left: auto;
@@ -266,7 +267,7 @@
   }
   .speech__tail img { display: none; }
   .speech__text { left: 22px; top: 20px; font-size: 18px; line-height: 1.5; }
-  .problem__question { top: auto; bottom: 16px; font-size: 28px; }
+  .problem__question { position: absolute; left: 0; right: 0; bottom: 16px; font-size: 28px; }
 
   .steps { padding-block: 72px 112px; }
   .steps__title { margin-bottom: 80px; }
@@ -286,8 +287,10 @@
   .story > .rooms {
     --u: clamp(1.1px, 0.11vw, 1.4px);
     width: min(var(--content-width), calc(100% - 2 * var(--desktop-gutter)));
+    min-height: calc(526 * var(--u));
+    padding-block: calc(136.76 * var(--u)) 32px;
   }
-  .rooms__intro { display: block; left: 0; top: 26%; width: 44%; }
+  .rooms__intro { position: relative; display: block; width: 44%; }
   .rooms__intro h2 { font-size: clamp(28px, 2.8vw, 38px); font-weight: 800; line-height: 1.4; letter-spacing: -0.035em; word-break: keep-all; }
   .rooms__intro p { margin-top: 20px; font-size: var(--font-body); line-height: 1.6; color: var(--text-muted); word-break: keep-all; }
   .rooms__lane--left { left: calc(100% - 386 * var(--u)); }
@@ -295,7 +298,7 @@
   .rooms__lane--right { left: calc(100% - 112 * var(--u)); }
   .rooms__shade { left: calc(100% - 386 * var(--u)); }
   .rooms__fade { left: auto; right: 0; }
-  .rooms > .cta { left: 0; top: 58%; width: min(390px, 44%); min-height: 56px; padding: 14px 16px; }
+  .rooms > .cta { width: min(390px, 44%); min-height: 56px; margin: 32px 0 0; padding: 14px 16px; }
   .rooms__motion-toggle { right: 12px; }
 
   .vote__header { flex-direction: row; align-items: end; justify-content: space-between; gap: 32px; }
@@ -367,5 +370,6 @@
   to { opacity: 0; transform: translateY(12px); }
 }
 @media (min-width: 768px) and (prefers-reduced-motion: reduce) {
+  .macbook-landing-page { --macbook-story-overlap: 0px; }
   .terms-sheet[open], .terms-sheet[data-closing] { animation-duration: 1ms; }
 }
