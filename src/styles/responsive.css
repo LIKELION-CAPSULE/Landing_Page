@@ -1,9 +1,11 @@
-/* Keep the 402px mobile design and its scaling unit intact. Larger viewports
-   get their own layout; illustration units are scoped to individual sections. */
+/* Artwork retains its 402px design unit; reading sizes use shared rem tokens.
+   Larger viewports get their own layout and section-scoped illustration units. */
 .rooms__intro { display: none; }
 
 @media (min-width: 768px) {
   :root {
+    --font-body: 1.125rem;
+    --font-detail: 1rem;
     --content-width: 1120px;
     --desktop-gutter: clamp(32px, 4vw, 64px);
   }
@@ -18,6 +20,7 @@
     --u: 1.25px;
     width: calc(402 * var(--u));
   }
+  .problem__title { font-size: clamp(2.5rem, 3.6vw, 3.125rem); }
 
   .steps { padding-block: 64px 80px; }
   .steps__title {
@@ -29,9 +32,7 @@
   }
   .step { gap: 24px; padding: 0 0 32px; }
   .step__text { gap: 12px; padding-inline: 0; }
-  .step__label { font-size: 18px; line-height: 1.4; }
-  .step__name { font-size: 32px; line-height: 1.3; white-space: normal; word-break: keep-all; }
-  .step__desc { font-size: 18px; line-height: 1.7; white-space: normal; word-break: keep-all; }
+  .step__name { font-size: clamp(2rem, 2.5vw, 2.25rem); }
   .step__media {
     width: 100%;
     height: auto;
@@ -44,9 +45,8 @@
   .step--2 + .step { margin-top: 64px; }
 
   .notice { padding: 64px 0 0; }
-  .notice__title { font-size: 20px; line-height: 1.5; }
-  .notice__body { max-width: 720px; font-size: 15px; line-height: 1.8; }
-  .notice__body br { display: none; }
+  .notice__title { font-size: 1.25rem; }
+  .notice__body { max-width: 720px; }
 
   .footer {
     display: grid;
@@ -56,17 +56,11 @@
     margin-top: 32px;
     padding: 28px 0 40px;
     border-top: 1px solid rgb(218 218 218 / 30%);
-    font-size: 14px;
-    line-height: 1.5;
   }
-  .footer > * { position: static; }
-  .footer__divider { display: none; }
   .footer__insta,
   .footer__mail,
   .footer__copy { grid-column: 1; }
-  .footer__mail { overflow-wrap: anywhere; }
-  .footer__copy { font-size: 12px; }
-  .footer__links { grid-column: 2; grid-row: 1 / 4; align-self: start; font-size: 13px; gap: 12px; }
+  .footer__links { grid-column: 2; grid-row: 1 / 4; align-self: start; }
 
   /* The funnel shares the landing's margins. Forms keep a readable line length. */
   :is(.vote, .preorder, .done, .survey) {
@@ -99,7 +93,7 @@
   .preorder .form-submit { min-height: 56px; margin-top: 24px; }
   .field__control { min-height: 52px; padding: 12px 16px; }
   .consents { margin-top: 16px; }
-  .preorder__fine { margin-top: 12px; font-size: max(0.75rem, 13px); line-height: 1.8; }
+  .preorder__fine { margin-top: 12px; }
   .done > .done__reservation { width: min(100%, 380px); margin-top: 32px; }
   .done__actions { margin-top: 32px; }
   .survey__form { margin-top: 32px; }
@@ -176,10 +170,6 @@
   .macbook-landing__model-space { width: 100%; height: auto; aspect-ratio: 364 / 225; }
   .macbook-landing .hero__preview figcaption {
     margin-top: 24px;
-    font-size: 14px;
-    line-height: 1.6;
-    white-space: normal;
-    text-wrap: balance;
   }
   .macbook-landing .hero__subtitle {
     grid-column: 1;
@@ -190,7 +180,6 @@
     line-height: 1.7;
     text-align: start;
   }
-  .macbook-landing__credit { bottom: 12px; font-size: 9px; }
   .macbook-landing[data-reduced-motion='true'] { height: max(100svh, 720px); }
 }
 
@@ -204,8 +193,8 @@
     height: calc(var(--problem-art-width) * 536 / 475 + 148px);
     min-height: 700px;
   }
-  .problem__eyebrow { left: 0; top: 200px; font-size: 18px; }
-  .problem__title { left: 0; top: 236px; font-size: clamp(40px, 3.6vw, 50px); line-height: 1.3; }
+  .problem__eyebrow { left: 0; top: 200px; }
+  .problem__title { left: 0; top: 236px; line-height: 1.3; }
   .problem__blur { display: none; }
   .problem__character {
     left: auto;
@@ -288,7 +277,6 @@
     column-gap: clamp(40px, 5vw, 72px);
     padding: 0;
   }
-  .step__name { font-size: clamp(28px, 2.5vw, 36px); }
   .step:nth-of-type(even) { grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr); }
   .step:nth-of-type(even) .step-demo { grid-column: 1; grid-row: 1; }
   .step:nth-of-type(even) .step__text { grid-column: 2; grid-row: 1; }
@@ -301,13 +289,13 @@
   }
   .rooms__intro { display: block; left: 0; top: 26%; width: 44%; }
   .rooms__intro h2 { font-size: clamp(28px, 2.8vw, 38px); font-weight: 800; line-height: 1.4; letter-spacing: -0.035em; word-break: keep-all; }
-  .rooms__intro p { margin-top: 20px; font-size: 16px; line-height: 1.8; color: var(--text-muted); word-break: keep-all; }
+  .rooms__intro p { margin-top: 20px; font-size: var(--font-body); line-height: 1.6; color: var(--text-muted); word-break: keep-all; }
   .rooms__lane--left { left: calc(100% - 386 * var(--u)); }
   .rooms__lane--mid { left: calc(100% - 278 * var(--u)); }
   .rooms__lane--right { left: calc(100% - 112 * var(--u)); }
   .rooms__shade { left: calc(100% - 386 * var(--u)); }
   .rooms__fade { left: auto; right: 0; }
-  .rooms > .cta { left: 0; top: 58%; width: min(390px, 44%); min-height: 56px; padding: 14px 16px; font-size: 18px; }
+  .rooms > .cta { left: 0; top: 58%; width: min(390px, 44%); min-height: 56px; padding: 14px 16px; }
   .rooms__motion-toggle { right: 12px; }
 
   .vote__header { flex-direction: row; align-items: end; justify-content: space-between; gap: 32px; }
@@ -369,7 +357,6 @@
   .survey__header { position: sticky; top: 48px; width: 100%; margin: 0; gap: 24px; }
   .survey__form { width: 100%; margin: 0; }
   .survey__title { font-size: max(2rem, 40px); word-break: keep-all; overflow-wrap: normal; }
-  .survey__lead { font-size: 18px; line-height: 1.7; }
   .survey > .form-submit { align-self: center; }
 }
 
@@ -380,6 +367,5 @@
   to { opacity: 0; transform: translateY(12px); }
 }
 @media (min-width: 768px) and (prefers-reduced-motion: reduce) {
-  .macbook-landing-page { --macbook-story-overlap: 0px; }
   .terms-sheet[open], .terms-sheet[data-closing] { animation-duration: 1ms; }
 }
