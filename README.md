@@ -163,6 +163,8 @@ npm run assets:optimize # 원본에서 배포용 복사본 재생성
 
 ## 배포할 때
 
+- 카카오톡 등 링크 공유 미리보기는 `index.html`의 Open Graph 태그로 설정해요. 대표 이미지는 제공된 **캐릭터와 함께하는 스터디룸 광고.png**를 그대로 복사한 `public/images/capsule-study-room-ad.png`(1672×941 PNG)이며, 빌드 시 `dist/images/`에 포함돼요. 이미지·서비스 URL은 `https://landing-page-nine-psi-56.vercel.app/` 기준이에요. 서비스 도메인을 바꾸면 canonical, `og:url`, `og:image`, `twitter:image`의 주소를 함께 수정하세요.
+- 재배포 후에도 카카오톡 미리보기가 갱신되지 않으면 [카카오 공유 디버거](https://developers.kakao.com/tool/debugger/sharing)에 공유한 서비스 URL을 입력하고 OG 캐시를 초기화한 뒤 링크를 다시 보내세요. [카카오 공식 안내](https://developers.kakao.com/docs/ko/message-template/faq)를 참고하세요.
 - `/rooms`, `/survey` 같은 주소에서 새로고침해도 열리도록, 호스팅에 **SPA fallback**(모든 경로를 `index.html`로 연결) 설정이 필요해요.
 - Vercel 환경변수에 Supabase URL·공개키를 설정하고 재배포해요. 신규 DB는 [데이터 수집 안내](docs/data-collection.md)의 마이그레이션 순서를 따르세요.
 - 기존 `main`과 이미 연결된 DB에는 `2026-10-12_joseon_room.sql`(새 포스터)과 [`2026-10-13_post_reservation_survey.sql`](supabase/migrations/2026-10-13_post_reservation_survey.sql)(예약 후 설문)을 순서대로 추가 적용해요. 12번 파일이 적용되어 있다면 13번만 실행하세요. 기존 예약·투표·설문 답변은 보존해요.
