@@ -1,0 +1,73 @@
+/* S6 mate intro: DESIGN_TOKENS.json v1.0.19 tokens only. One headliner, not a card list. */
+.story > .mate {
+  width: min(1120px, calc(100% - 48px));
+  padding-block: calc(4 * var(--spacing-content)) var(--spacing-content);
+  color: var(--color-ink);
+  scroll-margin-top: 80px;
+}
+.mate__heading { text-align: center; margin-bottom: calc(2 * var(--spacing-content)); }
+.mate__heading h2 { font-size: clamp(28px, 3.2vw, 44px); font-weight: 700; line-height: 1.35; letter-spacing: -.035em; word-break: keep-all; }
+.mate__heading > p { margin-top: 16px; color: var(--color-muted); font-size: 16px; line-height: 1.65; word-break: keep-all; }
+
+.mate-card {
+  display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); overflow: hidden;
+  border-radius: var(--radius-panel); background: var(--color-panel);
+}
+.mate-card__visual {
+  position: relative; min-height: 100%; overflow: hidden;
+  background:
+    radial-gradient(70% 55% at 50% 30%, color-mix(in srgb, var(--color-primary) 40%, var(--color-transparent)), var(--color-transparent) 72%),
+    linear-gradient(170deg, var(--color-primary-soft), var(--color-canvas) 92%);
+}
+.mate-card__visual img { position: absolute; inset: 24px 0 0; width: 100%; height: calc(100% - 24px); object-fit: cover; object-position: 50% 0; }
+.mate-card__visual::after {
+  content: ''; position: absolute; inset: 70% 0 0; pointer-events: none;
+  background: linear-gradient(var(--color-transparent), var(--color-panel));
+}
+.mate-card__badges { position: absolute; z-index: 1; top: 16px; left: 16px; display: flex; gap: 8px; list-style: none; margin: 0; padding: 0; }
+.mate-card__badges li {
+  padding: 6px 12px; border-radius: 999px; font-size: 12px; line-height: 18px; font-weight: 600;
+  background: color-mix(in srgb, var(--color-canvas) 86%, var(--color-transparent)); color: var(--color-ink);
+}
+.mate-card__info { display: flex; flex-direction: column; gap: var(--spacing-content); padding: var(--spacing-panel-roomy) calc(1.5 * var(--spacing-panel-roomy)) var(--spacing-panel-roomy) var(--spacing-panel-roomy); }
+.mate-card__info h3 { font-size: clamp(32px, 3.4vw, 44px); line-height: 1.2; font-weight: 750; letter-spacing: -.03em; }
+.mate-card__summary { margin-top: -12px; font-size: 18px; line-height: 1.6; color: var(--color-text-accent); word-break: keep-all; text-wrap: balance; }
+.mate-card__facts, .mate-card__taste { display: grid; gap: 12px; margin: 0; }
+.mate-card__facts > div, .mate-card__taste > div { display: grid; grid-template-columns: 5.5em minmax(0, 1fr); gap: 12px; align-items: baseline; }
+.mate-card dt { font-size: 14px; color: var(--color-subtle); }
+.mate-card dd { margin: 0; font-size: 16px; line-height: 1.6; word-break: keep-all; }
+.mate-card__first-line { margin: 0; padding: 16px 20px; border-radius: 16px; background: var(--color-surface); }
+.mate-card__first-line > span { display: block; margin-bottom: 4px; font-size: 12px; color: var(--color-muted); }
+.mate-card__first-line p { font-size: 17px; line-height: 1.65; font-weight: 500; word-break: keep-all; }
+.mate-card__taste { padding-top: var(--spacing-content-compact); border-top: 1px solid var(--color-divider); }
+.mate-card__tags { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; margin: 0; padding: 0; }
+.mate-card__tags li { padding: 6px 12px; border-radius: 999px; background: var(--color-surface); color: var(--color-muted); font-size: 13px; line-height: 18px; }
+
+.mate-next {
+  display: flex; align-items: center; gap: var(--spacing-content-compact); width: fit-content; max-width: 100%;
+  margin: var(--spacing-content) auto 0; padding: 16px 24px 16px 16px; border-radius: var(--radius-card);
+  background: var(--color-panel); color: var(--color-muted);
+}
+.mate-next__silhouette { position: relative; flex: none; display: grid; place-items: center; width: 56px; height: 56px; border-radius: 16px; background: var(--color-surface); overflow: hidden; }
+.mate-next__silhouette svg { width: 44px; height: 44px; margin-top: 12px; fill: var(--color-control-hover); }
+.mate-next__silhouette b { position: absolute; top: 6px; font-size: 14px; color: var(--color-ink); }
+.mate-next h3 { font-size: 16px; font-weight: 650; color: var(--color-ink); }
+.mate-next p { margin-top: 2px; font-size: 14px; line-height: 1.5; word-break: keep-all; }
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .mate-card { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .mate-card__info { padding: var(--spacing-panel); }
+}
+@media (max-width: 767px) {
+  .story > .mate { width: calc(100% - 32px); padding-block: calc(2 * var(--spacing-panel-roomy)) var(--spacing-content); }
+  .mate__heading { margin-bottom: 32px; }
+  .mate__heading h2 { font-size: clamp(23px, 6.1vw, 28px); letter-spacing: -.04em; }
+  .mate__heading > p { font-size: 14px; }
+  .mate-card { grid-template-columns: minmax(0, 1fr); }
+  .mate-card__visual { aspect-ratio: 4 / 4.2; min-height: 0; }
+  .mate-card__info { padding: var(--spacing-panel-compact) var(--spacing-content-compact) var(--spacing-panel); gap: 20px; }
+  .mate-card__summary { margin-top: -8px; font-size: 16px; }
+  .mate-card dd { font-size: 15px; }
+  .mate-card__first-line p { font-size: 16px; }
+  .mate-next { width: 100%; }
+}
