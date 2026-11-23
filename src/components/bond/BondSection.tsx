@@ -85,7 +85,7 @@ export default function BondSection() {
             ))}
             {!stage.image && <span className="bond-stage__lock" aria-hidden="true"><Icon size={28}>{lock}</Icon></span>}
             <span className="bond-stage__badge" aria-hidden="true">{stage.name}</span>
-            <span className="bond-stage__ai">AI 캐릭터예요</span>
+            <span className="bond-stage__ai">AI 캐릭터</span>
             {!reduced && (
               <button type="button" className="bond-stage__control" aria-pressed={stopped} aria-label={stopped ? '단계 자동 넘김 재생' : '단계 자동 넘김 일시정지'} onClick={toggle}>
                 <CallIcon name={stopped ? 'play' : 'pause'} />
@@ -123,7 +123,6 @@ export default function BondSection() {
             ))}
           </ol>
           <p className="bond__rule">친밀도는 함께한 시간과 대화로만 올라요. 결제로는 올릴 수 없어요.</p>
-          <p className="bond__note">표정과 대사는 예시예요. 실제 대화는 AI가 자유롭게 이어가요.</p>
         </div>
       </div>
 

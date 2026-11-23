@@ -14,12 +14,11 @@
 .beta-fact dt { font-size: 14px; color: var(--color-subtle); }
 .beta-fact dd { display: flex; flex-direction: column; gap: 6px; margin: 8px 0 0; }
 .beta-fact strong { font-size: 22px; line-height: 1.35; font-weight: 700; letter-spacing: -.02em; word-break: keep-all; }
-.beta-fact span { font-size: 14px; line-height: 1.55; color: var(--color-muted); word-break: keep-all; }
 
 .beta__columns { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: var(--spacing-section); margin-top: calc(2 * var(--spacing-section)); align-items: start; }
 .beta-start h3, .beta-faq h3 { margin-bottom: var(--spacing-content); font-size: 20px; font-weight: 650; }
 .beta-start ol { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--spacing-content); }
-.beta-start li { display: flex; gap: 16px; align-items: flex-start; }
+.beta-start li { display: flex; gap: 16px; align-items: center; }
 .beta-start li > span {
   flex: none; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%;
   background: var(--color-surface); color: var(--color-muted); font-size: 14px; font-weight: 700;
@@ -70,7 +69,6 @@
   .beta-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
   .beta-fact { padding: var(--spacing-content-compact); }
   .beta-fact strong { font-size: 18px; }
-  .beta-fact span { font-size: 13px; }
   .beta__columns { grid-template-columns: minmax(0, 1fr); gap: calc(2 * var(--spacing-content)); margin-top: calc(2 * var(--spacing-content)); }
   .beta-faq summary { font-size: 15px; padding-left: 16px; }
   .beta-faq details p { padding: 0 16px 16px; font-size: 14px; }

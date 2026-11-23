@@ -40,7 +40,7 @@
 @keyframes moment-wave { to { transform: scaleY(1); } }
 .moment-presence { display: grid; grid-template-columns: .85fr 1.15fr; padding: 16px; gap: 16px; background: var(--color-panel); }
 .moment-presence__mate { position: relative; min-width: 0; overflow: hidden; border-radius: 12px; background: var(--color-canvas); }
-.moment-presence__mate > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.moment-presence__mate > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 0; }
 .moment-presence__mate > .moment-pill { position: absolute; top: 8px; left: 8px; }
 .moment-presence__mate > .moment-caption { position: absolute; bottom: 12px; left: 8px; right: 8px; max-width: none; font-size: 12px; }
 .moment-presence__self { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; border-radius: 12px; background: var(--color-surface); color: var(--color-muted); }
@@ -78,7 +78,6 @@
 .moment-desktop__ai { position: absolute; z-index: 4; top: 6px; left: 6px; padding: 3px 6px; font-size: 12px; border-radius: 20px; background: var(--color-overlay); color: var(--color-ink); }
 .moment-desktop__mic { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); z-index: 4; display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: var(--color-control); color: var(--color-ink); }
 .moment-desktop__bubble { position: absolute; bottom: 30%; right: 4%; max-width: 55%; padding: 8px 12px; border-radius: 12px; background: var(--color-panel); color: var(--color-ink); font-size: 12px; line-height: 18px; z-index: 5; }
-.moments__note { margin-top: 56px; color: var(--color-subtle); text-align: center; font-size: 14px; line-height: 1.6; }
 @media (max-width:1023px) { .moment,.moment:nth-of-type(even) { grid-template-columns: minmax(0,1fr); gap: 24px; } .moment:nth-of-type(even) .moment__copy,.moment:nth-of-type(even) .moment-scene { grid-column: auto; grid-row: auto; } .moment + .moment { margin-top: 64px; } }
 @media (max-width:767px) {
   .story > .moments { width: calc(100% - 32px); padding-block: calc(2 * var(--spacing-panel-roomy)) var(--spacing-content); }
@@ -112,7 +111,6 @@
   .moment-desktop__mic { width: 24px; height: 24px; bottom: 5px; }
   .moment-desktop__mic svg { width: 14px; height: 14px; }
   .moment-desktop__bubble { bottom: 57%; max-width: 55%; padding: 5px 8px; font-size: 10px; line-height: 14px; }
-  .moments__note { font-size: 12px; }
 }
 @media (prefers-reduced-motion:reduce) { .moment-wave i,.moment-editor__cursor { animation: none; } .moment-video { transition: none; } }
 /* Keep the 44px control clear of the file names on the smallest desktop mock. */

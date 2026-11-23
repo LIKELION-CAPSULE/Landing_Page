@@ -28,7 +28,6 @@ export default function MateSection() {
     <section className="mate" id="mates" aria-labelledby="mate-title">
       <header className="mate__heading" data-reveal>
         <h2 id="mate-title">오늘 연결할 메이트</h2>
-        <p>12월 베타에서는 채린과 먼저 만나요.</p>
       </header>
 
       <article ref={chaerin} className="mate-card" aria-labelledby="mate-chaerin-name" data-reveal>

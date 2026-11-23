@@ -177,9 +177,12 @@ export default function ContrastSection() {
               <source src={landscapeMp4} type="video/mp4" media={LANDSCAPE_QUERY} />
             </video>
             {(!started || phase === 'waiting' || reduced) && <img className="contrast-call__poster" src={poster} alt="" loading="lazy" width={portrait ? 1080 : 1920} height={portrait ? 1920 : 1080} />}
-            <div className="contrast-call__top"><span className="contrast-call__status"><i />채린 · 연결 중</span><span>AI 캐릭터예요</span></div>
-            <div className="contrast-call__cam"><DetailIcon>{icons.presence}</DetailIcon><span>내 캠</span></div>
-            {(complete || phase === 'replying') && <div className="contrast-call__caption"><span>채린</span><p>{REPLY}</p></div>}
+            <div className="contrast-call__top"><span className="contrast-call__status"><i />채린 · 연결 중</span><span>AI 캐릭터</span></div>
+            {/* One bottom row keeps the caption and my cam on the same centre line. */}
+            <div className="contrast-call__bottom">
+              {(complete || phase === 'replying') && <div className="contrast-call__caption"><span>채린</span><p>{REPLY}</p></div>}
+              <div className="contrast-call__cam"><DetailIcon>{icons.presence}</DetailIcon><span>내 캠</span></div>
+            </div>
           </div>
           <ul className="contrast-card__details">
             <li><DetailIcon>{icons.voice}</DetailIcon>목소리로 대답해요</li>
@@ -188,7 +191,6 @@ export default function ContrastSection() {
             <li><DetailIcon>{icons.pip}</DetailIcon>작업 옆에 띄워 둬요</li>
           </ul>
           <div className="contrast-call__footer">
-            <p className="contrast__demo-note">실제 대화는 AI가 자유롭게 이어가요</p>
             <div className="contrast__replay-slot">{!reduced && <button type="button" className="contrast__replay" onClick={replay} style={{ visibility: complete ? 'visible' : 'hidden' }}><DetailIcon><path d="M3 11a9 9 0 1 1 2.4 6.1M3 4v7h7" /></DetailIcon>다시 보기</button>}</div>
           </div>
         </article>
