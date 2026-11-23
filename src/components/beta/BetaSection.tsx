@@ -40,7 +40,6 @@ export default function BetaSection() {
     <section className="beta" id="beta" aria-labelledby="beta-title">
       <header className="beta__heading" data-reveal>
         <h2 id="beta-title">12월 1일, 채린과 먼저 만나요</h2>
-        <p>웹 베타는 2주 동안, 100명과 먼저 열어요.</p>
       </header>
 
       <dl className="beta-facts" data-reveal>

@@ -55,7 +55,6 @@
 .contrast-call__caption p { font-size: clamp(16px, 1.5vw, 20px); line-height: 1.6; font-weight: 500; word-break: keep-all; }
 .contrast-call__footer { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 24px; }
 .contrast__after { text-align: center; margin-top: calc(2 * var(--spacing-section)); }
-.contrast__demo-note { font-size: 14px; line-height: 1.6; color: var(--color-subtle); }
 .contrast__replay-slot { display: flex; justify-content: center; min-height: 44px; flex: none; }
 .contrast__replay { display: flex; align-items: center; gap: 8px; padding: 12px 20px; min-height: 44px; border: 0; border-radius: 12px; background: var(--color-control); color: var(--color-ink); font: 500 14px/20px var(--font-sans); cursor: pointer; }
 .contrast__replay:hover { background: var(--color-control-hover); }

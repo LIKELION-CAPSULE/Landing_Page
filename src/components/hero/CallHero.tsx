@@ -202,7 +202,6 @@ export default function CallHero() {
           <p className="call-hero__subtitle">말을 걸면 목소리로 대답하고,<br className="call-hero__desktop-break" /> 함께한 시간만큼 새 에피소드가 열려요.</p>
           <CallCta placement="hero" state={cta} mobile={mobile} />
           <p className="call-hero__beta">{mobile && cta !== 'open' ? '웹 베타 · 무료 · 선착순 100명' : '12월 1일 웹 베타 · 무료 · 선착순 100명'}</p>
-          <p className="call-hero__demo-note">실제 대화는 AI가 자유롭게 이어가요.</p>
         </div>
         <span className="sr-only">채린은 AI 캐릭터예요. 영상과 말풍선은 예시 대화입니다.</span>
         <p className="sr-only">대화 예시. {HERO_DIALOGUE.map(line => `${line.speaker === 'mate' ? '채린' : '나'}: ${line.text}`).join(' ')}</p>

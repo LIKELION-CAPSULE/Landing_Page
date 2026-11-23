@@ -123,7 +123,6 @@ export default function BondSection() {
             ))}
           </ol>
           <p className="bond__rule">친밀도는 함께한 시간과 대화로만 올라요. 결제로는 올릴 수 없어요.</p>
-          <p className="bond__note">표정과 대사는 예시예요. 실제 대화는 AI가 자유롭게 이어가요.</p>
         </div>
       </div>
 

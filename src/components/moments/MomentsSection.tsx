@@ -111,5 +111,5 @@ const scenes = [
   { number: '03', title: '작업 옆에 띄워 둬요', description: 'PIP로 화면 구석에 띄워 두고, 하던 일을 계속해요.', component: DesktopScene },
 ]
 export default function MomentsSection() {
-  return <section className="moments" id="moments" aria-labelledby="moments-title"><h2 id="moments-title">옆에 있는 것처럼, 반응해요</h2><p className="sr-only">채린은 AI 캐릭터예요. 카메라와 마이크를 켜지 않는 무음 예시 장면이에요.</p>{scenes.map(({ number, title, description, component: Scene }) => <article className="moment" key={number}><div className="moment__copy"><span className="moment__number">{number}</span><h3>{title}</h3><p>{description}</p>{number === '02' && <small>영상은 브라우저 안에서만 쓰고, 저장하거나 보내지 않아요. 카메라 없이도 쓸 수 있어요.</small>}</div><Scene /></article>)}<p className="moments__note">실제 대화는 AI가 자유롭게 이어가요.</p></section>
+  return <section className="moments" id="moments" aria-labelledby="moments-title"><h2 id="moments-title">옆에 있는 것처럼, 반응해요</h2><p className="sr-only">채린은 AI 캐릭터예요. 카메라와 마이크를 켜지 않는 무음 예시 장면이에요.</p>{scenes.map(({ number, title, description, component: Scene }) => <article className="moment" key={number}><div className="moment__copy"><span className="moment__number">{number}</span><h3>{title}</h3><p>{description}</p>{number === '02' && <small>영상은 브라우저 안에서만 쓰고, 저장하거나 보내지 않아요. 카메라 없이도 쓸 수 있어요.</small>}</div><Scene /></article>)}</section>
 }

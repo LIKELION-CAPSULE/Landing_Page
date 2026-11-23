@@ -188,7 +188,6 @@ export default function ContrastSection() {
             <li><DetailIcon>{icons.pip}</DetailIcon>작업 옆에 띄워 둬요</li>
           </ul>
           <div className="contrast-call__footer">
-            <p className="contrast__demo-note">실제 대화는 AI가 자유롭게 이어가요</p>
             <div className="contrast__replay-slot">{!reduced && <button type="button" className="contrast__replay" onClick={replay} style={{ visibility: complete ? 'visible' : 'hidden' }}><DetailIcon><path d="M3 11a9 9 0 1 1 2.4 6.1M3 4v7h7" /></DetailIcon>다시 보기</button>}</div>
           </div>
         </article>
