@@ -1,0 +1,917 @@
+{
+  "generatedAt": "2026-11-24",
+  "source": "Front_Web local-assets/chaerin-v2 via localhost:3000; engine.js + player.js",
+  "displaySize": [
+    800,
+    600
+  ],
+  "pixelSize": [
+    1600,
+    1200
+  ],
+  "dpr": 2,
+  "view": {
+    "zoom": 2.5128834355828222,
+    "cx": 640,
+    "cy": 265.3125
+  },
+  "framing": "model y 31..520; head to chest; 4% top margin; transparent background",
+  "playerOptions": {
+    "blink": false,
+    "breath": false,
+    "idle": false,
+    "autoLook": false,
+    "headFollow": 0
+  },
+  "settleMs": 650,
+  "files": {
+    "neutral": {
+      "file": "neutral.webp",
+      "expression": "neutral",
+      "expressionElapsedMs": 651.5999999940395,
+      "blinkDisabled": true,
+      "params": {
+        "angleX": 0,
+        "angleY": 0,
+        "eyeX": 0,
+        "eyeY": 0,
+        "eyeOpenL": 1,
+        "eyeOpenR": 1,
+        "eyeSmile": 0,
+        "mouthOpen": 0,
+        "mouthForm": 0,
+        "browLY": 0,
+        "browRY": 0,
+        "browLAngle": 0,
+        "browRAngle": 0,
+        "eyeBall": 0,
+        "cheek": 0,
+        "tear": 0,
+        "gloom": 0,
+        "sweat": 0,
+        "anger": 0,
+        "sparkle": 0,
+        "heartEyes": 0,
+        "blankEyes": 0,
+        "mouthWide": 0,
+        "angleZ": 0,
+        "outfit_default": 1,
+        "outfit_oc4ad1": 0
+      },
+      "bytes": 148330,
+      "callBytes": 143696,
+      "quality": 86,
+      "defringe": "1px alpha erosion; RGB repair only on outer 2px AA band, opaque seed <=2px on nonzero-alpha path, max channel difference <=48; retain original RGB elsewhere",
+      "callFile": "neutral-call.webp"
+    },
+    "happy": {
+      "file": "happy.webp",
+      "expression": "happy",
+      "expressionElapsedMs": 650.5,
+      "blinkDisabled": true,
+      "params": {
+        "angleX": 0,
+        "angleY": 0,
+        "eyeX": 0,
+        "eyeY": 0,
+        "eyeOpenL": 1,
+        "eyeOpenR": 1,
+        "eyeSmile": 1,
+        "mouthOpen": 0.5,
+        "mouthForm": 0.5,
+        "browLY": 0.5,
+        "browRY": 0.5,
+        "browLAngle": -0.2,
+        "browRAngle": -0.2,
+        "eyeBall": 0,
+        "cheek": 0,
+        "tear": 0,
+        "gloom": 0,
+        "sweat": 0,
+        "anger": 0,
+        "sparkle": 0,
+        "heartEyes": 0,
+        "blankEyes": 0,
+        "mouthWide": 0,
+        "angleZ": 0,
+        "outfit_default": 1,
+        "outfit_oc4ad1": 0
+      },
+      "bytes": 148612,
+      "callBytes": 144060,
+      "quality": 86,
+      "defringe": "1px alpha erosion; RGB repair only on outer 2px AA band, opaque seed <=2px on nonzero-alpha path, max channel difference <=48; retain original RGB elsewhere",
+      "callFile": "happy-call.webp"
+    },
+    "laugh": {
+      "file": "laugh.webp",
+      "expression": "laugh",
+      "expressionElapsedMs": 651.2000000178814,
+      "blinkDisabled": true,
+      "params": {
+        "angleX": 0,
+        "angleY": 0,
+        "eyeX": 0,
+        "eyeY": -0.569999999942353,
+        "eyeOpenL": 0.9,
+        "eyeOpenR": 0.9,
+        "eyeSmile": 0.5,
+        "mouthOpen": 0,
+        "mouthForm": 1,
+        "browLY": 0.5,
+        "browRY": 0.5,
+        "browLAngle": -0.5,
+        "browRAngle": -0.5,
+        "eyeBall": 0,
+        "cheek": 0,
+        "tear": 0,
+        "gloom": 0,
+        "sweat": 0,
+        "anger": 0,
+        "sparkle": 0,
+        "heartEyes": 0,
+        "blankEyes": 0,
+        "mouthWide": 0,
+        "angleZ": 0,
+        "outfit_default": 1,
+        "outfit_oc4ad1": 0
+      },
+      "bytes": 149018,
+      "callBytes": 144314,
+      "quality": 86,
+      "defringe": "1px alpha erosion; RGB repair only on outer 2px AA band, opaque seed <=2px on nonzero-alpha path, max channel difference <=48; retain original RGB elsewhere",
+      "callFile": "laugh-call.webp"
+    },
+    "focus": {
+      "file": "focus.webp",
+      "expression": "focus",
+      "expressionElapsedMs": 651,
+      "blinkDisabled": true,
+      "params": {
+        "angleX": 0,
+        "angleY": -1,
+        "eyeX": 0,
+        "eyeY": -0.9999999998651535,
+        "eyeOpenL": 1,
+        "eyeOpenR": 0.85,
+        "eyeSmile": 0.2,
+        "mouthOpen": 0,
+        "mouthForm": -0.1,
+        "browLY": 0.5,
+        "browRY": 0,
+        "browLAngle": -0.2,
+        "browRAngle": -0.2,
+        "eyeBall": 0,
+        "cheek": 0,
+        "tear": 0,
+        "gloom": 0,
+        "sweat": 0,
+        "anger": 0,
+        "sparkle": 0,
+        "heartEyes": 0,
+        "blankEyes": 0,
+        "mouthWide": 0,
+        "angleZ": 1,
+        "outfit_default": 1,
+        "outfit_oc4ad1": 0
+      },
+      "bytes": 146422,
+      "callBytes": 145778,
+      "quality": 86,
+      "defringe": "1px alpha erosion; RGB repair only on outer 2px AA band, opaque seed <=2px on nonzero-alpha path, max channel difference <=48; retain original RGB elsewhere",
+      "callFile": "focus-call.webp"
+    },
+    "sulky": {
+      "file": "sulky.webp",
+      "expression": "sulky",
+      "expressionElapsedMs": 651,
+      "blinkDisabled": true,
+      "params": {
+        "angleX": -0.25,
+        "angleY": 0,
+        "eyeX": -0.35999999996359144,
+        "eyeY": 0,
+        "eyeOpenL": 0.78,
+        "eyeOpenR": 0.78,
+        "eyeSmile": 0.1,
+        "mouthOpen": 0,
+        "mouthForm": -0.35,
+        "browLY": -0.45,
+        "browRY": -0.45,
+        "browLAngle": 0.45,
+        "browRAngle": 0.45,
+        "eyeBall": 0,
+        "cheek": 0.3,
+        "tear": 0,
+        "gloom": 0,
+        "sweat": 0,
+        "anger": 0,
+        "sparkle": 0,
+        "heartEyes": 0,
+        "blankEyes": 0,
+        "mouthWide": 0,
+        "angleZ": 0,
+        "outfit_default": 1,
+        "outfit_oc4ad1": 0
+      },
+      "bytes": 148048,
+      "callBytes": 143848,
+      "quality": 86,
+      "defringe": "1px alpha erosion; RGB repair only on outer 2px AA band, opaque seed <=2px on nonzero-alpha path, max channel difference <=48; retain original RGB elsewhere",
+      "callFile": "sulky-call.webp"
+    },
+    "yawn": {
+      "file": "yawn.webp",
+      "expression": "yawn",
+      "expressionElapsedMs": 650.2000000178814,
+      "blinkDisabled": true,
+      "params": {
+        "angleX": 0,
+        "angleY": 1,
+        "eyeX": 0,
+        "eyeY": 0,
+        "eyeOpenL": 0,
+        "eyeOpenR": 0,
+        "eyeSmile": 0.3,
+        "mouthOpen": 1,
+        "mouthForm": -0.88,
+        "browLY": 0.6,
+        "browRY": 0.6,
+        "browLAngle": -0.36,
+        "browRAngle": -0.3,
+        "eyeBall": 0,
+        "cheek": 0,
+        "tear": 0,
+        "gloom": 0,
+        "sweat": 0,
+        "anger": 0,
+        "sparkle": 0,
+        "heartEyes": 0,
+        "blankEyes": 0,
+        "mouthWide": 0,
+        "angleZ": 0,
+        "outfit_default": 1,
+        "outfit_oc4ad1": 0
+      },
+      "bytes": 149316,
+      "callBytes": 146050,
+      "quality": 86,
+      "defringe": "1px alpha erosion; RGB repair only on outer 2px AA band, opaque seed <=2px on nonzero-alpha path, max channel difference <=48; retain original RGB elsewhere",
+      "callFile": "yawn-call.webp"
+    },
+    "angry": {
+      "file": "angry.webp",
+      "expression": "angry",
+      "expressionElapsedMs": 651.0999999940395,
+      "blinkDisabled": true,
+      "params": {
+        "angleX": 0,
+        "angleY": 0,
+        "eyeX": 0,
+        "eyeY": 0.8999999999089786,
+        "eyeOpenL": 0.85,
+        "eyeOpenR": 0.85,
+        "eyeSmile": 0,
+        "mouthOpen": 0.23,
+        "mouthForm": -0.84,
+        "browLY": -1,
+        "browRY": 0,
+        "browLAngle": 0,
+        "browRAngle": 1,
+        "eyeBall": 0,
+        "cheek": 0,
+        "tear": 0,
+        "gloom": 0,
+        "sweat": 0,
+        "anger": 0,
+        "sparkle": 0,
+        "heartEyes": 0,
+        "blankEyes": 0,
+        "mouthWide": 0,
+        "angleZ": 0,
+        "outfit_default": 1,
+        "outfit_oc4ad1": 0
+      },
+      "bytes": 149408,
+      "callBytes": 144656,
+      "quality": 86,
+      "defringe": "1px alpha erosion; RGB repair only on outer 2px AA band, opaque seed <=2px on nonzero-alpha path, max channel difference <=48; retain original RGB elsewhere",
+      "callFile": "angry-call.webp"
+    },
+    "contempt": {
+      "file": "contempt.webp",
+      "expression": "contempt",
+      "expressionElapsedMs": 651.5,
+      "blinkDisabled": true,
+      "params": {
+        "angleX": 0,
+        "angleY": 0,
+        "eyeX": -0.7499999998988651,
+        "eyeY": 0,
+        "eyeOpenL": 1,
+        "eyeOpenR": 0.67,
+        "eyeSmile": 0,
+        "mouthOpen": 0.3,
+        "mouthForm": -1,
+        "browLY": 1,
+        "browRY": -1,
+        "browLAngle": -0.15,
+        "browRAngle": 1,
+        "eyeBall": 0,
+        "cheek": 0,
+        "tear": 0,
+        "gloom": 0,
+        "sweat": 0,
+        "anger": 0,
+        "sparkle": 0,
+        "heartEyes": 0,
+        "blankEyes": 0,
+        "mouthWide": 0,
+        "angleZ": 0,
+        "outfit_default": 1,
+        "outfit_oc4ad1": 0
+      },
+      "bytes": 149024,
+      "callBytes": 144212,
+      "quality": 86,
+      "defringe": "1px alpha erosion; RGB repair only on outer 2px AA band, opaque seed <=2px on nonzero-alpha path, max channel difference <=48; retain original RGB elsewhere",
+      "callFile": "contempt-call.webp"
+    },
+    "shy": {
+      "file": "shy.webp",
+      "expression": "shy",
+      "expressionElapsedMs": 650.6000000238419,
+      "blinkDisabled": true,
+      "params": {
+        "angleX": 0,
+        "angleY": 0.17,
+        "eyeX": 0,
+        "eyeY": -0.5999999999393191,
+        "eyeOpenL": 0.8,
+        "eyeOpenR": 0.8,
+        "eyeSmile": 0.5,
+        "mouthOpen": 0.4,
+        "mouthForm": -0.15,
+        "browLY": 0.46,
+        "browRY": 0.44,
+        "browLAngle": -0.2,
+        "browRAngle": -0.22,
+        "eyeBall": 0,
+        "cheek": 1,
+        "tear": 0,
+        "gloom": 0,
+        "sweat": 0,
+        "anger": 0,
+        "sparkle": 0,
+        "heartEyes": 0,
+        "blankEyes": 0,
+        "mouthWide": 0,
+        "angleZ": 0,
+        "outfit_default": 1,
+        "outfit_oc4ad1": 0
+      },
+      "bytes": 150734,
+      "callBytes": 145660,
+      "quality": 86,
+      "defringe": "1px alpha erosion; RGB repair only on outer 2px AA band, opaque seed <=2px on nonzero-alpha path, max channel difference <=48; retain original RGB elsewhere",
+      "callFile": "shy-call.webp"
+    },
+    "mouth-closed": {
+      "file": "mouth-closed.webp",
+      "expression": "neutral",
+      "talkSampleSeconds": 1.6,
+      "expressionElapsedMs": 651,
+      "blinkDisabled": true,
+      "params": {
+        "angleX": -0.01999999999999999,
+        "angleY": 0.049999999999999975,
+        "eyeX": 0,
+        "eyeY": 0,
+        "eyeOpenL": 1,
+        "eyeOpenR": 1,
+        "eyeSmile": 0,
+        "mouthOpen": 0,
+        "mouthForm": 0,
+        "browLY": 0,
+        "browRY": 0,
+        "browLAngle": 0,
+        "browRAngle": 0,
+        "eyeBall": 0,
+        "cheek": 0,
+        "tear": 0,
+        "gloom": 0,
+        "sweat": 0,
+        "anger": 0,
+        "sparkle": 0,
+        "heartEyes": 0,
+        "blankEyes": 0,
+        "mouthWide": 0,
+        "angleZ": 0,
+        "outfit_default": 1,
+        "outfit_oc4ad1": 0
+      },
+      "bytes": 148662,
+      "callBytes": 144098,
+      "quality": 86,
+      "defringe": "1px alpha erosion; RGB repair only on outer 2px AA band, opaque seed <=2px on nonzero-alpha path, max channel difference <=48; retain original RGB elsewhere",
+      "callFile": "mouth-closed-call.webp"
+    },
+    "mouth-half": {
+      "file": "mouth-half.webp",
+      "expression": "neutral",
+      "talkSampleSeconds": 0.78,
+      "expressionElapsedMs": 650.8999999761581,
+      "blinkDisabled": true,
+      "params": {
+        "angleX": 0.037999999999999985,
+        "angleY": -0.009199999999999986,
+        "eyeX": 0,
+        "eyeY": 0,
+        "eyeOpenL": 1,
+        "eyeOpenR": 1,
+        "eyeSmile": 0,
+        "mouthOpen": 0.5,
+        "mouthForm": 0,
+        "browLY": 0,
+        "browRY": 0,
+        "browLAngle": 0,
+        "browRAngle": 0,
+        "eyeBall": 0,
+        "cheek": 0,
+        "tear": 0,
+        "gloom": 0,
+        "sweat": 0,
+        "anger": 0,
+        "sparkle": 0,
+        "heartEyes": 0,
+        "blankEyes": 0,
+        "mouthWide": 0.40000000000000013,
+        "angleZ": 0,
+        "outfit_default": 1,
+        "outfit_oc4ad1": 0
+      },
+      "bytes": 148496,
+      "callBytes": 144142,
+      "quality": 86,
+      "defringe": "1px alpha erosion; RGB repair only on outer 2px AA band, opaque seed <=2px on nonzero-alpha path, max channel difference <=48; retain original RGB elsewhere",
+      "callFile": "mouth-half-call.webp"
+    },
+    "mouth-open": {
+      "file": "mouth-open.webp",
+      "expression": "neutral",
+      "talkSampleSeconds": 0.45,
+      "expressionElapsedMs": 651.1999999880791,
+      "blinkDisabled": true,
+      "params": {
+        "angleX": 0.06000000000000001,
+        "angleY": 0.10300000000000001,
+        "eyeX": 0,
+        "eyeY": 0,
+        "eyeOpenL": 1,
+        "eyeOpenR": 1,
+        "eyeSmile": 0,
+        "mouthOpen": 0.7,
+        "mouthForm": 0,
+        "browLY": 0,
+        "browRY": 0,
+        "browLAngle": 0,
+        "browRAngle": 0,
+        "eyeBall": 0,
+        "cheek": 0,
+        "tear": 0,
+        "gloom": 0,
+        "sweat": 0,
+        "anger": 0,
+        "sparkle": 0,
+        "heartEyes": 0,
+        "blankEyes": 0,
+        "mouthWide": -0.09999999999999998,
+        "angleZ": 0,
+        "outfit_default": 1,
+        "outfit_oc4ad1": 0
+      },
+      "bytes": 149272,
+      "callBytes": 143624,
+      "quality": 86,
+      "defringe": "1px alpha erosion; RGB repair only on outer 2px AA band, opaque seed <=2px on nonzero-alpha path, max channel difference <=48; retain original RGB elsewhere",
+      "callFile": "mouth-open-call.webp"
+    }
+  },
+  "copiedRenders": {
+    "chaerin-v2-hero": {
+      "size": [
+        1520,
+        1800
+      ],
+      "view": {
+        "zoom": 1.9718,
+        "cx": 640,
+        "cy": 384.6
+      },
+      "framing": "model y 31..769",
+      "source": "Front_Web/src/assets/characters/chaerin-v2/chaerin-v2-hero.webp",
+      "file": "chaerin-v2-hero.webp"
+    },
+    "chaerin-v2-full": {
+      "size": [
+        1800,
+        2400
+      ],
+      "view": {
+        "zoom": 1.3581,
+        "cx": 640,
+        "cy": 621.6
+      },
+      "framing": "model y 31..1250",
+      "source": "Front_Web/src/assets/characters/chaerin-v2/chaerin-v2-full.webp",
+      "file": "chaerin-v2-full.webp"
+    }
+  },
+  "callVideos": {
+    "generatedAt": "2026-11-24",
+    "method": "Front_Web engine.js + player.js; bounded local RGB correction before background composition -> PNG -> ffmpeg",
+    "fps": 24,
+    "sourceFrames": 258,
+    "overlapFrames": 18,
+    "durationSeconds": 10,
+    "warmupSeconds": 6,
+    "sourceTimeline": [
+      {
+        "frame": 0,
+        "expression": "neutral"
+      },
+      {
+        "frame": 38,
+        "expression": "contempt"
+      },
+      {
+        "frame": 104,
+        "expression": "neutral"
+      },
+      {
+        "frame": 167,
+        "expression": "laugh"
+      },
+      {
+        "frame": 224,
+        "expression": "neutral"
+      }
+    ],
+    "talkFrames": [
+      38,
+      104,
+      167
+    ],
+    "talkMs": 1800,
+    "blinkFrames": [
+      74,
+      154,
+      222
+    ],
+    "playerOptions": {
+      "blink": true,
+      "breath": true,
+      "idle": true,
+      "autoLook": false,
+      "headFollow": 0
+    },
+    "compositeBreathing": {
+      "reason": "This model has no breath parameter; retain player idle and add a subtle render-only breathing transform without editing the engine/model.",
+      "periodSeconds": 3,
+      "scaleAmplitude": 0.0025,
+      "verticalAmplitudeFraction": 0.001
+    },
+    "variants": [
+      {
+        "name": "landscape",
+        "width": 1920,
+        "height": 1080,
+        "k": 2.098159509202454,
+        "topMargin": 0.04,
+        "framing": "face horizontal center 62%; head to chest; background zoom 1.28 and right shift 10%",
+        "view": {
+          "zoom": 2.4867075664621674,
+          "cx": 530.1894736842105,
+          "cy": 267.7789473684211
+        },
+        "background": {
+          "source": "Front_Web/src/assets/characters/chaerin-live2d-v1/chaerin-call-bg-landscape.webp",
+          "sha256": "1e71fdeba5596d5464952bb096730c64cb5f95d38e58c2f938beebf966f1d2bc",
+          "fit": "cover, centered"
+        },
+        "consoleErrors": []
+      },
+      {
+        "name": "portrait",
+        "width": 1080,
+        "height": 1920,
+        "k": 1.95,
+        "topMargin": 0.1,
+        "framing": "face center 30%H, head room ~10%; body fades at tie knot at 64-68%H; lower 35% dark",
+        "view": {
+          "zoom": 2.311111111111111,
+          "cx": 640,
+          "cy": 426.9230769230769
+        },
+        "background": {
+          "source": "Front_Web/src/assets/characters/chaerin-live2d-v1/chaerin-call-bg-portrait.webp",
+          "sha256": "147cd84b39289fbeb20ea691755309d93afc69080b45dcb2c23985f108739209",
+          "fit": "cover, centered"
+        },
+        "consoleErrors": []
+      }
+    ],
+    "alphaEdgeFix": "1px alpha erosion; RGB repair only on outer 2px AA band, opaque seed <=2px on nonzero-alpha path, max channel difference <=48; retain original RGB elsewhere",
+    "sourceFramesDirectory": "Landing_Page/.temp/renewal/02b-call-source-{landscape,portrait}/",
+    "loop": {
+      "overlapFrames": 18,
+      "overlapSeconds": 0.75,
+      "firstSourceFrame": 18,
+      "finalSourceFrame": 17,
+      "join": "Both ends are closed-mouth neutral. The last blended frame is simulation frame 17; playback continues naturally into frame 18."
+    },
+    "outputTimeline": [
+      {
+        "at": 0,
+        "expression": "neutral"
+      },
+      {
+        "at": 0.8333333333333334,
+        "expression": "contempt"
+      },
+      {
+        "at": 3.5833333333333335,
+        "expression": "neutral"
+      },
+      {
+        "at": 6.208333333333333,
+        "expression": "laugh"
+      },
+      {
+        "at": 8.583333333333334,
+        "expression": "neutral"
+      }
+    ],
+    "outputTalkStartsSeconds": [
+      0.8333333333333334,
+      3.5833333333333335,
+      6.208333333333333
+    ],
+    "encoding": {
+      "webm": {
+        "codec": "VP9",
+        "pixelFormat": "yuv420p",
+        "crf": 30,
+        "targetBitrate": "1800k",
+        "color": "BT.709 limited range"
+      },
+      "mp4": {
+        "codec": "H.264/AVC",
+        "tag": "avc1",
+        "profile": "High",
+        "level": "4.1",
+        "pixelFormat": "yuv420p",
+        "fastStart": true,
+        "crf": 21,
+        "maxRate": "2200k",
+        "color": "BT.709 limited range"
+      }
+    },
+    "outputs": [
+      {
+        "file": "call-landscape.webm",
+        "bytes": 1322987,
+        "ffprobe": {
+          "programs": [],
+          "stream_groups": [],
+          "streams": [
+            {
+              "codec_name": "vp9",
+              "profile": "Profile 0",
+              "codec_tag_string": "[0][0][0][0]",
+              "width": 1920,
+              "height": 1080,
+              "pix_fmt": "yuv420p",
+              "level": -99,
+              "r_frame_rate": "24/1"
+            }
+          ],
+          "format": {
+            "duration": "10.000000",
+            "size": "1322987"
+          }
+        }
+      },
+      {
+        "file": "call-landscape.mp4",
+        "bytes": 1506928,
+        "ffprobe": {
+          "programs": [],
+          "stream_groups": [],
+          "streams": [
+            {
+              "codec_name": "h264",
+              "profile": "High",
+              "codec_tag_string": "avc1",
+              "width": 1920,
+              "height": 1080,
+              "pix_fmt": "yuv420p",
+              "level": 41,
+              "r_frame_rate": "24/1",
+              "nb_frames": "240"
+            }
+          ],
+          "format": {
+            "duration": "10.000000",
+            "size": "1506928"
+          }
+        }
+      },
+      {
+        "file": "call-landscape-poster.webp",
+        "bytes": 134934,
+        "size": [
+          1920,
+          1080
+        ]
+      },
+      {
+        "file": "call-portrait.webm",
+        "bytes": 1292922,
+        "ffprobe": {
+          "programs": [],
+          "stream_groups": [],
+          "streams": [
+            {
+              "codec_name": "vp9",
+              "profile": "Profile 0",
+              "codec_tag_string": "[0][0][0][0]",
+              "width": 1080,
+              "height": 1920,
+              "pix_fmt": "yuv420p",
+              "level": -99,
+              "r_frame_rate": "24/1"
+            }
+          ],
+          "format": {
+            "duration": "10.000000",
+            "size": "1292922"
+          }
+        }
+      },
+      {
+        "file": "call-portrait.mp4",
+        "bytes": 1051721,
+        "ffprobe": {
+          "programs": [],
+          "stream_groups": [],
+          "streams": [
+            {
+              "codec_name": "h264",
+              "profile": "High",
+              "codec_tag_string": "avc1",
+              "width": 1080,
+              "height": 1920,
+              "pix_fmt": "yuv420p",
+              "level": 41,
+              "r_frame_rate": "24/1",
+              "nb_frames": "240"
+            }
+          ],
+          "format": {
+            "duration": "10.000000",
+            "size": "1051721"
+          }
+        }
+      },
+      {
+        "file": "call-portrait-poster.webp",
+        "bytes": 122760,
+        "size": [
+          1080,
+          1920
+        ]
+      }
+    ],
+    "validation": {
+      "browserTests": "02b-check.json + 02b-webkit.json",
+      "framesPerVideo": 240,
+      "maximumBytes": 3000000,
+      "seams": {
+        "call-landscape.webm": {
+          "lastToFirstMae0to255": 2.0106695280349793,
+          "firstToSecondMae0to255": 1.5778436856995885,
+          "penultimateToLastMae0to255": 1.7554226144547325,
+          "maxChannelDifferenceLastToFirst": [
+            [
+              0,
+              184
+            ],
+            [
+              0,
+              178
+            ],
+            [
+              0,
+              182
+            ]
+          ],
+          "relativeToAdjacentMovement": 1.1454048224504225,
+          "sourceSeamVsNextFrameRatio": 0.9951385154385567
+        },
+        "call-landscape.mp4": {
+          "lastToFirstMae0to255": 1.9880912422839507,
+          "firstToSecondMae0to255": 1.6107683899176954,
+          "penultimateToLastMae0to255": 1.601964699074074,
+          "maxChannelDifferenceLastToFirst": [
+            [
+              0,
+              176
+            ],
+            [
+              0,
+              180
+            ],
+            [
+              0,
+              177
+            ]
+          ],
+          "relativeToAdjacentMovement": 1.2342502216507583,
+          "sourceSeamVsNextFrameRatio": 0.9951385154385567
+        },
+        "call-portrait.webm": {
+          "lastToFirstMae0to255": 1.8073334619341563,
+          "firstToSecondMae0to255": 1.3463726530349795,
+          "penultimateToLastMae0to255": 1.5632100372942386,
+          "maxChannelDifferenceLastToFirst": [
+            [
+              0,
+              177
+            ],
+            [
+              0,
+              201
+            ],
+            [
+              0,
+              193
+            ]
+          ],
+          "relativeToAdjacentMovement": 1.1561680252913877,
+          "sourceSeamVsNextFrameRatio": 0.9937038420335839
+        },
+        "call-portrait.mp4": {
+          "lastToFirstMae0to255": 1.8997156314300412,
+          "firstToSecondMae0to255": 1.3835869984567903,
+          "penultimateToLastMae0to255": 1.3459278549382716,
+          "maxChannelDifferenceLastToFirst": [
+            [
+              0,
+              185
+            ],
+            [
+              0,
+              185
+            ],
+            [
+              0,
+              185
+            ]
+          ],
+          "relativeToAdjacentMovement": 1.3730366312699704,
+          "sourceSeamVsNextFrameRatio": 0.9937038420335839
+        }
+      },
+      "startExpression": "neutral",
+      "startMouthOpen": 0,
+      "timelineAndViewUnchangedFromPhase1": true,
+      "edgeRepair": "02b-cause.json; bounded AA-band repair; intentional interior translucency preserved"
+    },
+    "usage": "S1 CallHero; source/poster/preload use aspect ratio; mobile CTA still uses 767px width."
+  },
+  "haloFix": {
+    "date": "2026-11-24",
+    "method": "1px alpha erosion; RGB repair only on outer 2px AA band, opaque seed <=2px on nonzero-alpha path, max channel difference <=48; retain original RGB elsewhere",
+    "reason": "Unbounded/interior partial-alpha RGB replacement introduced gray/white patches; exclude intentional translucent interior and distant/dissimilar seeds",
+    "alphaPreservedAfterErosion": true,
+    "sourceModelEngineUnchanged": true
+  },
+  "contrastPosters": {
+    "generatedAt": "2026-11-24",
+    "sourceTimeSeconds": 1.25,
+    "expression": "contempt",
+    "purpose": "S2 reduced-motion completed state; normal waiting state reuses S1 neutral poster",
+    "method": "ffmpeg frame from 02b local-RGB-repaired final call WebM -> cwebp q86",
+    "outputs": [
+      {
+        "file": "contrast-landscape-poster.webp",
+        "bytes": 101130
+      },
+      {
+        "file": "contrast-portrait-poster.webp",
+        "bytes": 97916
+      }
+    ]
+  }
+}
