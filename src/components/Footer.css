@@ -1,0 +1,50 @@
+.story > .site-footer {
+  width: 100%;
+  margin: 0;
+  padding: 96px 32px 40px;
+  border: 0;
+  background: var(--color-canvas);
+  color: var(--color-muted);
+  font: 400 14px/24px var(--font-sans);
+}
+.site-footer__inner { width: min(1120px, 100%); margin-inline: auto; }
+.site-footer__closing {
+  margin-bottom: 64px;
+  color: var(--color-ink);
+  font-family: var(--font-story);
+  font-size: clamp(28px, 3.4vw, 44px);
+  font-weight: 500;
+  line-height: 1.6;
+  letter-spacing: -0.02em;
+  word-break: keep-all;
+}
+.site-footer__details { display: flex; justify-content: space-between; gap: var(--spacing-section); }
+.site-footer__contact { display: flex; flex-direction: column; align-items: flex-start; min-width: 0; }
+.site-footer__logo { width: 160px; height: auto; margin-bottom: var(--spacing-content); }
+.site-footer__contact a { display: inline-flex; align-items: center; min-height: 44px; max-width: 100%; overflow-wrap: anywhere; }
+.site-footer__legal { display: flex; flex-direction: column; align-items: flex-end; justify-content: space-between; gap: var(--spacing-content); }
+.site-footer__links { display: flex; flex-wrap: wrap; gap: 8px var(--spacing-content); }
+.site-footer__links button {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 8px 0;
+  border: 0;
+  background: var(--color-transparent);
+  color: var(--color-muted);
+  font: inherit;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.site-footer__links .site-footer__privacy { font-weight: 700; }
+.site-footer__copy { color: var(--color-subtle); font-size: 12px; }
+.site-footer :is(a, button):focus-visible { outline: 2px solid var(--color-focus-ring); outline-offset: 4px; border-radius: 2px; }
+@media (hover: hover) and (pointer: fine) {
+  .site-footer :is(a, button):hover { color: var(--color-text-accent-hover); }
+}
+@media (max-width: 767px) {
+  .story > .site-footer { padding: 64px 16px max(32px, env(safe-area-inset-bottom)); }
+  .site-footer__closing { margin-bottom: var(--spacing-section); }
+  .site-footer__details { flex-direction: column; gap: var(--spacing-content); }
+  .site-footer__legal { align-items: flex-start; gap: var(--spacing-content-compact); }
+  .site-footer__links { gap: 8px var(--spacing-content); }
+}

@@ -1,0 +1,119 @@
+.story > .moments { width: min(1120px, calc(100% - 48px)); padding-block: calc(4 * var(--spacing-content)) var(--spacing-content); color: var(--color-ink); }
+.moments > h2 { margin-bottom: calc(2 * var(--spacing-content)); text-align: center; font-size: clamp(28px,3.2vw,44px); font-weight: 700; line-height: 1.35; letter-spacing: -.035em; word-break: keep-all; }
+.moment { display: grid; grid-template-columns: minmax(0,.8fr) minmax(0,1.2fr); gap: 56px; align-items: center; }
+.moment + .moment { margin-top: 96px; }
+.moment:nth-of-type(even) { grid-template-columns: minmax(0,1.2fr) minmax(0,.8fr); }
+.moment:nth-of-type(even) .moment__copy { grid-column: 2; grid-row: 1; }
+.moment:nth-of-type(even) .moment-scene { grid-column: 1; grid-row: 1; }
+.moment__number { color: var(--color-text-accent); font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.moment__copy h3 { margin-top: var(--spacing-content-compact); font-size: clamp(24px,2.3vw,32px); font-weight: 600; line-height: 1.4; letter-spacing: -.03em; word-break: keep-all; }
+.moment__copy > p { margin-top: var(--spacing-content-compact); color: var(--color-muted); font-size: 16px; line-height: 1.75; word-break: keep-all; }
+.moment__copy small { display: block; margin-top: var(--spacing-content); color: var(--color-subtle); font-size: 12px; line-height: 1.8; word-break: keep-all; }
+.moment-scene { position: relative; min-width: 0; }
+.moment-voice,.moment-presence,.moment-desktop { position: relative; width: 100%; aspect-ratio: 16/10; overflow: hidden; border-radius: var(--radius-card); background: var(--color-panel); isolation: isolate; }
+.moment-call { position: absolute; inset: 0; }
+.moment-call > :is(img,video),.moment-desktop__video > :is(img,video) { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.moment-poster { z-index: 0; }
+.moment-video { opacity: 0; z-index: 1; transition: opacity 120ms linear; }
+.moment-video[data-front=true] { opacity: 1; z-index: 2; }
+.moment-still { opacity: 0; z-index: 3; }
+.moment-still[data-visible=true] { opacity: 1; }
+.moment-call__top { position: absolute; inset: 12px 12px auto; z-index: 4; display: flex; justify-content: space-between; gap: 8px; }
+.moment-pill { display: inline-flex; align-items: center; gap: 6px; background: color-mix(in srgb,var(--color-panel) 94%,var(--color-transparent)); border-radius: 24px; color: var(--color-ink); font-size: 12px; line-height: 20px; padding: 6px 8px; white-space: nowrap; }
+.moment-pill i,.moment-connected { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--color-success); }
+.moment-control { position: absolute; z-index: 8; bottom: 12px; left: 12px; width: 44px; height: 44px; display: grid; place-items: center; border: 0; border-radius: var(--radius-control); background: var(--color-control); color: var(--color-ink); cursor: pointer; }
+/* The presence caption sits at the mate panel's bottom-left; keep the control on the cam tile. */
+.moment-scene[data-scene=presence] > .moment-control { top: 28px; right: 28px; bottom: auto; left: auto; }
+@media (max-width: 767px) { .moment-scene[data-scene=presence] > .moment-control { top: auto; bottom: 24px; right: 24px; } }
+.moment-control:hover { background: var(--color-control-hover); }
+.moment-control:focus-visible { outline: 2px solid var(--color-focus-ring); outline-offset: 4px; }
+.moment-voice__captions { position: absolute; z-index: 5; bottom: 80px; left: 16px; right: 16px; display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
+.moment-caption { width: fit-content; max-width: 92%; padding: 10px 12px; border-radius: 14px; background: color-mix(in srgb,var(--color-panel) 96%,var(--color-transparent)); color: var(--color-ink); font-size: 14px; line-height: 1.6; word-break: keep-all; }
+.moment-caption > span { display: block; color: var(--color-muted); font-size: 12px; margin-bottom: 2px; }
+.moment-caption--self { align-self: flex-end; background: var(--color-primary-soft); }
+.moment-voice__mic { position: absolute; z-index: 6; bottom: 12px; left: 50%; transform: translateX(-50%); }
+.moment-voice__mic > span { display: flex; align-items: center; gap: 8px; height: 44px; padding: 8px 16px; border-radius: 24px; background: var(--color-control); color: var(--color-ink); font-size: 12px; white-space: nowrap; }
+[data-listening=true] .moment-voice__mic > span { background: var(--color-primary); color: var(--color-on-solid); }
+.moment-wave { position: absolute; display: flex; gap: 4px; height: 30px; align-items: center; bottom: 52px; left: 50%; transform: translateX(-50%); padding: 4px 10px; border-radius: 12px; background: var(--color-panel); }
+.moment-wave i { width: 3px; height: 20px; border-radius: 3px; background: var(--color-text-accent); transform: scaleY(.35); animation: moment-wave 650ms ease-in-out infinite alternate; animation-delay: calc(var(--bar) * -130ms); animation-play-state: paused; }
+[data-active=true] .moment-wave i { animation-play-state: running; }
+@keyframes moment-wave { to { transform: scaleY(1); } }
+.moment-presence { display: grid; grid-template-columns: .85fr 1.15fr; padding: 16px; gap: 16px; background: var(--color-panel); }
+.moment-presence__mate { position: relative; min-width: 0; overflow: hidden; border-radius: 12px; background: var(--color-canvas); }
+.moment-presence__mate > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.moment-presence__mate > .moment-pill { position: absolute; top: 8px; left: 8px; }
+.moment-presence__mate > .moment-caption { position: absolute; bottom: 12px; left: 8px; right: 8px; max-width: none; font-size: 12px; }
+.moment-presence__self { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; border-radius: 12px; background: var(--color-surface); color: var(--color-muted); }
+.moment-presence__label { position: absolute; left: 16px; top: 12px; font-size: 12px; }
+.moment-presence__avatar { color: var(--color-subtle); }
+.moment-presence__avatar > svg { width: 88px; height: 88px; }
+.moment-presence__self > p { display: flex; align-items: center; gap: 6px; font: 500 14px/24px var(--font-sans); font-variant-numeric: tabular-nums; }
+.moment-presence__self > p i { width: 6px; height: 6px; border-radius: 50%; background: var(--color-success); }
+.moment-presence__self[data-away=true] > p i { background: var(--color-subtle); }
+.moment-presence__self > small { font-size: 12px; color: var(--color-subtle); }
+.moment-desktop { container-type: inline-size; background: var(--color-canvas); }
+.moment-desktop__wallpaper { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.moment-desktop__menu { position: absolute; inset: 0 0 auto; height: 28px; padding: 4px 12px; display: flex; align-items: center; justify-content: space-between; background: color-mix(in srgb,var(--color-panel) 88%,var(--color-transparent)); color: var(--color-ink); font-size: 12px; z-index: 4; }
+.moment-desktop__menu > img { width: 18px; height: 18px; }
+.moment-desktop__files { position: absolute; top: 44px; left: 12px; width: 100px; display: flex; flex-direction: column; gap: 16px; color: var(--color-ink); }
+.moment-desktop__files > div { display: flex; align-items: center; flex-direction: column; gap: 4px; }
+.moment-desktop__files span { font-size: 12px; line-height: 16px; text-align: center; word-break: keep-all; overflow-wrap: anywhere; text-shadow: 0 1px 4px var(--color-canvas); }
+.moment-editor { position: absolute; left: 24%; top: 26%; width: 63%; height: 60%; border-radius: 12px; overflow: hidden; background: var(--color-surface); box-shadow: 0 12px 40px var(--color-overlay); }
+.moment-window-bar { display: flex; justify-content: space-between; align-items: center; gap: 6px; height: 28px; padding: 4px 10px; background: var(--color-panel); color: var(--color-muted); font-size: 12px; line-height: 20px; white-space: nowrap; }
+.moment-window-bar > span { display: inline-flex; align-items: center; gap: 5px; }
+.moment-window-dots i { width: 5px; height: 5px; border-radius: 50%; background: var(--color-subtle); }
+.moment-editor__page { padding: 16px; }
+.moment-editor__page > i { display: block; width: 90%; height: 5px; border-radius: 3px; background: var(--color-control); margin-bottom: 10px; }
+.moment-editor__page > i:nth-child(2n) { width: 70%; }
+.moment-editor__page > i[data-added=false] { visibility: hidden; }
+.moment-editor__cursor { display: block; visibility: hidden; width: 2px; height: 16px; background: var(--color-text-accent); animation: moment-cursor 1s steps(2,end) infinite; animation-play-state: paused; }
+.moment-editor[data-working=true] .moment-editor__cursor { visibility: visible; }
+[data-active=true] .moment-editor[data-working=true] .moment-editor__cursor { animation-play-state: running; }
+@keyframes moment-cursor { to { opacity: 0; } }
+.moment-desktop__call { position: absolute; left: 35%; top: 15%; width: 52%; overflow: hidden; border-radius: 12px; background: var(--color-panel); box-shadow: 0 10px 32px var(--color-overlay); transform-origin: top left; will-change: transform; z-index: 3; }
+.moment-desktop__video { position: relative; width: 100%; aspect-ratio: 16/10; overflow: hidden; }
+.moment-pip-button { border-radius: 5px; }
+.moment-pip-button svg { width: 20px; height: 20px; }
+.moment-pip-button[data-pressed=true] { color: var(--color-text-accent); background: var(--color-primary-soft-active); }
+.moment-desktop__ai { position: absolute; z-index: 4; top: 6px; left: 6px; padding: 3px 6px; font-size: 12px; border-radius: 20px; background: var(--color-overlay); color: var(--color-ink); }
+.moment-desktop__mic { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); z-index: 4; display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: var(--color-control); color: var(--color-ink); }
+.moment-desktop__bubble { position: absolute; bottom: 30%; right: 4%; max-width: 55%; padding: 8px 12px; border-radius: 12px; background: var(--color-panel); color: var(--color-ink); font-size: 12px; line-height: 18px; z-index: 5; }
+.moments__note { margin-top: 56px; color: var(--color-subtle); text-align: center; font-size: 14px; line-height: 1.6; }
+@media (max-width:1023px) { .moment,.moment:nth-of-type(even) { grid-template-columns: minmax(0,1fr); gap: 24px; } .moment:nth-of-type(even) .moment__copy,.moment:nth-of-type(even) .moment-scene { grid-column: auto; grid-row: auto; } .moment + .moment { margin-top: 64px; } }
+@media (max-width:767px) {
+  .story > .moments { width: calc(100% - 32px); padding-block: calc(2 * var(--spacing-panel-roomy)) var(--spacing-content); }
+  .moments > h2 { font-size: clamp(23px, 6.1vw, 28px); letter-spacing: -.04em; margin-bottom: var(--spacing-panel-roomy); }
+  .moment__copy h3 { font-size: 24px; margin-top: 12px; }
+  .moment__copy > p { font-size: 14px; }
+  .moment-voice,.moment-presence { aspect-ratio: 4/5; }
+  .moment-call__top { gap: 4px; }
+  .moment-pill { font-size: 12px; padding: 6px; }
+  .moment-caption { font-size: 12px; padding: 8px 10px; }
+  .moment-voice__captions { bottom: 76px; }
+  .moment-presence { grid-template-columns: minmax(0,1fr); grid-template-rows: .9fr 1.1fr; padding: 12px; gap: 12px; }
+  .moment-presence__avatar > svg { width: 56px; height: 56px; }
+  .moment-presence__self { gap: 4px; }
+  .moment-presence__mate > img { object-position: center 35%; }
+  .moment-presence__mate > .moment-caption { bottom: 8px; }
+  .moment-desktop { border-radius: 12px; }
+  .moment-desktop__menu { height: 24px; padding-inline: 8px; }
+  .moment-desktop__files { width: 74px; left: 4px; top: 30px; gap: 8px; }
+  .moment-desktop__files svg { width: 20px; height: 24px; }
+  .moment-desktop__files span { font-size: 9px; line-height: 12px; }
+  .moment-editor { left: 26%; top: 28%; width: 66%; height: 62%; border-radius: 8px; }
+  .moment-editor__page { padding: 8px; }
+  .moment-editor__page > i { height: 3px; margin-bottom: 6px; }
+  .moment-desktop__call { left: 38%; top: 16%; width: 34%; border-radius: 8px; }
+  .moment-window-bar { height: 18px; padding: 2px 5px; font-size: 8px; line-height: 14px; }
+  .moment-window-dots { display: none!important; }
+  .moment-pip-button svg { width: 14px; height: 14px; }
+  .moment-desktop__video { aspect-ratio: 4/5; }
+  .moment-desktop__ai { font-size: 7px; padding: 2px 4px; }
+  .moment-desktop__mic { width: 24px; height: 24px; bottom: 5px; }
+  .moment-desktop__mic svg { width: 14px; height: 14px; }
+  .moment-desktop__bubble { bottom: 57%; max-width: 55%; padding: 5px 8px; font-size: 10px; line-height: 14px; }
+  .moments__note { font-size: 12px; }
+}
+@media (prefers-reduced-motion:reduce) { .moment-wave i,.moment-editor__cursor { animation: none; } .moment-video { transition: none; } }
+/* Keep the 44px control clear of the file names on the smallest desktop mock. */
+@media (max-width:360px) { .moment-scene[data-scene=desktop] { padding-bottom: 56px; } .moment-scene[data-scene=desktop] > .moment-control { left: 0; bottom: 0; } }
