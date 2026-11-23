@@ -2,12 +2,12 @@ import { useState } from 'react'
 import { appUrl, copyPcLink, type CtaState, type PcLinkResult } from '../../lib/cta.ts'
 import { track } from '../../lib/analytics.ts'
 
-const DESKTOP_LOCKED: Record<Exclude<CtaState, 'open'>, string> = {
+const LOCKED_LABEL: Record<Exclude<CtaState, 'open'>, string> = {
   before_open: '12월 1일 오픈',
   preparing: '오픈 준비 중',
 }
 const MOBILE_NOTE: Record<CtaState, string> = {
-  before_open: '12월 1일부터 PC에서 만날 수 있어요',
+  before_open: '캡슐은 PC에서 만날 수 있어요',
   preparing: '곧 PC에서 만날 수 있어요',
   open: '캡슐은 PC에서 만날 수 있어요',
 }
@@ -26,9 +26,11 @@ export default function CallCta({ placement, state, mobile }: { placement: 'head
 
   return (
     <div className={`call-cta call-cta--${placement}`} data-cta-state={state}>
-      {mobile ? <button type="button" aria-busy={pending} onClick={() => { void send() }}>PC로 링크 보내기</button>
-        : state === 'open' ? <a href={appUrl()} onClick={clicked}>채린이 깨우러 가기</a>
-          : <button type="button" aria-disabled="true" onClick={clicked}>{DESKTOP_LOCKED[state]}</button>}
+      {/* Phones share the landing link, but only from 12/1 on, same as the desktop button. */}
+      {mobile && state !== 'before_open' ? <button type="button" aria-busy={pending} onClick={() => { void send() }}>PC로 링크 보내기</button>
+        : !mobile && state === 'open' ? <a href={appUrl()} onClick={clicked}>채린이 깨우러 가기</a>
+          // Reached only when state is not 'open' (desktop) or is 'before_open' (phone).
+          : <button type="button" aria-disabled="true" onClick={clicked}>{LOCKED_LABEL[state as Exclude<CtaState, 'open'>]}</button>}
       {mobile && <p className="call-cta__device">{MOBILE_NOTE[state]}</p>}
       <div className="call-cta__status" role="status">
         {result?.method === 'clipboard' && '링크를 복사했어요. PC에서 열어 주세요.'}

@@ -48,7 +48,9 @@ function PresenceScene() {
   const { frame: cameraRef, view: frameView } = useMomentFrame(), t = clock.time
   const away = t >= 1600 && t < 4200, returned = t >= 4500 && t < 7800
   const opacity = t < 7800 ? clamp((t - 4500) / 300) : 1 - clamp((t - 7800) / 300)
-  const view = frameView
+  // Always the wide (head→chest) render: the tall one fades out below the shoulders for
+  // phone text overlays, which looks like a cut-off body in this narrow panel.
+  const view = frameView ? 'wide' as const : null
   return <div className="moment-scene" role="group" aria-describedby="moment-presence-description" data-scene="presence" data-phase={away ? 'away' : returned ? 'returned' : 'present'} data-time={Math.round(t)} data-active={clock.active} data-reduced={clock.reduced}>
     <p className="sr-only" id="moment-presence-description">내 캠의 사람이 자리를 비웠다가 돌아오자 채린이 알아채고 말을 거는 예시예요.</p>
     <div className="moment-presence" ref={frameRef} aria-hidden="true">
