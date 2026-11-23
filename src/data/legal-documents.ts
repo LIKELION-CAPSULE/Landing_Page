@@ -11,7 +11,8 @@ export type LegalBlock =
 // These documents use headings, paragraphs, lists and tables only. Keep their
 // source readable without introducing HTML or a general Markdown dependency.
 function parseDocument(markdown: string): LegalBlock[] {
-  return markdown.trim().split(/\n\s*\n/).map((section) => {
+  // Editorial/legal-review comments belong in source, outside the displayed policy.
+  return markdown.replace(/<!--[\s\S]*?-->/g, '').trim().split(/\n\s*\n/).map((section) => {
     const lines = section.split('\n')
     if (section.startsWith('### ')) {
       return { type: 'heading', text: section.slice(4) }

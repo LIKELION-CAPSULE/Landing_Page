@@ -1,0 +1,207 @@
+{
+  "variant": "tall",
+  "fps": 24,
+  "view": {
+    "zoom": 2.32,
+    "cx": 640,
+    "cy": 340.3448275862069
+  },
+  "width": 800,
+  "height": 1000,
+  "generatedAt": "2026-11-24",
+  "dataSha256": "f787bfc33bab6326a780227c69461202fd8ff73f3d41b9e6b82299837dd0cbd0",
+  "edgeRule": "02b-edges.py unchanged",
+  "clips": {
+    "idle": {
+      "id": "idle",
+      "clip": "demo-idle",
+      "durationMs": 6000,
+      "frames": 144,
+      "durationSeconds": 6,
+      "keys": [
+        0,
+        37,
+        72,
+        143
+      ],
+      "firstLastPngSha256": "142e93e2bcac5b6f3751b479a6af6da4aedc08ebdcc055dc1d877939d305f662",
+      "files": {
+        "webm": {
+          "file": "demo-idle-tall.webm",
+          "bytes": 419291
+        },
+        "mp4": {
+          "file": "demo-idle-tall.mp4",
+          "bytes": 306559
+        }
+      }
+    },
+    "long_time": {
+      "id": "long_time",
+      "chip": "오랜만이야!",
+      "dialogue": "뭐야, 살아 있었네? …딱히 기다린 건 아니거든.",
+      "expressions": {
+        "start": "contempt",
+        "afterEllipsis": "laugh"
+      },
+      "talkMs": 2940,
+      "clip": "demo-long_time",
+      "talkStartMs": 300,
+      "talkEndMs": 3240,
+      "turnMs": 1560,
+      "durationMs": 4240,
+      "frames": 102,
+      "durationSeconds": 4.25,
+      "keys": [
+        0,
+        46,
+        32,
+        101
+      ],
+      "firstLastPngSha256": "142e93e2bcac5b6f3751b479a6af6da4aedc08ebdcc055dc1d877939d305f662",
+      "files": {
+        "webm": {
+          "file": "demo-long_time-tall.webm",
+          "bytes": 256164
+        },
+        "mp4": {
+          "file": "demo-long_time-tall.mp4",
+          "bytes": 216371
+        }
+      }
+    },
+    "ask": {
+      "id": "ask",
+      "chip": "이거 어떻게 해?",
+      "dialogue": "…그거 나도 몰라. 같이 찾아보든가. 너 혼자 끙끙대는 거 보기 답답하니까.",
+      "expressions": {
+        "start": "focus"
+      },
+      "talkMs": 4480,
+      "clip": "demo-ask",
+      "talkStartMs": 300,
+      "talkEndMs": 4780,
+      "turnMs": null,
+      "durationMs": 5780,
+      "frames": 139,
+      "durationSeconds": 5.791666666666667,
+      "keys": [
+        0,
+        37,
+        45,
+        138
+      ],
+      "firstLastPngSha256": "142e93e2bcac5b6f3751b479a6af6da4aedc08ebdcc055dc1d877939d305f662",
+      "files": {
+        "webm": {
+          "file": "demo-ask-tall.webm",
+          "bytes": 313505
+        },
+        "mp4": {
+          "file": "demo-ask-tall.mp4",
+          "bytes": 257354
+        }
+      }
+    },
+    "thanks": {
+      "id": "thanks",
+      "chip": "오늘 고마웠어",
+      "dialogue": "뭐래, 갑자기 왜 그래? …뭐 사줄 거 있으면 그냥 말해.",
+      "expressions": {
+        "start": "angry",
+        "afterEllipsis": "laugh"
+      },
+      "talkMs": 3220,
+      "clip": "demo-thanks",
+      "talkStartMs": 300,
+      "talkEndMs": 3520,
+      "turnMs": 1700,
+      "durationMs": 4520,
+      "frames": 109,
+      "durationSeconds": 4.541666666666667,
+      "keys": [
+        0,
+        49,
+        34,
+        108
+      ],
+      "firstLastPngSha256": "142e93e2bcac5b6f3751b479a6af6da4aedc08ebdcc055dc1d877939d305f662",
+      "files": {
+        "webm": {
+          "file": "demo-thanks-tall.webm",
+          "bytes": 275118
+        },
+        "mp4": {
+          "file": "demo-thanks-tall.mp4",
+          "bytes": 221872
+        }
+      }
+    },
+    "bye": {
+      "id": "bye",
+      "chip": "나 이제 갈게",
+      "dialogue": "내일도 늦으면 딸기우유 쏘는 거다. …조심히 가.",
+      "expressions": {
+        "start": "happy"
+      },
+      "talkMs": 2940,
+      "clip": "demo-bye",
+      "talkStartMs": 300,
+      "talkEndMs": 3240,
+      "turnMs": null,
+      "durationMs": 4240,
+      "frames": 102,
+      "durationSeconds": 4.25,
+      "keys": [
+        0,
+        37,
+        32,
+        101
+      ],
+      "firstLastPngSha256": "142e93e2bcac5b6f3751b479a6af6da4aedc08ebdcc055dc1d877939d305f662",
+      "files": {
+        "webm": {
+          "file": "demo-bye-tall.webm",
+          "bytes": 243924
+        },
+        "mp4": {
+          "file": "demo-bye-tall.mp4",
+          "bytes": 208789
+        }
+      }
+    },
+    "silence": {
+      "id": "silence",
+      "chip": "",
+      "dialogue": "…야, 졸아? 모르는 거 있으면 그냥 물어봐. 안 잡아먹어.",
+      "expressions": {
+        "start": "sulky"
+      },
+      "talkMs": 3500,
+      "clip": "demo-silence",
+      "talkStartMs": 300,
+      "talkEndMs": 3800,
+      "turnMs": null,
+      "durationMs": 4800,
+      "frames": 116,
+      "durationSeconds": 4.833333333333333,
+      "keys": [
+        0,
+        37,
+        37,
+        115
+      ],
+      "firstLastPngSha256": "142e93e2bcac5b6f3751b479a6af6da4aedc08ebdcc055dc1d877939d305f662",
+      "files": {
+        "webm": {
+          "file": "demo-silence-tall.webm",
+          "bytes": 293944
+        },
+        "mp4": {
+          "file": "demo-silence-tall.mp4",
+          "bytes": 218673
+        }
+      }
+    }
+  }
+}

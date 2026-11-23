@@ -60,7 +60,9 @@ for filename, codes in [('capsule-ui.woff2', core), ('capsule-legal.woff2', lega
                  '  font-weight: 45 920;\n  font-display: swap;\n'
                  f'  src: url("./assets/fonts/{filename}") format("woff2");\n'
                  f'  unicode-range: {ranges(codes)};\n}}\n')
-(ROOT / 'src/font.css').write_text('\n'.join(faces))
+font_css = ROOT / 'src/font.css'
+story_face = font_css.read_text().partition('/* Modified Hahmlet subset;')[2]
+font_css.write_text('\n'.join(faces) + ('/* Modified Hahmlet subset;' + story_face if story_face else ''))
 print(f'{len(core)} UI codepoints; {len(legal)} legal codepoints; {len(available - core - legal)} fallback codepoints')
 print(f'Initial subset: {(FONTS / "capsule-ui.woff2").stat().st_size:,} B')
 print(f'Legal subset: {(FONTS / "capsule-legal.woff2").stat().st_size:,} B (on demand)')
