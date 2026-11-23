@@ -134,7 +134,7 @@ export default function TalkDemo() {
           {media.poster && <img className="talk-demo__poster" src={media.poster} alt="" width={tall ? 800 : 1280} height={tall ? 1000 : 800} />}
           {!reduced && [0, 1].map(index => <video key={index} ref={element => { media.videos.current[index] = element }} src={media.slots[index]?.blob} data-clip={media.slots[index]?.clip} data-front={media.front === index} muted playsInline preload="auto" loop={media.slots[index]?.clip === 'idle'} onLoadedData={() => media.prepare(index)} onSeeked={() => media.prepare(index)} onTimeUpdate={() => media.onTimeUpdate(index)} onError={media.onError} />)}
           {near && <img className="talk-demo__still" data-visible={reduced ? true : media.fallback} src={staticSource} alt="" width={tall ? 800 : 1280} height={tall ? 1000 : 800} />}
-          <div className="talk-demo__meta"><span className="talk-demo__pill"><i />채린 · 연결 중 <b>{String(Math.floor(seconds / 60)).padStart(2, '0')}:{String(seconds % 60).padStart(2, '0')}</b></span><span className="talk-demo__pill">AI 캐릭터예요</span></div>
+          <div className="talk-demo__meta"><span className="talk-demo__pill"><i />채린 · 연결 중 <b>{String(Math.floor(seconds / 60)).padStart(2, '0')}:{String(seconds % 60).padStart(2, '0')}</b></span><span className="talk-demo__pill">AI 캐릭터</span></div>
           <div className="talk-demo__self"><CallIcon name="person" /><span>내 캠</span><small>카메라 꺼짐</small></div>
           {mobile && <div className="talk-demo__overlay">{overlayMessages.map(message => bubble(message, true))}</div>}
         </div>

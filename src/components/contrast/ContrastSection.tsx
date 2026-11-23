@@ -177,7 +177,7 @@ export default function ContrastSection() {
               <source src={landscapeMp4} type="video/mp4" media={LANDSCAPE_QUERY} />
             </video>
             {(!started || phase === 'waiting' || reduced) && <img className="contrast-call__poster" src={poster} alt="" loading="lazy" width={portrait ? 1080 : 1920} height={portrait ? 1920 : 1080} />}
-            <div className="contrast-call__top"><span className="contrast-call__status"><i />채린 · 연결 중</span><span>AI 캐릭터예요</span></div>
+            <div className="contrast-call__top"><span className="contrast-call__status"><i />채린 · 연결 중</span><span>AI 캐릭터</span></div>
             <div className="contrast-call__cam"><DetailIcon>{icons.presence}</DetailIcon><span>내 캠</span></div>
             {(complete || phase === 'replying') && <div className="contrast-call__caption"><span>채린</span><p>{REPLY}</p></div>}
           </div>

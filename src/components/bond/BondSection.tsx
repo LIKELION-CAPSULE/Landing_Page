@@ -85,7 +85,7 @@ export default function BondSection() {
             ))}
             {!stage.image && <span className="bond-stage__lock" aria-hidden="true"><Icon size={28}>{lock}</Icon></span>}
             <span className="bond-stage__badge" aria-hidden="true">{stage.name}</span>
-            <span className="bond-stage__ai">AI 캐릭터예요</span>
+            <span className="bond-stage__ai">AI 캐릭터</span>
             {!reduced && (
               <button type="button" className="bond-stage__control" aria-pressed={stopped} aria-label={stopped ? '단계 자동 넘김 재생' : '단계 자동 넘김 일시정지'} onClick={toggle}>
                 <CallIcon name={stopped ? 'play' : 'pause'} />

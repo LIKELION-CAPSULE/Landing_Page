@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import CallCta from './CallCta.tsx'
 import CallIcon from './CallIcon.tsx'
-import { isOpen, MOBILE_QUERY, OPEN_AT } from '../../lib/cta.ts'
+import { ctaState, MOBILE_QUERY, OPEN_AT } from '../../lib/cta.ts'
 import { track } from '../../lib/analytics.ts'
 import logo from '../../assets/hero/logo-lockup.svg'
 import landscapeWebm from '../../assets/mates/chaerin/call-landscape.webm'
@@ -43,7 +43,7 @@ export default function CallHero() {
   const mobile = useMedia(MOBILE_QUERY)
   const portrait = useMedia(PORTRAIT_QUERY)
   const reduced = useMedia('(prefers-reduced-motion: reduce)')
-  const [open, setOpen] = useState(isOpen)
+  const [cta, setCta] = useState(ctaState)
   const [scrolled, setScrolled] = useState(() => window.scrollY > 24)
   const [headerCtaVisible, setHeaderCtaVisible] = useState(false)
   const [inView, setInView] = useState(true)
@@ -60,9 +60,9 @@ export default function CallHero() {
   const currentPoster = portrait ? portraitPoster : landscapePoster
 
   useEffect(() => {
-    const visibility = () => { setTabVisible(!document.hidden); setOpen(isOpen()) }
+    const visibility = () => { setTabVisible(!document.hidden); setCta(ctaState()) }
     const scroll = () => setScrolled(window.scrollY > 24)
-    const route = () => setOpen(isOpen())
+    const route = () => setCta(ctaState())
     const timer = window.setTimeout(route, Math.min(Math.max(OPEN_AT - Date.now(), 0), 2_147_483_647))
     const observer = new IntersectionObserver(([entry]) => setInView(entry.isIntersecting), { threshold: 0 })
     if (section.current) observer.observe(section.current)
@@ -83,7 +83,7 @@ export default function CallHero() {
     const observer = new IntersectionObserver(([entry]) => setHeaderCtaVisible(!entry.isIntersecting), { rootMargin: '-80px 0px 0px 0px' })
     observer.observe(button)
     return () => observer.disconnect()
-  }, [mobile, open])
+  }, [mobile, cta])
 
   useLayoutEffect(() => {
     const element = copy.current
@@ -171,7 +171,7 @@ export default function CallHero() {
       <header className="call-header" data-scrolled={scrolled || undefined}>
         <div className="call-header__inner">
           <img src={logo} width="1992" height="456" alt="캡슐 CAPSULE" draggable={false} />
-          {!mobile && <div className="call-header__cta" data-visible={headerCtaVisible || undefined} inert={!headerCtaVisible} aria-hidden={!headerCtaVisible}><CallCta placement="header" open={open} mobile={false} /></div>}
+          {!mobile && <div className="call-header__cta" data-visible={headerCtaVisible || undefined} inert={!headerCtaVisible} aria-hidden={!headerCtaVisible}><CallCta placement="header" state={cta} mobile={false} /></div>}
         </div>
       </header>
       <section ref={section} className="call-hero" aria-labelledby="call-hero-title" data-reduced-motion={staticMotion} data-in-view={inView} data-playing={playing} data-video-layout={portrait ? 'portrait' : 'landscape'}>
@@ -195,13 +195,13 @@ export default function CallHero() {
         <div className="call-meta" aria-hidden="true">
           <span className="call-meta__pill call-meta__connection"><span className="call-meta__name"><i />채린 · 연결 중</span>
           <span className="call-meta__time">{String(Math.floor(elapsed / 60)).padStart(2, '0')}:{String(elapsed % 60).padStart(2, '0')}</span></span>
-          <span className="call-meta__pill call-meta__ai">AI 캐릭터예요</span>
+          <span className="call-meta__pill call-meta__ai">AI 캐릭터</span>
         </div>
         <div ref={copy} className="call-hero__copy">
           <h1 id="call-hero-title"><span>나만의 AI 캐릭터와,</span>{' '}<span>영상통화하듯 함께</span></h1>
           <p className="call-hero__subtitle">말을 걸면 목소리로 대답하고,<br className="call-hero__desktop-break" /> 함께한 시간만큼 새 에피소드가 열려요.</p>
-          <CallCta placement="hero" open={open} mobile={mobile} />
-          <p className="call-hero__beta">{mobile && !open ? '웹 베타 · 무료 · 선착순 100명' : '12월 1일 웹 베타 · 무료 · 선착순 100명'}</p>
+          <CallCta placement="hero" state={cta} mobile={mobile} />
+          <p className="call-hero__beta">{mobile && cta !== 'open' ? '웹 베타 · 무료 · 선착순 100명' : '12월 1일 웹 베타 · 무료 · 선착순 100명'}</p>
           <p className="call-hero__demo-note">실제 대화는 AI가 자유롭게 이어가요.</p>
         </div>
         <span className="sr-only">채린은 AI 캐릭터예요. 영상과 말풍선은 예시 대화입니다.</span>
@@ -216,7 +216,7 @@ export default function CallHero() {
         </button>
         <a className="call-scroll" href="#contrast" onClick={event => {
           event.preventDefault()
-          track('cta_clicked', { cta: 'scroll_hint', state: open ? 'open' : 'before_open', device: mobile ? 'mobile' : 'desktop' })
+          track('cta_clicked', { cta: 'scroll_hint', state: cta, device: mobile ? 'mobile' : 'desktop' })
           document.getElementById('contrast')?.scrollIntoView({ behavior: reduced ? 'instant' : 'smooth' })
         }}><span>스크롤해서 더 알아보기</span><CallIcon name="down" /></a>
       </section>

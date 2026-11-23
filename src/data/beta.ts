@@ -2,10 +2,10 @@
 // §11.2 (AI notice, camera, age). Numbers that PRD marks as recommended are left out on purpose.
 
 export const BETA_FACTS = [
-  { label: '기간', value: '12월 1일 – 14일', note: '2주 동안 열려요' },
-  { label: '인원', value: '선착순 100명', note: '자리가 차면 마감돼요' },
-  { label: '요금', value: '무료', note: '베타 동안 모든 기능을 열어 둬요' },
-  { label: '크레딧', value: '매일 출석 지급', note: '친구를 초대하면 둘 다 받아요' },
+  { label: '기간', value: '12월 1일 – 14일' },
+  { label: '인원', value: '선착순 100명' },
+  { label: '요금', value: '무료' },
+  { label: '크레딧', value: '매일 출석 지급' },
 ] as const
 
 export const START_STEPS = [
