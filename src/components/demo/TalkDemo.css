@@ -1,0 +1,78 @@
+/* Frame shared with S2/S5–S7; the wider 1440px cap stays because of the call + chat panel layout. */
+.story > .talk-demo { width: min(1440px, calc(100% - 48px)); padding-block: calc(4 * var(--spacing-content)) var(--spacing-content); color: var(--color-ink); scroll-margin-top: 96px; }
+.talk-demo__heading { text-align: center; margin-bottom: calc(2 * var(--spacing-content)); }
+.talk-demo__heading h2 { font-size: clamp(28px, 3.2vw, 44px); font-weight: 700; line-height: 1.35; letter-spacing: -.035em; word-break: keep-all; }
+.talk-demo__heading > p { margin-top: 16px; color: var(--color-muted); font-size: 16px; line-height: 1.65; word-break: keep-all; }
+.talk-demo__layout { display: grid; grid-template-columns: minmax(0, 1fr) 376px; align-items: stretch; gap: 24px; }
+/* Explicit width lets WebKit measure this grid item before any poster loads. */
+.talk-demo__stage { position: relative; width: 100%; aspect-ratio: 16 / 10; min-width: 0; border-radius: 20px; background: var(--color-panel); overflow: hidden; isolation: isolate; }
+.talk-demo__visual { position: absolute; inset: 0; }
+.talk-demo__visual > :is(video, img) { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.talk-demo__poster { z-index: 0; }
+.talk-demo__visual > video { z-index: 1; opacity: 0; transition: opacity 120ms linear; }
+.talk-demo__visual > video[data-front=true] { z-index: 2; opacity: 1; }
+.talk-demo__still { z-index: 3; opacity: 0; transition: opacity 120ms linear; }
+.talk-demo__still[data-visible=true] { opacity: 1; }
+.talk-demo__meta { position: absolute; top: 16px; left: 16px; right: 16px; z-index: 4; display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+.talk-demo__pill { display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 24px; background: color-mix(in srgb, var(--color-panel) 92%, var(--color-transparent)); color: var(--color-ink); font-size: 12px; line-height: 20px; white-space: nowrap; }
+.talk-demo__pill i { width: 6px; height: 6px; border-radius: 50%; background: var(--color-success); }
+.talk-demo__pill b { display: inline-block; width: 5ch; flex: 0 0 5ch; font-weight: 500; font-variant-numeric: tabular-nums; text-align: center; }
+.talk-demo__self { position: absolute; z-index: 4; right: 16px; bottom: 16px; width: 104px; height: 80px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; border-radius: 12px; background: color-mix(in srgb, var(--color-panel) 94%, var(--color-transparent)); color: var(--color-muted); font-size: 12px; }
+.talk-demo__self small { font-size: 12px; color: var(--color-subtle); }
+.talk-demo__motion { position: absolute; z-index: 5; left: 16px; bottom: 16px; display: inline-flex; align-items: center; gap: 8px; min-width: 44px; min-height: 44px; padding: 10px 12px; border: 0; border-radius: 12px; background: var(--color-control); color: var(--color-ink); font: 500 12px/20px var(--font-sans); cursor: pointer; }
+.talk-demo__motion:hover { background: var(--color-control-hover); }
+.talk-demo__panel { min-width: 0; min-height: 0; height: 100%; contain: size; display: flex; flex-direction: column; padding: 24px; border-radius: 20px; background: var(--color-panel); }
+.talk-demo__panel > h3 { flex: none; font-size: 18px; font-weight: 600; line-height: 28px; margin-bottom: var(--spacing-content-compact); }
+.talk-demo__history-wrap { position: relative; display: flex; flex-direction: column; flex: 1; min-height: 0; }
+/* Keep the keyboard ring outside the element whose contents are masked. */
+.talk-demo__history-wrap:has(.talk-demo__history:focus-visible) { outline: 2px solid var(--color-focus-ring); outline-offset: 4px; }
+.talk-demo__history { flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 12px; overflow: auto; overscroll-behavior: contain; scrollbar-width: thin; padding: 4px 4px 16px; overflow-anchor: none; }
+.talk-demo__history[data-scrolled=true] { mask-image: linear-gradient(to bottom, var(--color-transparent), var(--color-on-solid) 24px); }
+.talk-demo__latest { position: absolute; right: 8px; bottom: 8px; z-index: 1; min-height: 44px; padding: 8px 16px; border: 0; border-radius: 24px; background: var(--color-primary-soft-hover); color: var(--color-text-accent); font: 500 12px/20px var(--font-sans); cursor: pointer; }
+.talk-demo__latest:hover { background: var(--color-primary-soft-active); }
+.talk-demo__empty { margin: auto 0; color: var(--color-subtle); font-size: 14px; line-height: 1.7; }
+.talk-message { flex: none; max-width: 94%; padding: 12px 16px; border-radius: 16px; background: var(--color-surface); color: var(--color-ink); font-size: 14px; line-height: 1.65; word-break: keep-all; overflow-wrap: anywhere; }
+.talk-message > span { display: block; margin-bottom: 4px; color: var(--color-muted); font-size: 12px; line-height: 18px; }
+.talk-message--self { align-self: flex-end; background: var(--color-primary-soft); }
+.talk-demo__chips { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; margin-top: 8px; flex: none; }
+.talk-demo__chips button { min-width: 0; min-height: 48px; padding: 10px 8px; border: 0; border-radius: 12px; color: var(--color-text-accent); background: var(--color-primary-soft); font: 500 14px/22px var(--font-sans); word-break: keep-all; cursor: pointer; transition: opacity 120ms, background 120ms; }
+.talk-demo__chips button:hover { background: var(--color-primary-soft-hover); }
+.talk-demo__chips button:active { background: var(--color-primary-soft-active); }
+.talk-demo__chips button[aria-disabled=true] { opacity: .45; cursor: default; }
+.talk-demo :is(button, [tabindex="0"]):focus-visible { outline: 2px solid var(--color-focus-ring); outline-offset: 4px; }
+.talk-demo__composer { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 16px; padding: 12px 16px; min-height: 48px; border-radius: 12px; background: var(--color-surface); color: var(--color-subtle); font-size: 14px; flex: none; }
+.talk-demo__composer svg { width: 18px; height: 18px; }
+.talk-demo__beta { margin-top: 8px; font-size: 12px; line-height: 18px; color: var(--color-subtle); }
+.talk-demo__note { margin-top: 24px; text-align: center; font-size: 14px; line-height: 1.6; color: var(--color-subtle); word-break: keep-all; }
+.talk-demo__overlay { position: absolute; z-index: 4; bottom: 64px; left: 16px; right: 16px; display: flex; flex-direction: column; align-items: flex-start; gap: 8px; pointer-events: none; }
+.talk-message--overlay { max-width: 94%; background: color-mix(in srgb, var(--color-panel) 94%, var(--color-transparent)); }
+.talk-message--overlay.talk-message--self { background: var(--color-primary-soft); }
+.talk-message--overlay:not(:last-child) { opacity: .55; }
+@media (max-width: 1279px) and (min-width: 1024px) { .talk-demo__layout { grid-template-columns: minmax(0, 1fr) 360px; gap: 16px; } .talk-demo__panel { padding: 16px; } .talk-demo__composer, .talk-demo__beta { display: none; } }
+@media (max-width: 1023px) {
+  .talk-demo__layout { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .talk-demo__panel { height: auto; contain: none; padding: 24px; }
+  .talk-demo__history-wrap { flex: none; }
+  .talk-demo__history { height: 208px; flex: none; }
+  .talk-demo__chips { margin-top: 16px; }
+}
+@media (max-width: 767px) {
+  .story > .talk-demo { width: calc(100% - 32px); padding-block: calc(2 * var(--spacing-panel-roomy)) var(--spacing-content); }
+  .talk-demo__heading { margin-bottom: 32px; }
+  .talk-demo__heading h2 { font-size: clamp(23px, 6.1vw, 28px); letter-spacing: -.04em; }
+  .talk-demo__heading > p { font-size: 14px; line-height: 24px; }
+  .talk-demo__panel { padding: 0; background: var(--color-transparent); }
+  .talk-demo__stage { aspect-ratio: 4 / 5; }
+  .talk-demo__panel > h3, .talk-demo__history-wrap, .talk-demo__composer, .talk-demo__beta { display: none; }
+  .talk-demo__chips { margin-top: 0; gap: 8px; }
+  .talk-demo__chips button { min-height: 48px; }
+  .talk-demo__meta { inset: 12px 12px auto; gap: 4px; flex-wrap: wrap; }
+  .talk-demo__pill { font-size: 12px; gap: 5px; padding: 6px 8px; }
+  .talk-demo__self { display: none; }
+  .talk-message--overlay { padding: 8px 12px; font-size: 13px; line-height: 20px; }
+  .talk-message--overlay > span { margin-bottom: 2px; }
+  .talk-demo__motion { left: 12px; bottom: 12px; }
+}
+@media (prefers-reduced-motion: reduce) { .talk-demo__visual > video, .talk-demo__still, .talk-demo__chips button { transition: none; } }
+/* Leave the eye/mouth region clear on the shortest 4:5 frames. */
+@media (max-width: 360px) { .talk-message--overlay:not(:last-child) { display: none; } }
