@@ -8,49 +8,32 @@ const TOKEN = import.meta.env.VITE_MIXPANEL_TOKEN as string | undefined
 export function initAnalytics() {
   if (!TOKEN) return
   mixpanel.init(TOKEN, {
-    // pushState 라우터(useRoute)라 경로가 바뀔 때마다 SDK 가 $mp_web_page_view 를 보낸다.
+    // 단일 랜딩의 페이지뷰는 SDK의 $mp_web_page_view를 사용한다.
     // 수동 landing_view 는 보내지 않는다 — 같은 방문이 두 번 집계된다.
     track_pageview: 'url-with-path',
     // 클릭 자동 수집을 끈다. 아래 track() 으로 보내는 CTA 이벤트와 중복된다.
     autocapture: false,
     persistence: 'localStorage',
     // 세션 녹화. 출시 전 트래픽이 적어 전부 녹화한다 (무료 플랜 월 1만 건).
-    // 입력창은 기본값(record_mask_inputs)대로 가려져 이메일은 녹화에 남지 않는다.
-    // 포스터를 보여야 투표 화면이 읽히므로 이미지 차단은 풀고 영상·오디오만 막는다.
+    // 입력은 SDK 기본값대로 가리고 영상·오디오를 차단한다.
     record_sessions_percent: 100,
     record_block_selector: 'video, audio',
     ...(import.meta.env.VITE_MIXPANEL_API_HOST ? { api_host: import.meta.env.VITE_MIXPANEL_API_HOST as string } : {}),
   })
 }
 
-export type EventName =
-  | 'cta_clicked'
-  | 'artwork_vote_submitted'
-  | 'presign_cta_clicked'
-  | 'presign_completed'
-  | 'presign_duplicate'
-  | 'survey_cta_clicked'
-  | 'survey_completed'
-  | 'landing_api_failed'
+// Source: docs/renewal-2026-11.md §5. Require the documented attributes per event.
+export type EventProps = {
+  cta_clicked: { cta: 'hero' | 'final' | 'header' | 'scroll_hint'; state: 'before_open' | 'open'; device: 'desktop' | 'mobile' }
+  demo_chip_clicked: { chip: 'long_time' | 'ask' | 'thanks' | 'bye' }
+  demo_silence_shown: Record<string, never>
+  pc_link_copied: { method: 'share' | 'clipboard' }
+  mate_card_viewed: { mate: 'chaerin' | 'upcoming' }
+}
+export type EventName = keyof EventProps
 
 // ⚠️ 이메일·자유 서술 등 직접 식별 정보는 속성에 넣지 않는다 (docs/data-collection.md).
-export function track(event: EventName, props?: Record<string, string | number | boolean | null>) {
+export function track<E extends EventName>(event: E, props: EventProps[E]) {
   if (!TOKEN) return
   mixpanel.track(event, props)
-}
-
-// 투표·사전예약 행에 같이 저장하는 방문자 ID. Mixpanel 의 익명 distinct_id 를 그대로 써서
-// 분석 이벤트와 DB 행을 같은 키로 이을 수 있다. 토큰이 없으면 localStorage 의 UUID 로 대신한다.
-export function visitorId(): string {
-  if (TOKEN) return String(mixpanel.get_distinct_id())
-  const key = 'capsule_visitor_id'
-  try {
-    const stored = localStorage.getItem(key)
-    if (stored) return stored
-    const fresh = crypto.randomUUID()
-    localStorage.setItem(key, fresh)
-    return fresh
-  } catch {
-    return crypto.randomUUID()
-  }
 }
