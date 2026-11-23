@@ -36,7 +36,7 @@ function VoiceScene() {
     <p className="sr-only" id="moment-voice-description">마이크로 말을 건네자 채린이 입 모양과 표정으로 대답하는 통화 예시예요.</p>
     <div className="moment-voice" ref={frameRef} aria-hidden="true" data-listening={listening}>
       <div className="moment-call" ref={cameraRef}><VideoLayers media={media} still={still} reduced={clock.reduced} /></div>
-      <div className="moment-call__top"><span className="moment-pill"><i />채린 · 연결 중</span><span className="moment-pill">AI 캐릭터예요</span></div>
+      <div className="moment-call__top"><span className="moment-pill"><i />채린 · 연결 중</span><span className="moment-pill">AI 캐릭터</span></div>
       <div className="moment-voice__captions">{(clock.reduced || t >= 2500 && t < 7100) && <p className="moment-caption moment-caption--self">{MOMENT_VOICE.self}</p>}{(clock.reduced || speaking && t >= 3150) && <p className="moment-caption"><span>채린</span>{text || '…'}</p>}</div>
       <div className="moment-voice__mic">{listening && <div className="moment-wave">{[0, 1, 2, 3, 4, 5, 6].map(n => <i key={n} style={{ '--bar': n } as CSSProperties} />)}</div>}<span><CallIcon name="mic" />누르고 말하기</span></div>
     </div><SceneControl clock={clock} name="목소리" />
@@ -48,11 +48,13 @@ function PresenceScene() {
   const { frame: cameraRef, view: frameView } = useMomentFrame(), t = clock.time
   const away = t >= 1600 && t < 4200, returned = t >= 4500 && t < 7800
   const opacity = t < 7800 ? clamp((t - 4500) / 300) : 1 - clamp((t - 7800) / 300)
-  const view = frameView
+  // Always the wide (head→chest) render: the tall one fades out below the shoulders for
+  // phone text overlays, which looks like a cut-off body in this narrow panel.
+  const view = frameView ? 'wide' as const : null
   return <div className="moment-scene" role="group" aria-describedby="moment-presence-description" data-scene="presence" data-phase={away ? 'away' : returned ? 'returned' : 'present'} data-time={Math.round(t)} data-active={clock.active} data-reduced={clock.reduced}>
     <p className="sr-only" id="moment-presence-description">내 캠의 사람이 자리를 비웠다가 돌아오자 채린이 알아채고 말을 거는 예시예요.</p>
     <div className="moment-presence" ref={frameRef} aria-hidden="true">
-      <div className="moment-presence__mate" ref={cameraRef}>{clock.near && view && <><img src={demoPoster(view)} alt="" /><img src={demoStill(view, 'silence', false)} alt="" style={{ opacity }} /></>}<span className="moment-pill">AI 캐릭터예요</span>{returned && <p className="moment-caption">…어디 갔다 왔어?</p>}</div>
+      <div className="moment-presence__mate" ref={cameraRef}>{clock.near && view && <><img src={demoPoster(view)} alt="" /><img src={demoStill(view, 'silence', false)} alt="" style={{ opacity }} /></>}<span className="moment-pill">AI 캐릭터</span>{returned && <p className="moment-caption">…어디 갔다 왔어?</p>}</div>
       <div className="moment-presence__self" data-away={away}><span className="moment-presence__label">내 캠</span><div className="moment-presence__avatar">{away ? <Chair /> : <CallIcon name="person" />}</div><p><i />{away ? `자리 비움 00:${String(42 + Math.floor((t - 1600) / 1000)).padStart(2, '0')}` : '자리에 있음'}</p><small>카메라 예시 화면</small></div>
     </div><SceneControl clock={clock} name="자리 인식" />
   </div>
@@ -99,7 +101,7 @@ function DesktopScene() {
       <div className="moment-editor" data-working={t >= 2700 && t < 6500}><div className="moment-window-bar"><span>기획서_v3</span><span className="moment-window-dots"><i /><i /><i /></span></div><div className="moment-editor__page">{[0, 1, 2, 3, 4].map(n => <i key={n} />)}<i data-added={t >= 3000 && t < 7100} /><b className="moment-editor__cursor" /></div></div>
       <div className="moment-desktop__call" ref={call} style={{ transform: `translate(${geometry.x * progress}px,${geometry.y * progress}px) scale(${1 + (geometry.scale - 1) * progress})` }}>
         <div className="moment-window-bar"><span><i className="moment-connected" />채린 · 연결 중</span><span className="moment-pip-button" data-pressed={phase === 'press'}><CallIcon name="pip" /></span></div>
-        <div className="moment-desktop__video" ref={cameraRef}><VideoLayers media={media} still={media.poster} reduced={clock.reduced} /><span className="moment-desktop__ai">AI 캐릭터예요</span><span className="moment-desktop__mic"><CallIcon name="mic" /></span></div>
+        <div className="moment-desktop__video" ref={cameraRef}><VideoLayers media={media} still={media.poster} reduced={clock.reduced} /><span className="moment-desktop__ai">AI 캐릭터</span><span className="moment-desktop__mic"><CallIcon name="mic" /></span></div>
       </div>
       {phase === 'bubble' && <p className="moment-desktop__bubble">나도 옆에서 내 거 할게.</p>}
     </div><SceneControl clock={clock} name="PIP" />
@@ -111,5 +113,5 @@ const scenes = [
   { number: '03', title: '작업 옆에 띄워 둬요', description: 'PIP로 화면 구석에 띄워 두고, 하던 일을 계속해요.', component: DesktopScene },
 ]
 export default function MomentsSection() {
-  return <section className="moments" id="moments" aria-labelledby="moments-title"><h2 id="moments-title">옆에 있는 것처럼, 반응해요</h2><p className="sr-only">채린은 AI 캐릭터예요. 카메라와 마이크를 켜지 않는 무음 예시 장면이에요.</p>{scenes.map(({ number, title, description, component: Scene }) => <article className="moment" key={number}><div className="moment__copy"><span className="moment__number">{number}</span><h3>{title}</h3><p>{description}</p>{number === '02' && <small>영상은 브라우저 안에서만 쓰고, 저장하거나 보내지 않아요. 카메라 없이도 쓸 수 있어요.</small>}</div><Scene /></article>)}<p className="moments__note">실제 대화는 AI가 자유롭게 이어가요.</p></section>
+  return <section className="moments" id="moments" aria-labelledby="moments-title"><h2 id="moments-title">옆에 있는 것처럼, 반응해요</h2><p className="sr-only">채린은 AI 캐릭터예요. 카메라와 마이크를 켜지 않는 무음 예시 장면이에요.</p>{scenes.map(({ number, title, description, component: Scene }) => <article className="moment" key={number}><div className="moment__copy"><span className="moment__number">{number}</span><h3>{title}</h3><p>{description}</p>{number === '02' && <small>영상은 브라우저 안에서만 쓰고, 저장하거나 보내지 않아요. 카메라 없이도 쓸 수 있어요.</small>}</div><Scene /></article>)}</section>
 }
