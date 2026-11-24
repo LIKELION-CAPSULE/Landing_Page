@@ -71,9 +71,9 @@ Mixpanel은 페이지 방문, 지정한 버튼·데모 이벤트를 수집합니
 ## 배포
 
 1. `npm ci` 후 `npm run build`를 실행하고 `dist/`를 정적 호스팅합니다.
-2. 기존 주소에서도 앱이 실행되도록 알 수 없는 경로를 `/index.html`로 보내는 SPA fallback을 설정합니다. 예: Vercel의 rewrite 규칙. JS·CSS·이미지·영상 파일 요청은 실제 파일로 제공해야 합니다.
-3. `VITE_APP_URL`과 분석 프로젝트 지역을 배포 환경에 맞춥니다. 현재 canonical·`og:url`의 도메인은 도메인 확정 전 값을 유지하고 있습니다.
-4. 도메인을 확정하면 `index.html`의 canonical·`og:url`·OG/Twitter 이미지 절대 주소를 함께 확인합니다.
+2. 페이지는 `/` 하나입니다. `vercel.json`은 옛 주소(`/rooms`, `/preorder`, `/done`, `/survey`, `/test`, 끝 슬래시 포함)를 주소 변경 없이 `index.html`로 rewrite하고, `src/main.tsx`가 분석 초기화 전에 주소를 `/`로 바꿉니다(쿼리·해시 유지). 그 밖의 없는 경로는 Vercel 기본 404를 돌려줍니다. 같은 파일에서 보안 헤더(`X-Content-Type-Options`, `Referrer-Policy`, `X-Frame-Options`)와 해시 파일(`/assets/*`)의 1년 캐시를 설정합니다. 다른 호스팅으로 옮기면 같은 규칙을 옮겨 설정합니다.
+3. `VITE_APP_URL`과 분석 프로젝트 지역을 배포 환경에 맞춥니다.
+4. 운영 도메인은 `https://landing.capsule.ai.kr`입니다. 임시 주소 `landing-page-nine-psi-56.vercel.app`은 이 도메인으로 넘어갑니다. 도메인을 바꾸면 `index.html`의 canonical·`og:url`·OG/Twitter 이미지 절대 주소를 함께 바꿉니다.
 5. OG 이미지를 교체한 뒤에는 공유 서비스의 미리보기 디버거에서 재수집을 요청하고, 호스팅/CDN의 이미지 캐시도 갱신합니다. 플랫폼별 캐시가 남으면 새 이미지 경로를 사용하고 메타 주소도 함께 변경합니다.
 6. 모바일·키보드·모션 줄이기, 링크 유입 값 전달, 영상의 화면 밖·탭 숨김 정지를 확인합니다.
 
