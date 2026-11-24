@@ -15,6 +15,9 @@ const MOBILE_NOTE: Record<CtaState, string> = {
 export default function CallCta({ placement, state, mobile }: { placement: 'header' | 'hero' | 'final'; state: CtaState; mobile: boolean }) {
   const [result, setResult] = useState<PcLinkResult | null>(null)
   const [pending, setPending] = useState(false)
+  // Defensive: a link renders only with a usable app address (lib/cta.ts keeps 'open' in sync).
+  const href = !mobile && state === 'open' ? appUrl() : null
+  const locked: Exclude<CtaState, 'open'> = state === 'open' ? 'preparing' : state
   const clicked = () => track('cta_clicked', { cta: placement, state, device: mobile ? 'mobile' : 'desktop' })
   const send = async () => {
     if (pending) return
@@ -28,9 +31,9 @@ export default function CallCta({ placement, state, mobile }: { placement: 'head
     <div className={`call-cta call-cta--${placement}`} data-cta-state={state}>
       {/* Phones share the landing link, but only from 12/1 on, same as the desktop button. */}
       {mobile && state !== 'before_open' ? <button type="button" aria-busy={pending} onClick={() => { void send() }}>PC로 링크 보내기</button>
-        : !mobile && state === 'open' ? <a href={appUrl()} onClick={clicked}>채린이 깨우러 가기</a>
-          // Reached only when state is not 'open' (desktop) or is 'before_open' (phone).
-          : <button type="button" aria-disabled="true" onClick={clicked}>{LOCKED_LABEL[state as Exclude<CtaState, 'open'>]}</button>}
+        : href ? <a href={href} onClick={clicked}>채린이 깨우러 가기</a>
+          // Desktop before opening/while preparing, or a phone before 12/1.
+          : <button type="button" aria-disabled="true" onClick={clicked}>{LOCKED_LABEL[locked]}</button>}
       {mobile && <p className="call-cta__device">{MOBILE_NOTE[state]}</p>}
       <div className="call-cta__status" role="status">
         {result?.method === 'clipboard' && '링크를 복사했어요. PC에서 열어 주세요.'}

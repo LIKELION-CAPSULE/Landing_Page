@@ -1,7 +1,8 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import CallCta from './CallCta.tsx'
 import CallIcon from './CallIcon.tsx'
-import { ctaState, MOBILE_QUERY, OPEN_AT } from '../../lib/cta.ts'
+import { MOBILE_QUERY } from '../../lib/cta.ts'
+import { useCtaState } from '../../hooks/useCtaState.ts'
 import { track } from '../../lib/analytics.ts'
 import logo from '../../assets/hero/logo-lockup.svg'
 import landscapeWebm from '../../assets/mates/chaerin/call-landscape.webm'
@@ -43,7 +44,7 @@ export default function CallHero() {
   const mobile = useMedia(MOBILE_QUERY)
   const portrait = useMedia(PORTRAIT_QUERY)
   const reduced = useMedia('(prefers-reduced-motion: reduce)')
-  const [cta, setCta] = useState(ctaState)
+  const cta = useCtaState()
   const [scrolled, setScrolled] = useState(() => window.scrollY > 24)
   const [headerCtaVisible, setHeaderCtaVisible] = useState(false)
   const [inView, setInView] = useState(true)
@@ -60,19 +61,16 @@ export default function CallHero() {
   const currentPoster = portrait ? portraitPoster : landscapePoster
 
   useEffect(() => {
-    const visibility = () => { setTabVisible(!document.hidden); setCta(ctaState()) }
+    const visibility = () => setTabVisible(!document.hidden)
     const scroll = () => setScrolled(window.scrollY > 24)
-    const route = () => setCta(ctaState())
-    const timer = window.setTimeout(route, Math.min(Math.max(OPEN_AT - Date.now(), 0), 2_147_483_647))
     const observer = new IntersectionObserver(([entry]) => setInView(entry.isIntersecting), { threshold: 0 })
     if (section.current) observer.observe(section.current)
     document.addEventListener('visibilitychange', visibility)
     window.addEventListener('scroll', scroll, { passive: true })
-    window.addEventListener('popstate', route)
     return () => {
-      observer.disconnect(); window.clearTimeout(timer)
+      observer.disconnect()
       document.removeEventListener('visibilitychange', visibility)
-      window.removeEventListener('scroll', scroll); window.removeEventListener('popstate', route)
+      window.removeEventListener('scroll', scroll)
     }
   }, [])
 

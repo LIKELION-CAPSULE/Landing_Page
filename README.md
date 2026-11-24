@@ -48,13 +48,13 @@ npm run preview
 
 | 변수 | 설명 |
 | --- | --- |
-| `VITE_APP_URL` | 앱 로그인 주소. 비어 있으면 `https://capsule-front-web.vercel.app/login` |
+| `VITE_APP_URL` | 앱 로그인 주소(`http`/`https` 절대 주소). 비어 있거나 잘못된 값이면 12월 1일 이후에도 PC 버튼이 "오픈 준비 중"으로 잠긴 채 유지됩니다. 바꾼 뒤에는 다시 배포해야 반영됩니다 |
 | `VITE_MIXPANEL_TOKEN` | 공개 프로젝트 토큰. 비어 있으면 분석 호출 없음 |
 | `VITE_MIXPANEL_API_HOST` | 선택 설정. Mixpanel 프로젝트 지역에 맞는 API 주소. 비어 있으면 SDK 기본 주소 |
 
 `VITE_` 값은 공개 번들에 포함되므로 비밀 키를 넣지 않습니다. 앱 링크에는 현재 URL의 `utm_*`와 `ref`가 전달됩니다.
 
-2026년 12월 1일 00:00 KST 전에는 PC 시작 버튼이 오픈 일정을 표시합니다. 이후에는 앱으로 연결합니다. 휴대폰에서는 공유 또는 링크 복사를 제공합니다. 로컬 확인용 `?cta=before`와 `?cta=open`으로 상태를 전환할 수 있습니다.
+2026년 12월 1일 00:00 KST 전에는 PC와 휴대폰 버튼 모두 "12월 1일 오픈"으로 잠깁니다. 이후 PC는 `VITE_APP_URL`이 올바를 때 앱으로 연결하고, 아니면 "오픈 준비 중"을 표시합니다. 휴대폰은 랜딩 주소를 공유하거나 링크를 복사합니다. QA용 `?cta=before|preparing|open` 파라미터는 로컬 개발과 Vercel preview 배포에서만 동작하고 프로덕션에서는 무시됩니다. preview에서 `VITE_APP_URL`이 없으면 `?cta=open`은 `https://capsule-front-web.vercel.app/login`으로 연결합니다.
 
 Mixpanel은 페이지 방문, 지정한 버튼·데모 이벤트를 수집합니다. 세션 재현 비율은 100%이며 입력값 가림과 영상·오디오 차단을 설정합니다. 설정 코드는 `src/lib/analytics.ts`, 약관 원문은 `src/data/legal/`에 있습니다. 원문 상단의 법적 검토용 주석은 화면에 표시하지 않습니다. 법적 검토 및 미정 항목 확정은 공개 운영 전에 필요합니다.
 

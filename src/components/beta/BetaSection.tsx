@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react'
 import CallCta from '../hero/CallCta.tsx'
 import avatar from '../../assets/mates/chaerin/avatar.webp'
 import { BETA_FACTS, FAQ, START_STEPS } from '../../data/beta.ts'
-import { ctaState, MOBILE_QUERY, OPEN_AT, type CtaState } from '../../lib/cta.ts'
+import { MOBILE_QUERY } from '../../lib/cta.ts'
+import { useCtaState } from '../../hooks/useCtaState.ts'
 import './BetaSection.css'
 
 function useMedia(query: string) {
@@ -14,23 +15,6 @@ function useMedia(query: string) {
     return () => media.removeEventListener('change', change)
   }, [query])
   return matches
-}
-
-// Same rule as the hero (lib/cta.ts): before 12/1 → before_open; after → open only if VITE_APP_URL is set.
-function useCtaState(): CtaState {
-  const [cta, setCta] = useState(ctaState)
-  useEffect(() => {
-    const update = () => setCta(ctaState())
-    const timer = window.setTimeout(update, Math.min(Math.max(OPEN_AT - Date.now(), 0), 2_147_483_647))
-    document.addEventListener('visibilitychange', update)
-    window.addEventListener('popstate', update)
-    return () => {
-      window.clearTimeout(timer)
-      document.removeEventListener('visibilitychange', update)
-      window.removeEventListener('popstate', update)
-    }
-  }, [])
-  return cta
 }
 
 export default function BetaSection() {
