@@ -12,6 +12,11 @@ html {
   background-color: var(--color-canvas);
   -webkit-text-size-adjust: 100%;
   scrollbar-gutter: stable;
+  /* Keep anchor targets and keyboard focus clear of the fixed header (80px, 64px on phones). */
+  scroll-padding-top: 96px;
+}
+@media (max-width: 767px) {
+  html { scroll-padding-top: 80px; }
 }
 
 body {

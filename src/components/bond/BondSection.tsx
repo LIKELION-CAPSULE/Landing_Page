@@ -87,15 +87,15 @@ export default function BondSection() {
             <span className="bond-stage__badge" aria-hidden="true">{stage.name}</span>
             <span className="bond-stage__ai">AI 캐릭터</span>
             {!reduced && (
-              <button type="button" className="bond-stage__control" aria-pressed={stopped} aria-label={stopped ? '단계 자동 넘김 재생' : '단계 자동 넘김 일시정지'} onClick={toggle}>
+              <button type="button" className="bond-stage__control" aria-label={stopped ? '단계 자동 넘김 재생' : '단계 자동 넘김 일시정지'} onClick={toggle}>
                 <CallIcon name={stopped ? 'play' : 'pause'} />
               </button>
             )}
           </div>
           {/* Announce only lines the visitor chose; automatic advances stay quiet. */}
-          <figcaption id="bond-line" className="bond-stage__line" aria-live={manual ? 'polite' : 'off'} aria-atomic="true" data-locked={stage.image ? undefined : ''}>
+          <figcaption id="bond-line" className="bond-stage__line" aria-live={manual ? 'polite' : 'off'} aria-atomic="true" data-locked={stage.image ? undefined : ''} data-notice={stage.notice || undefined}>
             <span className="sr-only">{stage.name} 단계, </span>
-            <span>채린</span>
+            {!stage.notice && <span>채린</span>}
             <p key={stage.id}>{stage.line}</p>
           </figcaption>
         </figure>

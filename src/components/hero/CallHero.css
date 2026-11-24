@@ -27,8 +27,8 @@
 .call-cta :is(button, a):focus-visible { outline: 2px solid var(--color-focus-ring); outline-offset: 4px; }
 .call-cta--hero { margin-top: 32px; }
 .call-cta > :is(a, button) { display: inline-flex; align-items: center; justify-content: center; max-width: 100%; min-height: 52px; padding: 12px 28px; border: 0; border-radius: 12px; background: var(--color-primary); color: var(--color-on-solid); font: 600 16px/24px var(--font-sans); text-align: center; cursor: pointer; }
-.call-cta > :is(a, button):hover { background: var(--color-primary-hover); }
-.call-cta > :is(a, button):active { background: var(--color-primary-active); }
+.call-cta > :is(a, button):not([aria-disabled=true]):hover { background: var(--color-primary-hover); }
+.call-cta > :is(a, button):not([aria-disabled=true]):active { background: var(--color-primary-active); }
 .call-cta > [aria-disabled=true] { color: var(--color-text-disabled); background: var(--color-disabled); cursor: default; }
 .call-cta--header > :is(a, button) { min-height: 44px; padding: 10px 20px; font-size: 14px; line-height: 22px; }
 .call-cta__device, .call-cta__status { font-size: 14px; line-height: 22px; color: var(--color-muted); }

@@ -20,7 +20,7 @@ export default function Footer() {
             </div>
             <div className="site-footer__legal">
               <nav className="site-footer__links" aria-label="약관">
-                <button type="button" aria-haspopup="dialog" onClick={(event) => showDocument('terms', event.currentTarget)}>이용 약관</button>
+                <button type="button" aria-haspopup="dialog" onClick={(event) => showDocument('terms', event.currentTarget)}>이용약관</button>
                 <button type="button" className="site-footer__privacy" aria-haspopup="dialog" onClick={(event) => showDocument('privacy', event.currentTarget)}>개인정보처리방침</button>
               </nav>
               <p className="site-footer__copy">© 2026 CAPSULE</p>

@@ -64,6 +64,8 @@
 .legal-dialog__body th, .legal-dialog__body td { padding: 10px; border: 1px solid var(--color-divider); text-align: left; vertical-align: top; }
 .legal-dialog__body th { background: var(--color-surface); font-weight: 700; }
 .legal-dialog__body th:first-child { width: 25%; }
+.legal-dialog__table { overflow-x: auto; overscroll-behavior-x: contain; }
+.legal-dialog__table:focus-visible { outline: 2px solid var(--color-focus-ring); outline-offset: 2px; }
 .legal-dialog__body strong { font-weight: 700; }
 
 @media (max-width: 600px) {
@@ -71,6 +73,7 @@
   .legal-dialog__header { padding: max(12px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) 12px max(16px, env(safe-area-inset-left)); }
   .legal-dialog__body { padding: 24px max(16px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left)); }
   .legal-dialog__body th, .legal-dialog__body td { padding: 8px; }
+  .legal-dialog__table > table { min-width: 30rem; }
 }
 
 @media (hover: hover) and (pointer: fine) {
