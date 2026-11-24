@@ -1,5 +1,5 @@
 /* Frame shared with S2/S5–S7; the wider 1440px cap stays because of the call + chat panel layout. */
-.story > .talk-demo { width: min(1440px, calc(100% - 48px)); padding-block: calc(4 * var(--spacing-content)) var(--spacing-content); color: var(--color-ink); scroll-margin-top: 96px; }
+.story > .talk-demo { width: min(1440px, calc(100% - 48px)); padding-block: calc(4 * var(--spacing-content)) var(--spacing-content); color: var(--color-ink); }
 .talk-demo__heading { text-align: center; margin-bottom: calc(2 * var(--spacing-content)); }
 .talk-demo__heading h2 { font-size: clamp(28px, 3.2vw, 44px); font-weight: 700; line-height: 1.35; letter-spacing: -.035em; word-break: keep-all; }
 .talk-demo__heading > p { margin-top: 16px; color: var(--color-muted); font-size: 16px; line-height: 1.65; word-break: keep-all; }

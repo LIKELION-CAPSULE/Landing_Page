@@ -50,6 +50,7 @@ const icons = {
 export default function ContrastSection() {
   const section = useRef<HTMLElement>(null)
   const video = useRef<HTMLVideoElement>(null)
+  const callTitle = useRef<HTMLHeadingElement>(null)
   const elapsed = useRef(0)
   const triggered = useRef(false)
   const portrait = useMedia(PORTRAIT_QUERY)
@@ -135,6 +136,8 @@ export default function ContrastSection() {
     setPhase('waiting')
     setStarted(true)
     setRun(value => value + 1)
+    // The button hides while the demo replays; keep keyboard focus in this card.
+    callTitle.current?.focus({ preventScroll: true })
   }
 
   return (
@@ -168,7 +171,7 @@ export default function ContrastSection() {
           </ul>
         </article>
         <article className="contrast-card contrast-card--call" aria-labelledby="contrast-call-title">
-          <h3 id="contrast-call-title"><span className="contrast-card__signal" aria-hidden="true" />캡슐의 통화</h3>
+          <h3 id="contrast-call-title" ref={callTitle} tabIndex={-1}><span className="contrast-card__signal" aria-hidden="true" />캡슐의 통화</h3>
           <div className="contrast-call" aria-hidden="true" data-speaking={!reduced && phase === 'replying' && letters * CHARACTER_MS < TALK_MS}>
             <video key={portrait ? 'portrait' : 'landscape'} ref={video} muted playsInline preload={reduced ? 'none' : 'metadata'} poster={poster}>
               <source src={portraitWebm} type="video/webm" media={PORTRAIT_QUERY} />

@@ -68,7 +68,10 @@ export default function TalkDemo() {
     const warm = new IntersectionObserver(([entry]) => { if (entry.isIntersecting) { setNear(true); warm.disconnect() } }, { rootMargin: '600px 0px' })
     const observer = new IntersectionObserver(([entry]) => {
       setInView(entry.isIntersecting && entry.intersectionRect.height > 0)
-      setHalfVisible(entry.intersectionRatio >= .5)
+      // Same rule as S2: a section taller than twice the viewport never reaches a 50%
+      // ratio, so measure against the height that can actually be on screen.
+      const available = Math.min(entry.boundingClientRect.height, entry.rootBounds?.height ?? window.innerHeight)
+      setHalfVisible(entry.isIntersecting && available > 0 && entry.intersectionRect.height >= available * .5)
     }, { threshold: Array.from({ length: 101 }, (_, i) => i / 100) })
     warm.observe(element); observer.observe(element)
     const visibility = () => setTabVisible(!document.hidden)
@@ -120,14 +123,18 @@ export default function TalkDemo() {
     return () => cancelAnimationFrame(frame)
   }, [active, halfVisible, reduced, start])
 
-  const bubble = (message: Message, overlay = false) => <div key={message.id} className={`talk-message talk-message--${message.speaker}${overlay ? ' talk-message--overlay' : ''}`} data-speaker={message.speaker} aria-hidden="true">
-    {message.speaker === 'mate' && <span>채린</span>}<p>{message.visible}</p>
+  // The panel history is readable; the phone overlay duplicates it and a reply that is
+  // still typing would read letter by letter, so both stay hidden from assistive tech.
+  const bubble = (message: Message, overlay = false) => <div key={message.id} className={`talk-message talk-message--${message.speaker}${overlay ? ' talk-message--overlay' : ''}`} data-speaker={message.speaker} aria-hidden={overlay || !message.complete || undefined}>
+    {message.speaker === 'mate' ? <span>채린</span> : !overlay && <span className="sr-only">나: </span>}<p>{message.visible}</p>
   </div>
+  const latestReply = messages.findLast(message => message.speaker === 'mate' && message.complete)
 
   return <section className="talk-demo" id="talk" ref={section} aria-labelledby="talk-title" data-state={reaction ? reaction.item.id : 'idle'} data-phase={busy ? (localTime < (timing?.talkStartMs ?? 0) ? 'transition' : localTime < (timing?.talkEndMs ?? 0) ? 'talking' : 'hold') : 'idle'} data-expression={expression} data-view={media.view} data-frame-view={frameView} data-fallback={media.fallback} data-active={active}>
     <header className="talk-demo__heading"><h2 id="talk-title">채린에게 직접 말 걸어 보세요</h2><p>답장을 골라 보세요. 가만히 있으면 채린이 먼저 말을 걸어요.</p></header>
     <p className="sr-only">채린은 AI 캐릭터예요. 미리 만든 예시 반응을 보여 주는 데모예요.</p>
-    <div className="sr-only" role="log" aria-live="polite" aria-relevant="additions" aria-label="채린과의 대화 기록">{messages.filter(message => message.complete).map(message => <p key={message.id}>{message.speaker === 'mate' ? '채린' : '나'}: {message.text}</p>)}</div>
+    {/* Announce each finished reply once; the history region itself is not live. */}
+    <div className="sr-only" aria-live="polite">{latestReply && <p key={latestReply.id}>채린: {latestReply.text}</p>}</div>
     <div className="talk-demo__layout">
       <div className="talk-demo__stage" ref={frame}>
         <div className="talk-demo__visual" aria-hidden="true">
@@ -138,12 +145,12 @@ export default function TalkDemo() {
           <div className="talk-demo__self"><CallIcon name="person" /><span>내 캠</span><small>카메라 꺼짐</small></div>
           {mobile && <div className="talk-demo__overlay">{overlayMessages.map(message => bubble(message, true))}</div>}
         </div>
-        {!reduced && <button className="talk-demo__motion" type="button" aria-label={paused ? '데모 영상 재생' : '데모 영상 일시정지'} aria-pressed={paused} onClick={() => setPaused(value => !value)}><CallIcon name={paused ? 'play' : 'pause'} /><span>{paused ? '재생' : '일시정지'}</span></button>}
+        {!reduced && <button className="talk-demo__motion" type="button" aria-label={paused ? '데모 영상 재생' : '데모 영상 일시정지'} onClick={() => setPaused(value => !value)}><CallIcon name={paused ? 'play' : 'pause'} /><span>{paused ? '재생' : '일시정지'}</span></button>}
       </div>
       <div className="talk-demo__panel">
         <h3>채팅</h3>
         <div className="talk-demo__history-wrap">
-          <div className="talk-demo__history" ref={historyRef} role="region" aria-label="대화 기록 스크롤" tabIndex={mobile ? -1 : 0} data-scrolled={scrolled} onScroll={onScroll} onWheel={stopJump} onPointerDown={stopJump} onKeyDown={stopJump}>{panelMessages.length ? panelMessages.map(message => bubble(message)) : <p className="talk-demo__empty" aria-hidden="true">채린이 연결됐어요.<br />먼저 한마디 건네 볼까요?</p>}</div>
+          <div className="talk-demo__history" ref={historyRef} role="region" aria-label="대화 기록 스크롤" tabIndex={mobile ? -1 : 0} data-scrolled={scrolled} onScroll={onScroll} onWheel={stopJump} onPointerDown={stopJump} onKeyDown={stopJump}>{panelMessages.length ? panelMessages.map(message => bubble(message)) : <p className="talk-demo__empty">채린이 연결됐어요.<br />먼저 한마디 건네 볼까요?</p>}</div>
           {unread && !mobile && <button className="talk-demo__latest" type="button" onClick={jumpToLatest}>새 메시지</button>}
         </div>
         <div className="talk-demo__chips" role="group" aria-label="채린에게 보낼 답장">{DEMO_CHIPS.map(item => <button key={item.id} type="button" data-chip={item.id} aria-disabled={busy} onClick={() => start(item)}>{item.chip}</button>)}</div>

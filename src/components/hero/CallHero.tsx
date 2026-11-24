@@ -1,8 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import CallCta from './CallCta.tsx'
 import CallIcon from './CallIcon.tsx'
-import { MOBILE_QUERY } from '../../lib/cta.ts'
-import { useCtaState } from '../../hooks/useCtaState.ts'
+import { MOBILE_QUERY, type CtaState } from '../../lib/cta.ts'
 import { track } from '../../lib/analytics.ts'
 import logo from '../../assets/hero/logo-lockup.svg'
 import landscapeWebm from '../../assets/mates/chaerin/call-landscape.webm'
@@ -35,7 +34,27 @@ function useMedia(query: string) {
   return matches
 }
 
-export default function CallHero() {
+// The fixed site header lives outside <main> (banner landmark). LandingPage owns the shared
+// CTA state; the hero reports whether its own CTA has slid under the header.
+export function CallHeader({ cta, ctaVisible }: { cta: CtaState; ctaVisible: boolean }) {
+  const mobile = useMedia(MOBILE_QUERY)
+  const [scrolled, setScrolled] = useState(() => window.scrollY > 24)
+  useEffect(() => {
+    const scroll = () => setScrolled(window.scrollY > 24)
+    window.addEventListener('scroll', scroll, { passive: true })
+    return () => window.removeEventListener('scroll', scroll)
+  }, [])
+  return (
+    <header className="call-header" data-scrolled={scrolled || undefined}>
+      <div className="call-header__inner">
+        <img src={logo} width="1992" height="456" alt="캡슐 CAPSULE" draggable={false} />
+        {!mobile && <div className="call-header__cta" data-visible={ctaVisible || undefined} inert={!ctaVisible} aria-hidden={!ctaVisible}><CallCta placement="header" state={cta} mobile={false} /></div>}
+      </div>
+    </header>
+  )
+}
+
+export default function CallHero({ cta, onHeaderCtaVisibleChange }: { cta: CtaState; onHeaderCtaVisibleChange: (visible: boolean) => void }) {
   const section = useRef<HTMLElement>(null)
   const video = useRef<HTMLVideoElement>(null)
   const copy = useRef<HTMLDivElement>(null)
@@ -44,9 +63,6 @@ export default function CallHero() {
   const mobile = useMedia(MOBILE_QUERY)
   const portrait = useMedia(PORTRAIT_QUERY)
   const reduced = useMedia('(prefers-reduced-motion: reduce)')
-  const cta = useCtaState()
-  const [scrolled, setScrolled] = useState(() => window.scrollY > 24)
-  const [headerCtaVisible, setHeaderCtaVisible] = useState(false)
   const [inView, setInView] = useState(true)
   const [tabVisible, setTabVisible] = useState(() => !document.hidden)
   const [userPaused, setUserPaused] = useState(false)
@@ -62,15 +78,12 @@ export default function CallHero() {
 
   useEffect(() => {
     const visibility = () => setTabVisible(!document.hidden)
-    const scroll = () => setScrolled(window.scrollY > 24)
     const observer = new IntersectionObserver(([entry]) => setInView(entry.isIntersecting), { threshold: 0 })
     if (section.current) observer.observe(section.current)
     document.addEventListener('visibilitychange', visibility)
-    window.addEventListener('scroll', scroll, { passive: true })
     return () => {
       observer.disconnect()
       document.removeEventListener('visibilitychange', visibility)
-      window.removeEventListener('scroll', scroll)
     }
   }, [])
 
@@ -78,10 +91,10 @@ export default function CallHero() {
     const button = copy.current?.querySelector('.call-cta--hero > :is(button, a)')
     if (!button || mobile) return
     // Account for the fixed header: a CTA underneath it is no longer visible.
-    const observer = new IntersectionObserver(([entry]) => setHeaderCtaVisible(!entry.isIntersecting), { rootMargin: '-80px 0px 0px 0px' })
+    const observer = new IntersectionObserver(([entry]) => onHeaderCtaVisibleChange(!entry.isIntersecting), { rootMargin: '-80px 0px 0px 0px' })
     observer.observe(button)
     return () => observer.disconnect()
-  }, [mobile, cta])
+  }, [mobile, cta, onHeaderCtaVisibleChange])
 
   useLayoutEffect(() => {
     const element = copy.current
@@ -165,13 +178,6 @@ export default function CallHero() {
   }
 
   return (
-    <>
-      <header className="call-header" data-scrolled={scrolled || undefined}>
-        <div className="call-header__inner">
-          <img src={logo} width="1992" height="456" alt="캡슐 CAPSULE" draggable={false} />
-          {!mobile && <div className="call-header__cta" data-visible={headerCtaVisible || undefined} inert={!headerCtaVisible} aria-hidden={!headerCtaVisible}><CallCta placement="header" state={cta} mobile={false} /></div>}
-        </div>
-      </header>
       <section ref={section} className="call-hero" aria-labelledby="call-hero-title" data-reduced-motion={staticMotion} data-in-view={inView} data-playing={playing} data-video-layout={portrait ? 'portrait' : 'landscape'}>
         <div className="call-hero__media" aria-hidden="true">
           <picture className="call-hero__poster">
@@ -208,7 +214,7 @@ export default function CallHero() {
         <div className="call-controls" aria-hidden="true">
           {(['mic', 'camera', 'chat', 'pip', 'hangup'] as const).map(name => <span className={name === 'hangup' ? 'call-controls__end' : ''} key={name}><CallIcon name={name} /></span>)}
         </div>
-        <button className="call-motion" type="button" aria-label={playing ? '영상 일시정지' : '영상 재생'} aria-pressed={!playing} onClick={toggle}>
+        <button className="call-motion" type="button" aria-label={playing ? '영상 일시정지' : '영상 재생'} onClick={toggle}>
           <CallIcon name={playing ? 'pause' : 'play'} /><span>{playing ? '일시정지' : '재생'}</span>
         </button>
         <a className="call-scroll" href="#contrast" onClick={event => {
@@ -217,6 +223,5 @@ export default function CallHero() {
           document.getElementById('contrast')?.scrollIntoView({ behavior: reduced ? 'instant' : 'smooth' })
         }}><span>스크롤해서 더 알아보기</span><CallIcon name="down" /></a>
       </section>
-    </>
   )
 }

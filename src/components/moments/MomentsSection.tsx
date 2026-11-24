@@ -13,7 +13,7 @@ const clamp = (n: number) => Math.max(0, Math.min(1, n))
 function typed(text: string, progress: number) { return Array.from(text).slice(0, Math.floor(Array.from(text).length * clamp(progress))).join('') }
 
 function SceneControl({ clock, name }: { clock: Clock; name: string }) {
-  return !clock.reduced && <button className="moment-control" type="button" aria-label={`${name} 장면 ${clock.paused ? '재생' : '일시정지'}`} aria-pressed={clock.paused} onClick={clock.toggle}><CallIcon name={clock.paused ? 'play' : 'pause'} /></button>
+  return !clock.reduced && <button className="moment-control" type="button" aria-label={`${name} 장면 ${clock.paused ? '재생' : '일시정지'}`} onClick={clock.toggle}><CallIcon name={clock.paused ? 'play' : 'pause'} /></button>
 }
 function VideoLayers({ media, still, reduced }: { media: Media; still?: string; reduced: boolean }) {
   return <>

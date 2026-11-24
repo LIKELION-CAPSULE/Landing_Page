@@ -5,7 +5,7 @@
     --desktop-gutter: clamp(32px, 4vw, 64px);
   }
 
-  .story > :is(section, footer) {
+  .story > section {
     width: min(var(--content-width), calc(100% - 2 * var(--desktop-gutter)));
   }
 

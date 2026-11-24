@@ -1,4 +1,7 @@
-.story > .site-footer {
+.site-footer {
+  /* Outside <main> (contentinfo landmark); keeps the layering it had inside .story. */
+  position: relative;
+  z-index: 1;
   width: 100%;
   margin: 0;
   padding: 96px 32px 40px;
@@ -42,7 +45,7 @@
   .site-footer :is(a, button):hover { color: var(--color-text-accent-hover); }
 }
 @media (max-width: 767px) {
-  .story > .site-footer { padding: 64px 16px max(32px, env(safe-area-inset-bottom)); }
+  .site-footer { padding: 64px 16px max(32px, env(safe-area-inset-bottom)); }
   .site-footer__closing { margin-bottom: var(--spacing-section); }
   .site-footer__details { flex-direction: column; gap: var(--spacing-content); }
   .site-footer__legal { align-items: flex-start; gap: var(--spacing-content-compact); }

@@ -5,7 +5,6 @@
   width: min(1120px, calc(100% - 48px));
   padding-block: calc(4 * var(--spacing-content)) var(--spacing-content);
   color: var(--color-ink);
-  scroll-margin-top: 80px;
 }
 .contrast__heading { text-align: center; margin-bottom: calc(2 * var(--spacing-content)); }
 .contrast__heading h2 { font-size: clamp(28px, 3.2vw, 44px); font-weight: 700; line-height: 1.35; letter-spacing: -.035em; word-break: keep-all; }
@@ -61,6 +60,9 @@
 .contrast__replay:hover { background: var(--color-control-hover); }
 .contrast__replay:active { background: var(--color-control-active); }
 .contrast__replay:focus-visible { outline: 2px solid var(--color-focus-ring); outline-offset: 4px; }
+/* Replay moves focus to the card title (tabIndex -1); show a ring for keyboard users only. */
+#contrast-call-title:focus { outline: none; }
+#contrast-call-title:focus-visible { outline: 2px solid var(--color-focus-ring); outline-offset: 4px; border-radius: 4px; }
 .contrast__closing { font-family: var(--font-story); font-size: 40px; font-weight: 500; line-height: 1.6; word-break: keep-all; }
 .contrast__closing > span { color: var(--color-text-accent); }
 .contrast__mobile-break { display: none; }
