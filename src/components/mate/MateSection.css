@@ -3,7 +3,6 @@
   width: min(1120px, calc(100% - 48px));
   padding-block: calc(4 * var(--spacing-content)) var(--spacing-content);
   color: var(--color-ink);
-  scroll-margin-top: 80px;
 }
 .mate__heading { text-align: center; margin-bottom: calc(2 * var(--spacing-content)); }
 .mate__heading h2 { font-size: clamp(28px, 3.2vw, 44px); font-weight: 700; line-height: 1.35; letter-spacing: -.035em; word-break: keep-all; }

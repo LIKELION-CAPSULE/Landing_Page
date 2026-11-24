@@ -11,7 +11,7 @@ function useViewedOnce(mate: 'chaerin' | 'upcoming') {
     const element = ref.current
     if (!element) return
     const observer = new IntersectionObserver(([entry]) => {
-      if (!entry.isIntersecting) return
+      if (!entry.isIntersecting || entry.intersectionRatio < .5) return
       track('mate_card_viewed', { mate })
       observer.disconnect()
     }, { threshold: .5 })

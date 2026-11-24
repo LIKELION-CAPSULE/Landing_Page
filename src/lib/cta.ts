@@ -5,14 +5,32 @@ export const MOBILE_QUERY = '(max-width: 767px)'
 
 export type CtaState = 'before_open' | 'preparing' | 'open'
 
-const APP_URL = import.meta.env.VITE_APP_URL as string | undefined
+// QA switches exist only in local dev and Vercel preview builds, never in production.
+// VITE_VERCEL_ENV comes from Vercel's automatically exposed system variables.
+const QA_BUILD = import.meta.env.DEV || import.meta.env.VITE_VERCEL_ENV === 'preview'
 
-// Opens only when the date has passed AND the app URL is configured, so the button never
+// Only an absolute http(s) URL counts. Anything else (empty, typo, relative path) is treated
+// as missing, so the button stays "오픈 준비 중" instead of linking somewhere broken.
+function parseAppUrl(value: unknown): string | null {
+  if (typeof value !== 'string' || !value.trim()) return null
+  try {
+    const url = new URL(value.trim())
+    return url.protocol === 'https:' || url.protocol === 'http:' ? url.href : null
+  } catch {
+    return null
+  }
+}
+
+const APP_URL = parseAppUrl(import.meta.env.VITE_APP_URL)
+// The hard-coded app address is a QA convenience only; production needs a valid VITE_APP_URL.
+const APP_TARGET = APP_URL ?? (QA_BUILD ? 'https://capsule-front-web.vercel.app/login' : null)
+
+// Opens only when the date has passed AND the app URL is valid, so the button never
 // points at a service page that is not ready yet. Set VITE_APP_URL in Vercel and redeploy to open.
-// QA override: ?cta=before | preparing | open
+// QA override (dev/preview only): ?cta=before | preparing | open
 export function ctaState(now: Date | number = Date.now()): CtaState {
-  const override = new URLSearchParams(window.location.search).get('cta')
-  if (override === 'open') return 'open'
+  const override = QA_BUILD ? new URLSearchParams(window.location.search).get('cta') : null
+  if (override === 'open') return APP_TARGET ? 'open' : 'preparing'
   if (override === 'before') return 'before_open'
   if (override === 'preparing') return 'preparing'
   if (Number(now) < OPEN_AT) return 'before_open'
@@ -29,8 +47,9 @@ function withAttribution(target: URL): string {
   return target.href
 }
 
-export function appUrl(): string {
-  return withAttribution(new URL(APP_URL || 'https://capsule-front-web.vercel.app/login'))
+// null when no usable address exists; callers then render the locked button, never a link.
+export function appUrl(): string | null {
+  return APP_TARGET ? withAttribution(new URL(APP_TARGET)) : null
 }
 
 // Phones get the landing page itself: it works before the app is ready, and on PC

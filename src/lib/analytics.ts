@@ -22,7 +22,8 @@ export function initAnalytics() {
   })
 }
 
-// Source: docs/renewal-2026-11.md §5. Require the documented attributes per event.
+// Source: docs/renewal-2026-11.md §5. Trigger rules and metrics: docs/data-collection.md,
+// docs/frontend-schema.md §3. Update those docs when this contract changes.
 export type EventProps = {
   cta_clicked: { cta: 'hero' | 'final' | 'header' | 'scroll_hint'; state: 'before_open' | 'preparing' | 'open'; device: 'desktop' | 'mobile' }
   demo_chip_clicked: { chip: 'long_time' | 'ask' | 'thanks' | 'bye' }

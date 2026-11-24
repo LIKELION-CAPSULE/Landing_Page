@@ -1,7 +1,7 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import CallCta from './CallCta.tsx'
 import CallIcon from './CallIcon.tsx'
-import { ctaState, MOBILE_QUERY, OPEN_AT } from '../../lib/cta.ts'
+import { MOBILE_QUERY, type CtaState } from '../../lib/cta.ts'
 import { track } from '../../lib/analytics.ts'
 import logo from '../../assets/hero/logo-lockup.svg'
 import landscapeWebm from '../../assets/mates/chaerin/call-landscape.webm'
@@ -34,7 +34,27 @@ function useMedia(query: string) {
   return matches
 }
 
-export default function CallHero() {
+// The fixed site header lives outside <main> (banner landmark). LandingPage owns the shared
+// CTA state; the hero reports whether its own CTA has slid under the header.
+export function CallHeader({ cta, ctaVisible }: { cta: CtaState; ctaVisible: boolean }) {
+  const mobile = useMedia(MOBILE_QUERY)
+  const [scrolled, setScrolled] = useState(() => window.scrollY > 24)
+  useEffect(() => {
+    const scroll = () => setScrolled(window.scrollY > 24)
+    window.addEventListener('scroll', scroll, { passive: true })
+    return () => window.removeEventListener('scroll', scroll)
+  }, [])
+  return (
+    <header className="call-header" data-scrolled={scrolled || undefined}>
+      <div className="call-header__inner">
+        <img src={logo} width="1992" height="456" alt="캡슐 CAPSULE" draggable={false} />
+        {!mobile && <div className="call-header__cta" data-visible={ctaVisible || undefined} inert={!ctaVisible} aria-hidden={!ctaVisible}><CallCta placement="header" state={cta} mobile={false} /></div>}
+      </div>
+    </header>
+  )
+}
+
+export default function CallHero({ cta, onHeaderCtaVisibleChange }: { cta: CtaState; onHeaderCtaVisibleChange: (visible: boolean) => void }) {
   const section = useRef<HTMLElement>(null)
   const video = useRef<HTMLVideoElement>(null)
   const copy = useRef<HTMLDivElement>(null)
@@ -43,15 +63,20 @@ export default function CallHero() {
   const mobile = useMedia(MOBILE_QUERY)
   const portrait = useMedia(PORTRAIT_QUERY)
   const reduced = useMedia('(prefers-reduced-motion: reduce)')
-  const [cta, setCta] = useState(ctaState)
-  const [scrolled, setScrolled] = useState(() => window.scrollY > 24)
-  const [headerCtaVisible, setHeaderCtaVisible] = useState(false)
   const [inView, setInView] = useState(true)
   const [tabVisible, setTabVisible] = useState(() => !document.hidden)
   const [userPaused, setUserPaused] = useState(false)
   const [motionOptIn, setMotionOptIn] = useState(false)
   const [ready, setReady] = useState(false)
   const [posterPainted, setPosterPainted] = useState(false)
+  const posterImage = useRef<HTMLImageElement>(null)
+  // Paint the eagerly loaded poster before revealing decoded motion. A failed poster
+  // must not keep the video hidden forever, so errors release the gate too.
+  const posterSettled = useCallback(() => {
+    requestAnimationFrame(() => requestAnimationFrame(() => setPosterPainted(true)))
+  }, [])
+  // A cached poster can finish before React attaches onLoad; settle it on mount.
+  useEffect(() => { if (posterImage.current?.complete) posterSettled() }, [posterSettled])
   const [playing, setPlaying] = useState(false)
   const [elapsed, setElapsed] = useState(12)
   const [dialogue, setDialogue] = useState<{ ids: number[]; fading: number[] }>({ ids: [], fading: [] })
@@ -60,19 +85,13 @@ export default function CallHero() {
   const currentPoster = portrait ? portraitPoster : landscapePoster
 
   useEffect(() => {
-    const visibility = () => { setTabVisible(!document.hidden); setCta(ctaState()) }
-    const scroll = () => setScrolled(window.scrollY > 24)
-    const route = () => setCta(ctaState())
-    const timer = window.setTimeout(route, Math.min(Math.max(OPEN_AT - Date.now(), 0), 2_147_483_647))
+    const visibility = () => setTabVisible(!document.hidden)
     const observer = new IntersectionObserver(([entry]) => setInView(entry.isIntersecting), { threshold: 0 })
     if (section.current) observer.observe(section.current)
     document.addEventListener('visibilitychange', visibility)
-    window.addEventListener('scroll', scroll, { passive: true })
-    window.addEventListener('popstate', route)
     return () => {
-      observer.disconnect(); window.clearTimeout(timer)
+      observer.disconnect()
       document.removeEventListener('visibilitychange', visibility)
-      window.removeEventListener('scroll', scroll); window.removeEventListener('popstate', route)
     }
   }, [])
 
@@ -80,10 +99,10 @@ export default function CallHero() {
     const button = copy.current?.querySelector('.call-cta--hero > :is(button, a)')
     if (!button || mobile) return
     // Account for the fixed header: a CTA underneath it is no longer visible.
-    const observer = new IntersectionObserver(([entry]) => setHeaderCtaVisible(!entry.isIntersecting), { rootMargin: '-80px 0px 0px 0px' })
+    const observer = new IntersectionObserver(([entry]) => onHeaderCtaVisibleChange(!entry.isIntersecting), { rootMargin: '-80px 0px 0px 0px' })
     observer.observe(button)
     return () => observer.disconnect()
-  }, [mobile, cta])
+  }, [mobile, cta, onHeaderCtaVisibleChange])
 
   useLayoutEffect(() => {
     const element = copy.current
@@ -167,21 +186,11 @@ export default function CallHero() {
   }
 
   return (
-    <>
-      <header className="call-header" data-scrolled={scrolled || undefined}>
-        <div className="call-header__inner">
-          <img src={logo} width="1992" height="456" alt="캡슐 CAPSULE" draggable={false} />
-          {!mobile && <div className="call-header__cta" data-visible={headerCtaVisible || undefined} inert={!headerCtaVisible} aria-hidden={!headerCtaVisible}><CallCta placement="header" state={cta} mobile={false} /></div>}
-        </div>
-      </header>
       <section ref={section} className="call-hero" aria-labelledby="call-hero-title" data-reduced-motion={staticMotion} data-in-view={inView} data-playing={playing} data-video-layout={portrait ? 'portrait' : 'landscape'}>
         <div className="call-hero__media" aria-hidden="true">
           <picture className="call-hero__poster">
             <source media={PORTRAIT_QUERY} srcSet={portraitPoster} />
-            <img src={landscapePoster} alt="" fetchPriority="high" width="1920" height="1080" onLoad={() => {
-              // Paint the eagerly loaded poster before revealing decoded motion.
-              requestAnimationFrame(() => requestAnimationFrame(() => setPosterPainted(true)))
-            }} />
+            <img ref={posterImage} src={landscapePoster} alt="" fetchPriority="high" width="1920" height="1080" onLoad={posterSettled} onError={posterSettled} />
           </picture>
           <video key={portrait ? 'portrait' : 'landscape'} ref={video} data-ready={ready && posterPainted && !staticMotion || undefined} muted autoPlay={!staticMotion} loop playsInline preload="metadata" poster={currentPoster} tabIndex={-1}
             onLoadStart={() => setReady(false)} onLoadedData={() => { if (!staticMotion) setReady(true) }} onPlaying={() => { setPlaying(true); setReady(true) }} onPause={() => setPlaying(false)}>
@@ -201,7 +210,7 @@ export default function CallHero() {
           <h1 id="call-hero-title"><span>나만의 AI 캐릭터와,</span>{' '}<span>영상통화하듯 함께</span></h1>
           <p className="call-hero__subtitle">말을 걸면 목소리로 대답하고,<br className="call-hero__desktop-break" /> 함께한 시간만큼 새 에피소드가 열려요.</p>
           <CallCta placement="hero" state={cta} mobile={mobile} />
-          <p className="call-hero__beta">{mobile && cta !== 'open' ? '웹 베타 · 무료 · 선착순 100명' : '12월 1일 웹 베타 · 무료 · 선착순 100명'}</p>
+          <p className="call-hero__beta">{/* Before opening, the button already says "12월 1일 오픈"; don't repeat the date. */}{cta === 'before_open' ? '웹 베타 · 무료 · 선착순 100명' : '12월 1일 웹 베타 · 무료 · 선착순 100명'}</p>
         </div>
         <span className="sr-only">채린은 AI 캐릭터예요. 영상과 말풍선은 예시 대화입니다.</span>
         <p className="sr-only">대화 예시. {HERO_DIALOGUE.map(line => `${line.speaker === 'mate' ? '채린' : '나'}: ${line.text}`).join(' ')}</p>
@@ -210,7 +219,7 @@ export default function CallHero() {
         <div className="call-controls" aria-hidden="true">
           {(['mic', 'camera', 'chat', 'pip', 'hangup'] as const).map(name => <span className={name === 'hangup' ? 'call-controls__end' : ''} key={name}><CallIcon name={name} /></span>)}
         </div>
-        <button className="call-motion" type="button" aria-label={playing ? '영상 일시정지' : '영상 재생'} aria-pressed={!playing} onClick={toggle}>
+        <button className="call-motion" type="button" aria-label={playing ? '영상 일시정지' : '영상 재생'} onClick={toggle}>
           <CallIcon name={playing ? 'pause' : 'play'} /><span>{playing ? '일시정지' : '재생'}</span>
         </button>
         <a className="call-scroll" href="#contrast" onClick={event => {
@@ -219,6 +228,5 @@ export default function CallHero() {
           document.getElementById('contrast')?.scrollIntoView({ behavior: reduced ? 'instant' : 'smooth' })
         }}><span>스크롤해서 더 알아보기</span><CallIcon name="down" /></a>
       </section>
-    </>
   )
 }

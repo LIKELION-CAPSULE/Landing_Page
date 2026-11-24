@@ -45,7 +45,7 @@ export default function LegalDocumentDialog({ ref, document, onClose }: Props) {
                 return <List key={index}>{block.items.map((item) => <li key={item}>{inlineText(item)}</li>)}</List>
               }
               if (block.type === 'table') {
-                return (
+                const table = (
                   <table key={index}>
                     <thead><tr>{block.headers.map((header) => <th key={header} scope="col">{header}</th>)}</tr></thead>
                     <tbody>{block.rows.map((row, rowIndex) => (
@@ -53,6 +53,10 @@ export default function LegalDocumentDialog({ ref, document, onClose }: Props) {
                     ))}</tbody>
                   </table>
                 )
+                // Three or more columns get too narrow on phones: keep a readable width and
+                // let the table scroll sideways, reachable by keyboard.
+                if (block.headers.length < 3) return table
+                return <div key={index} className="legal-dialog__table" role="region" aria-label={`${block.headers.join(', ')} 표`} tabIndex={0}>{table}</div>
               }
               return null
             })}
