@@ -37,7 +37,7 @@ export default function CallCta({ placement, state, mobile }: { placement: 'head
       {mobile && <p className="call-cta__device">{MOBILE_NOTE[state]}</p>}
       <div className="call-cta__status" role="status">
         {result?.method === 'clipboard' && '링크를 복사했어요. PC에서 열어 주세요.'}
-        {result?.method === 'share' && '링크를 보냈어요'}
+        {result?.method === 'share' && '링크를 보냈어요.'}
         {result?.method === 'manual' && <><span>아래 링크를 직접 복사해 주세요.</span><a data-pc-link href={result.url}>{result.url}</a></>}
       </div>
     </div>

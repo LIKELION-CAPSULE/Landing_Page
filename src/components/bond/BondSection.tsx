@@ -93,9 +93,9 @@ export default function BondSection() {
             )}
           </div>
           {/* Announce only lines the visitor chose; automatic advances stay quiet. */}
-          <figcaption id="bond-line" className="bond-stage__line" aria-live={manual ? 'polite' : 'off'} aria-atomic="true" data-locked={stage.image ? undefined : ''}>
+          <figcaption id="bond-line" className="bond-stage__line" aria-live={manual ? 'polite' : 'off'} aria-atomic="true" data-locked={stage.image ? undefined : ''} data-notice={stage.notice || undefined}>
             <span className="sr-only">{stage.name} 단계, </span>
-            <span>채린</span>
+            {!stage.notice && <span>채린</span>}
             <p key={stage.id}>{stage.line}</p>
           </figcaption>
         </figure>

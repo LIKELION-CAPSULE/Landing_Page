@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import CallCta from './CallCta.tsx'
 import CallIcon from './CallIcon.tsx'
 import { MOBILE_QUERY, type CtaState } from '../../lib/cta.ts'
@@ -69,6 +69,14 @@ export default function CallHero({ cta, onHeaderCtaVisibleChange }: { cta: CtaSt
   const [motionOptIn, setMotionOptIn] = useState(false)
   const [ready, setReady] = useState(false)
   const [posterPainted, setPosterPainted] = useState(false)
+  const posterImage = useRef<HTMLImageElement>(null)
+  // Paint the eagerly loaded poster before revealing decoded motion. A failed poster
+  // must not keep the video hidden forever, so errors release the gate too.
+  const posterSettled = useCallback(() => {
+    requestAnimationFrame(() => requestAnimationFrame(() => setPosterPainted(true)))
+  }, [])
+  // A cached poster can finish before React attaches onLoad; settle it on mount.
+  useEffect(() => { if (posterImage.current?.complete) posterSettled() }, [posterSettled])
   const [playing, setPlaying] = useState(false)
   const [elapsed, setElapsed] = useState(12)
   const [dialogue, setDialogue] = useState<{ ids: number[]; fading: number[] }>({ ids: [], fading: [] })
@@ -182,10 +190,7 @@ export default function CallHero({ cta, onHeaderCtaVisibleChange }: { cta: CtaSt
         <div className="call-hero__media" aria-hidden="true">
           <picture className="call-hero__poster">
             <source media={PORTRAIT_QUERY} srcSet={portraitPoster} />
-            <img src={landscapePoster} alt="" fetchPriority="high" width="1920" height="1080" onLoad={() => {
-              // Paint the eagerly loaded poster before revealing decoded motion.
-              requestAnimationFrame(() => requestAnimationFrame(() => setPosterPainted(true)))
-            }} />
+            <img ref={posterImage} src={landscapePoster} alt="" fetchPriority="high" width="1920" height="1080" onLoad={posterSettled} onError={posterSettled} />
           </picture>
           <video key={portrait ? 'portrait' : 'landscape'} ref={video} data-ready={ready && posterPainted && !staticMotion || undefined} muted autoPlay={!staticMotion} loop playsInline preload="metadata" poster={currentPoster} tabIndex={-1}
             onLoadStart={() => setReady(false)} onLoadedData={() => { if (!staticMotion) setReady(true) }} onPlaying={() => { setPlaying(true); setReady(true) }} onPause={() => setPlaying(false)}>
@@ -205,7 +210,7 @@ export default function CallHero({ cta, onHeaderCtaVisibleChange }: { cta: CtaSt
           <h1 id="call-hero-title"><span>나만의 AI 캐릭터와,</span>{' '}<span>영상통화하듯 함께</span></h1>
           <p className="call-hero__subtitle">말을 걸면 목소리로 대답하고,<br className="call-hero__desktop-break" /> 함께한 시간만큼 새 에피소드가 열려요.</p>
           <CallCta placement="hero" state={cta} mobile={mobile} />
-          <p className="call-hero__beta">{mobile && cta !== 'open' ? '웹 베타 · 무료 · 선착순 100명' : '12월 1일 웹 베타 · 무료 · 선착순 100명'}</p>
+          <p className="call-hero__beta">{/* Before opening, the button already says "12월 1일 오픈"; don't repeat the date. */}{cta === 'before_open' ? '웹 베타 · 무료 · 선착순 100명' : '12월 1일 웹 베타 · 무료 · 선착순 100명'}</p>
         </div>
         <span className="sr-only">채린은 AI 캐릭터예요. 영상과 말풍선은 예시 대화입니다.</span>
         <p className="sr-only">대화 예시. {HERO_DIALOGUE.map(line => `${line.speaker === 'mate' ? '채린' : '나'}: ${line.text}`).join(' ')}</p>

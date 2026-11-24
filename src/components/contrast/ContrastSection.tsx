@@ -20,6 +20,8 @@ const TALK_START = renders.callVideos.outputTalkStartsSeconds[0]
 const TALK_END = renders.callVideos.outputTimeline.find(item => item.at > TALK_START && item.expression === 'neutral')!.at
 const TALK_MS = (TALK_END - TALK_START) * 1000
 const END_MS = WAIT_MS + Math.max(REPLY.length * CHARACTER_MS, TALK_MS)
+// A reply that cannot get a decoded frame for this long ends as the static result.
+const STALL_MS = 4000
 type Phase = 'ready' | 'waiting' | 'replying' | 'complete'
 
 function useMedia(query: string) {
@@ -53,6 +55,8 @@ export default function ContrastSection() {
   const callTitle = useRef<HTMLHeadingElement>(null)
   const elapsed = useRef(0)
   const triggered = useRef(false)
+  const needsReload = useRef(false)
+  const sourcesFailed = useRef(false)
   const portrait = useMedia(PORTRAIT_QUERY)
   const reduced = useMedia('(prefers-reduced-motion: reduce)')
   const [inView, setInView] = useState(false)
@@ -61,9 +65,14 @@ export default function ContrastSection() {
   const [phase, setPhase] = useState<Phase>('ready')
   const [letters, setLetters] = useState(0)
   const [run, setRun] = useState(0)
+  // Layout whose <video> is paused on the final rendered frame. A rotated/resized layout
+  // remounts the video, so it shows the end-scene image instead of the neutral poster.
+  const [heldFrame, setHeldFrame] = useState<'portrait' | 'landscape' | null>(null)
+  const layout = portrait ? 'portrait' : 'landscape'
   const complete = reduced || phase === 'complete'
   const active = started && inView && tabVisible && !reduced && !complete
-  const poster = reduced
+  // contrast-*-poster is the contempt reply frame: the closest still to the end scene.
+  const poster = complete
     ? (portrait ? portraitPoster : landscapePoster)
     : (portrait ? neutralPortraitPoster : neutralLandscapePoster)
 
@@ -87,6 +96,25 @@ export default function ContrastSection() {
     return () => { observer.disconnect(); document.removeEventListener('visibilitychange', visibility) }
   }, [])
 
+  // With <source> children, failures fire `error` on each source (not the video) and
+  // networkState briefly reads NO_SOURCE during normal selection, so count errors instead.
+  useEffect(() => {
+    const element = video.current
+    if (!element) return
+    sourcesFailed.current = false
+    const errors = new Set<EventTarget>()
+    const failed = (event: Event) => {
+      if (event.target === element) { sourcesFailed.current = true; return }
+      errors.add(event.target!)
+      const candidates = [...element.querySelectorAll('source')].filter(source => (!source.media || matchMedia(source.media).matches) && element.canPlayType(source.type) !== '')
+      if (candidates.every(source => errors.has(source))) sourcesFailed.current = true
+    }
+    const reset = () => { errors.clear(); sourcesFailed.current = false }
+    element.addEventListener('error', failed, true)
+    element.addEventListener('emptied', reset)
+    return () => { element.removeEventListener('error', failed, true); element.removeEventListener('emptied', reset) }
+  }, [layout])
+
   useEffect(() => {
     const element = video.current
     if (!element || !active) { element?.pause(); return }
@@ -94,9 +122,22 @@ export default function ContrastSection() {
     let previous = 0
     let disposed = false
     let playRequested = false
+    let stalledMs = 0
     const tick = (now: number) => {
       if (disposed) return
       const replying = elapsed.current >= WAIT_MS
+      // Every source failed, or the reply cannot get a frame: end as the static result
+      // (end-scene image, full caption, replay button) instead of waiting forever.
+      const failed = element.error !== null || sourcesFailed.current
+      stalledMs = replying && element.readyState < 2 && previous ? stalledMs + now - previous : 0
+      if (failed || stalledMs >= STALL_MS) {
+        needsReload.current = true
+        element.pause()
+        setHeldFrame(null)
+        setLetters(REPLY.length)
+        setPhase('complete')
+        return
+      }
       // Pause the demonstration clock while a video frame is buffering, so
       // both versions start the same line together even on a slow connection.
       if (previous && (!replying || element.readyState >= 2)) elapsed.current += now - previous
@@ -112,6 +153,7 @@ export default function ContrastSection() {
         element.pause()
         if (element.currentTime >= TALK_END) element.currentTime = TALK_END - 1 / renders.callVideos.fps
       }
+      if (time >= END_MS) setHeldFrame(element.readyState >= 2 ? layout : null)
       setPhase(time >= END_MS ? 'complete' : time < WAIT_MS ? 'waiting' : 'replying')
       setLetters(Math.min(REPLY.length, Math.floor(Math.max(0, time - WAIT_MS) / CHARACTER_MS)))
       if (time < END_MS) frame = requestAnimationFrame(tick)
@@ -128,9 +170,12 @@ export default function ContrastSection() {
       element.pause()
       element.removeEventListener('loadedmetadata', prepare)
     }
-  }, [active, portrait, run])
+  }, [active, portrait, run, layout])
 
   const replay = () => {
+    // After a load failure, replay retries the video from scratch.
+    if (needsReload.current) { needsReload.current = false; video.current?.load() }
+    setHeldFrame(null)
     elapsed.current = 0
     setLetters(0)
     setPhase('waiting')
@@ -179,7 +224,7 @@ export default function ContrastSection() {
               <source src={landscapeWebm} type="video/webm" media={LANDSCAPE_QUERY} />
               <source src={landscapeMp4} type="video/mp4" media={LANDSCAPE_QUERY} />
             </video>
-            {(!started || phase === 'waiting' || reduced) && <img className="contrast-call__poster" src={poster} alt="" loading="lazy" width={portrait ? 1080 : 1920} height={portrait ? 1920 : 1080} />}
+            {(!started || phase === 'waiting' || (complete && heldFrame !== layout)) && <img className="contrast-call__poster" src={poster} alt="" loading="lazy" width={portrait ? 1080 : 1920} height={portrait ? 1920 : 1080} />}
             <div className="contrast-call__top"><span className="contrast-call__status"><i />채린 · 연결 중</span><span>AI 캐릭터</span></div>
             {/* One bottom row keeps the caption and my cam on the same centre line. */}
             <div className="contrast-call__bottom">
