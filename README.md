@@ -21,7 +21,9 @@
 
 ### 404 화면
 
-없는 주소는 `dist/404.html`(빌드 때 프리렌더, `noindex`, 탭 제목 「캡슐 CAPSULE · 페이지를 찾을 수 없어요」)로 나가고, Vercel은 이 파일을 404 상태로 돌려줍니다. 옛 주소 rewrite와 `/api/login-mates`는 그대로입니다. 「404」의 0 자리는 로고 v2 캡슐이 금 가 조금씩 벌어진 모습이고, 보라빛 유리 조각이 떠다닙니다(SVG + CSS, 새 의존성 없음, 동작 줄이기·저사양에서는 멈춤). 시각 부분은 `src/components/not-found/`(React와 CSS만, 색은 앱 토큰을 기본값과 함께 사용) 한 폴더에 있어 앱으로 그대로 옮길 수 있습니다. 버튼은 「홈으로」와 대표 버튼(같은 날짜 규칙, 열린 뒤 「CAPSULE 시작하기」)입니다. `vite preview`도 없는 주소에 같은 파일을 404로 돌려주고, `vite` 개발 서버는 경로를 보고 이 화면을 그립니다.
+없는 주소는 `dist/404.html`(빌드 때 프리렌더, `noindex`, 탭 제목 「캡슐 CAPSULE · 페이지를 찾을 수 없어요」)로 나가고, Vercel은 이 파일을 404 상태로 돌려줍니다. 옛 주소 rewrite와 `/api/login-mates`는 그대로입니다. 버튼은 「홈으로」와 대표 버튼(같은 날짜 규칙, 열린 뒤 「CAPSULE 시작하기」)입니다. `vite preview`도 없는 주소에 같은 파일을 404로 돌려주고, `vite` 개발 서버는 경로를 보고 이 화면을 그립니다.
+
+「4 · 깨진 캡슐 · 4」의 숫자는 HTML 글자이고, 가운데와 주변은 three.js 장면입니다(`src/components/not-found/three/broken-capsule-scene.ts`). 앱의 캡슐 모델(`capsule-model.ts`·`capsule-shape.ts`, Front_Web `src/shared/three/`에서 그대로 복사)이 이음매에서 깨져 두 쪽으로 떠 있고, 틈에서 코어 빛이 새어 나오며, 두께 있는 껍질 파편이 바깥으로 흩어집니다. `three@0.187.0`(앱과 같은 버전)은 404에서만 늦게 불러오므로 `/` 첫 화면 JS에는 들어가지 않습니다. HTML에는 같은 장면의 정지 이미지(`src/assets/not-found/broken-capsule*.webp`)가 들어 있어 JS 전에 보이고, 3D가 첫 프레임을 그리면 겹쳐서 바뀝니다. 동작 줄이기·데이터 절약·저사양·WebGL 없음(`src/lib/realtime.ts`, 첫 화면 Live2D와 같은 판정)이면 정지 이미지만 씁니다. 장면을 바꾸면 `node scripts/build-404-still.mjs`(개발 서버 + 설치된 Chrome headless)로 정지 이미지를 다시 만듭니다.
 
 ### 첫 화면 Live2D
 
