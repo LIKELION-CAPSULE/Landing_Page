@@ -29,7 +29,8 @@ export type EventProps = {
   demo_chip_clicked: { chip: 'long_time' | 'ask' | 'thanks' | 'bye' }
   demo_silence_shown: Record<string, never>
   pc_link_copied: { method: 'share' | 'clipboard' }
-  mate_card_viewed: { mate: 'chaerin' | 'upcoming' }
+  mate_card_viewed: { mate: 'chaerin' | 'dohyun' }
+  hero_mate_selected: { mate: 'chaerin' | 'dohyun' }
 }
 export type EventName = keyof EventProps
 

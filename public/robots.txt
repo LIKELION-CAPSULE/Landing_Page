@@ -1,0 +1,16 @@
+# 캡슐 CAPSULE 랜딩 (https://landing.capsule.ai.kr): a single public page, open to search engines and AI crawlers.
+# Not for crawling: the API proxy and the retired addresses that only redirect to / (old/test paths).
+User-agent: *
+User-agent: GPTBot
+User-agent: ClaudeBot
+User-agent: PerplexityBot
+User-agent: Google-Extended
+Allow: /
+Disallow: /api/
+Disallow: /rooms
+Disallow: /preorder
+Disallow: /done
+Disallow: /survey
+Disallow: /test
+
+Sitemap: https://landing.capsule.ai.kr/sitemap.xml

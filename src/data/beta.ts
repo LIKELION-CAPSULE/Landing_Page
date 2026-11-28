@@ -1,5 +1,6 @@
 // S7 copy. Source: PRD 2026-11-22 §5 (beta scope), §8 (connection rules), §9 (beta credits),
 // §11.2 (AI notice, camera, age). Numbers that PRD marks as recommended are left out on purpose.
+// 2026-11-28: copy now covers both launch mates (채린, 서도현; Front_Web catalog.ts). Values unchanged.
 
 export const BETA_FACTS = [
   { label: '기간', value: '12월 1일 – 14일' },
@@ -9,7 +10,7 @@ export const BETA_FACTS = [
 ] as const
 
 export const START_STEPS = [
-  { title: '메이트 고르기', body: '채린을 골라 세계관과 내 역할을 확인해요.' },
+  { title: '메이트 고르기', body: '채린이나 서도현을 골라 시작 상황과 내 역할을 확인해요.' },
   { title: '연결하기', body: '영상통화처럼 연결해 말을 걸고, PIP로 작업 옆에 띄워요.' },
   { title: '연결 기록 보기', body: '연결을 끊으면 함께한 시간과 나눈 대화가 기록으로 남아요.' },
 ] as const
@@ -17,15 +18,15 @@ export const START_STEPS = [
 export const FAQ = [
   {
     q: '카메라를 꼭 켜야 하나요?',
-    a: '아니요. 카메라 없이도 채팅과 음성으로 함께할 수 있어요. 카메라를 켜면 자리를 비웠다 돌아온 걸 채린이 알아채고, 함께한 시간이 기록돼요.',
+    a: '아니요. 카메라 없이도 채팅과 음성으로 함께할 수 있어요. 카메라를 켜면 자리를 비웠다 돌아온 걸 메이트가 알아채고, 함께한 시간이 기록돼요.',
   },
   {
     q: '카메라 영상은 어디에 저장되나요?',
     a: '저장하지 않아요. 영상은 브라우저 안에서만 판단에 쓰고, 서버에는 자리에 있는지 같은 상태만 보내요.',
   },
   {
-    q: '채린은 사람인가요?',
-    a: '아니요. 채린은 AI 캐릭터예요. 대화는 정해진 대본이 아니라 AI가 자유롭게 이어가요.',
+    q: '메이트는 사람인가요?',
+    a: '아니요. 채린과 서도현은 실제 사람이 아닌 AI 캐릭터예요. 대화는 정해진 대본이 아니라 AI가 자유롭게 이어가요.',
   },
   {
     q: '정말 무료인가요?',

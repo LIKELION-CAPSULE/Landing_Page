@@ -4,17 +4,13 @@ import { track } from '../../lib/analytics.ts'
 import CallIcon from '../hero/CallIcon.tsx'
 import { demoStill, useDemoClips, type DemoView } from './useDemoClips.ts'
 import { useDemoHistory } from './useDemoHistory.ts'
+import { REDUCED_MOTION_QUERY, useMedia, useTabVisible } from '../../hooks/useMedia.ts'
 import './TalkDemo.css'
 
 // Module lifetime is the page lifetime, including StrictMode or layout remounts.
 const pageSession = { touched: false, silenceShown: false }
 type Message = { id: number; speaker: 'self' | 'mate'; text: string; visible: string; complete: boolean }
 type Reaction = { item: DemoReply; elapsed: number; replyId: number }
-function useMedia(query: string) {
-  const [matches, setMatches] = useState(() => matchMedia(query).matches)
-  useEffect(() => { const media = matchMedia(query), changed = () => setMatches(media.matches); media.addEventListener('change', changed); return () => media.removeEventListener('change', changed) }, [query])
-  return matches
-}
 function textAt(item: DemoReply, elapsed: number) {
   const units = Array.from(item.dialogue.replace(/\s/g, '')).length
   let remaining = Math.floor(Math.max(0, Math.min(1, elapsed / item.talkMs)) * units), result = ''
@@ -28,9 +24,9 @@ function textAt(item: DemoReply, elapsed: number) {
 export default function TalkDemo() {
   const section = useRef<HTMLElement>(null), frame = useRef<HTMLDivElement>(null)
   const [frameView, setFrameView] = useState<DemoView | null>(null)
-  const mobile = useMedia('(max-width: 767px)'), compact = useMedia('(max-width: 1023px)'), reduced = useMedia('(prefers-reduced-motion: reduce)')
+  const mobile = useMedia('(max-width: 767px)'), compact = useMedia('(max-width: 1023px)'), reduced = useMedia(REDUCED_MOTION_QUERY)
   const [near, setNear] = useState(false), [inView, setInView] = useState(false), [halfVisible, setHalfVisible] = useState(false)
-  const [tabVisible, setTabVisible] = useState(() => !document.hidden), [paused, setPaused] = useState(false)
+  const tabVisible = useTabVisible(), [paused, setPaused] = useState(false)
   const [messages, setMessages] = useState<Message[]>([]), [reaction, setReaction] = useState<Reaction | null>(null), [progress, setProgress] = useState(0), [seconds, setSeconds] = useState(0)
   const run = useRef<Reaction | null>(null), sequence = useRef(0), connection = useRef(0), silenceClock = useRef(0)
   const active = inView && tabVisible && !paused
@@ -74,9 +70,7 @@ export default function TalkDemo() {
       setHalfVisible(entry.isIntersecting && available > 0 && entry.intersectionRect.height >= available * .5)
     }, { threshold: Array.from({ length: 101 }, (_, i) => i / 100) })
     warm.observe(element); observer.observe(element)
-    const visibility = () => setTabVisible(!document.hidden)
-    document.addEventListener('visibilitychange', visibility)
-    return () => { warm.disconnect(); observer.disconnect(); document.removeEventListener('visibilitychange', visibility) }
+    return () => { warm.disconnect(); observer.disconnect() }
   }, [])
 
   const start = useCallback((item: DemoReply, automatic = false) => {

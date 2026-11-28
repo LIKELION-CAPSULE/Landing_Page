@@ -1,102 +1,133 @@
+/* First screen: a video call in progress (the original landing composition, 2026-11-28 user request), with the
+   mate's live Aliving2D model in a face close-up instead of the rendered video. Call UI follows the app's
+   connection screen (Front_Web ConnectionPage, glass-dock.css, connections.css 「나」 tile). */
 .call-header, .call-hero { font-family: var(--font-sans); color: var(--color-ink); }
 .call-header { position: fixed; inset: 0 0 auto; z-index: 20; height: 80px; transition: background 180ms; }
-.call-header[data-scrolled] { background: color-mix(in srgb, var(--color-canvas) 95%, var(--color-transparent)); backdrop-filter: blur(16px); }
+.call-header[data-scrolled] { background: color-mix(in srgb, var(--color-canvas) 92%, var(--color-transparent)); backdrop-filter: blur(16px); }
 .call-header__inner { max-width: 1600px; height: 100%; margin: auto; padding: 0 48px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
-.call-header__inner > img { width: 134px; height: auto; }
+.call-header__brand { display: block; border-radius: 8px; }
+.call-header__brand img { width: 136px; height: auto; display: block; }
 .call-header__cta { opacity: 0; visibility: hidden; transform: translateY(-4px); transition: opacity 200ms, transform 200ms, visibility 0s 200ms; }
 .call-header__cta[data-visible] { opacity: 1; visibility: visible; transform: translateY(0); transition-delay: 0s; }
+
 .call-hero { --call-gutter: clamp(24px, 2.8vw, 40px); position: relative; isolation: isolate; height: clamp(640px, 100svh, 960px); min-width: 0; background: var(--color-canvas); overflow: clip; }
-.call-hero__media, .call-hero__media video, .call-hero__poster, .call-hero__poster img, .call-hero__shade { position: absolute; inset: 0; width: 100%; height: 100%; }
-/* Start fully transparent before the clipping boundary, then extend the fade over
-   48vw (at least 491px on desktop). There is no opaque video cut at the left edge. */
+/* Fade in from the left over 48vw, no hard edge (as before). */
 .call-hero__media {
-  z-index: -3;
+  position: absolute; inset: 0; z-index: -3; overflow: hidden;
   clip-path: inset(0 0 0 20%);
   mask-image: linear-gradient(90deg, var(--color-transparent) 20%, color-mix(in srgb, var(--color-ink) 3%, var(--color-transparent)) 25%, color-mix(in srgb, var(--color-ink) 12%, var(--color-transparent)) 32%, color-mix(in srgb, var(--color-ink) 35%, var(--color-transparent)) 42%, color-mix(in srgb, var(--color-ink) 70%, var(--color-transparent)) 54%, color-mix(in srgb, var(--color-ink) 92%, var(--color-transparent)) 62%, var(--color-ink) 68%);
 }
-.call-hero__media video, .call-hero__poster img { object-fit: cover; object-position: 62% 50%; }
-.call-hero__poster { z-index: 0; pointer-events: none; }
-.call-hero__media video { z-index: 1; opacity: 0; }
-.call-hero__media video[data-ready] { opacity: 1; }
-.call-hero__shade { z-index: -1; pointer-events: none; background: linear-gradient(0deg, color-mix(in srgb, var(--color-canvas) 80%, var(--color-transparent)), var(--color-transparent) 28%); }
+.call-hero__room, .call-hero__room img, .call-hero__stage, .call-hero__live { position: absolute; inset: 0; width: 100%; height: 100%; }
+.call-hero__room img { object-fit: cover; object-position: 50% 40%; filter: blur(3px) brightness(0.66) saturate(1.1); transform: scale(1.04); }
+/* The close-up box: still and live model share it (container units place the still; see STAGE_CSS). */
+.call-hero__stage { container-type: size; }
+.call-hero__still { position: absolute; max-width: none; opacity: 0; transition: opacity 360ms var(--ease-out); user-select: none; }
+.call-hero__still[data-current] { opacity: 1; }
+.call-hero__live { opacity: 0; transition: opacity 360ms var(--ease-out); pointer-events: none; }
+.call-hero[data-live] .call-hero__live { opacity: 1; }
+.call-hero[data-live] .call-hero__still[data-current] { opacity: 0; transition-delay: 120ms; }
+.call-hero__shade { position: absolute; inset: 0; z-index: -1; pointer-events: none; background: linear-gradient(0deg, color-mix(in srgb, var(--color-canvas) 80%, var(--color-transparent)), var(--color-transparent) 28%); }
+
 .call-hero__copy { position: absolute; left: max(48px, calc((100% - 1504px)/2)); top: 48%; transform: translateY(-50%); width: 40%; max-width: 610px; }
 .call-hero h1 { font-size: clamp(38px, 3.5vw, 56px); font-weight: 700; line-height: 1.28; letter-spacing: -.045em; word-break: keep-all; }
 .call-hero h1 > span { display: block; }
-.call-hero__subtitle { margin-top: 24px; max-width: 420px; font-size: 17px; line-height: 1.7; color: var(--color-muted); word-break: keep-all; }
-.call-cta { position: relative; }
-.call-cta :is(button, a):focus-visible { outline: 2px solid var(--color-focus-ring); outline-offset: 4px; }
-.call-cta--hero { margin-top: 32px; }
-.call-cta > :is(a, button) { display: inline-flex; align-items: center; justify-content: center; max-width: 100%; min-height: 52px; padding: 12px 28px; border: 0; border-radius: 12px; background: var(--color-primary); color: var(--color-on-solid); font: 600 16px/24px var(--font-sans); text-align: center; cursor: pointer; }
-.call-cta > :is(a, button):not([aria-disabled=true]):hover { background: var(--color-primary-hover); }
-.call-cta > :is(a, button):not([aria-disabled=true]):active { background: var(--color-primary-active); }
-.call-cta > [aria-disabled=true] { color: var(--color-text-disabled); background: var(--color-disabled); cursor: default; }
-.call-cta--header > :is(a, button) { min-height: 44px; padding: 10px 20px; font-size: 14px; line-height: 22px; }
-.call-cta__device, .call-cta__status { font-size: 14px; line-height: 22px; color: var(--color-muted); }
-.call-cta__device { margin-top: 8px; }
-.call-cta__status:not(:empty) { margin-top: 8px; }
-.call-cta__status a { display: block; overflow-wrap: anywhere; color: var(--color-text-accent); user-select: text; }
+.call-hero__subtitle { margin-top: 24px; max-width: 440px; font-size: 17px; line-height: 1.7; color: var(--color-muted); word-break: keep-all; }
+/* Small mate choice under the subtitle. */
+.call-mates { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 24px; }
+.call-mate {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 4px 14px 4px 4px; border: 0; border-radius: 999px;
+  background: color-mix(in srgb, var(--color-surface) 82%, transparent); color: var(--color-muted); font: 600 14px/20px var(--font-sans); cursor: pointer;
+  transition: background-color 150ms, color 150ms;
+}
+.call-mate img { width: 32px; height: 32px; border-radius: 50%; background: var(--color-panel); }
+.call-mate:hover { background: var(--color-surface-hover); color: var(--color-ink); }
+.call-mate[aria-pressed=true] { background: var(--color-selected); color: var(--color-selected-text); }
+.call-cta--hero { margin-top: 24px; }
 .call-hero__beta { margin-top: 16px; color: var(--color-muted); font-size: 13px; line-height: 20px; }
+
+/* Call header chip (app: ● name + relation line), the timer and the AI disclosure. */
 .call-meta { position: absolute; top: 24px; right: var(--call-gutter); display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 500; line-height: 20px; }
-/* At 92% panel opacity, even a pure white frame leaves > 4.5:1 contrast. */
 .call-meta__pill { display: inline-flex; align-items: center; border-radius: 24px; padding: 7px 12px; color: var(--color-ink); background: color-mix(in srgb, var(--color-panel) 92%, var(--color-transparent)); white-space: nowrap; }
 .call-meta__connection { gap: 10px; }
-.call-meta__name { display: inline-flex; align-items: center; gap: 7px; }
-.call-meta__name i { width: 6px; height: 6px; border-radius: 50%; background: var(--color-success); }
+.call-meta__name { display: inline-flex; align-items: center; gap: 7px; font-weight: 600; }
+.call-meta__name i { width: 7px; height: 7px; border-radius: 50%; background: var(--color-success); }
+.call-meta__name small { color: var(--color-subtle); font-size: 12px; font-weight: 500; }
 .call-meta__time { display: inline-block; flex: 0 0 5ch; width: 5ch; text-align: center; font-variant-numeric: tabular-nums; }
-.call-dialogue { position: absolute; right: var(--call-gutter); bottom: 200px; width: clamp(190px, 20.5vw, 304px); display: flex; flex-direction: column; align-items: flex-start; gap: 10px; pointer-events: none; }
-.call-bubble { box-sizing: border-box; flex: none; overflow: hidden; max-width: 100%; padding: 12px 16px; border-radius: 18px; color: var(--color-ink); background: color-mix(in srgb, var(--color-panel) 94%, var(--color-transparent)); backdrop-filter: blur(16px); font-size: 14px; line-height: 22px; word-break: keep-all; overflow-wrap: anywhere; transition: opacity 800ms; }
-.call-bubble > span { display: block; margin-bottom: 3px; color: var(--color-muted); font-size: 12px; line-height: 18px; }
-.call-bubble--self { align-self: flex-end; background: var(--color-primary-soft); }
-.call-bubble[data-fading] { opacity: .45; }
-/* Vertically centred on the control dock (dock: bottom 88px, height 64px → centre 120px). */
-.call-self { position: absolute; right: var(--call-gutter); bottom: 56px; width: 180px; height: 128px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; border-radius: 20px; color: var(--color-muted); background: color-mix(in srgb, var(--color-panel) 94%, var(--color-transparent)); font-size: 13px; }
-.call-self > svg { width: 30px; height: 30px; }
-.call-self small { color: var(--color-subtle); font-size: 12px; }
-.call-controls { position: absolute; bottom: 88px; left: 50%; transform: translateX(-50%); display: flex; gap: 12px; padding: 10px 14px; background: color-mix(in srgb, var(--color-panel) 90%, var(--color-transparent)); border-radius: 24px; backdrop-filter: blur(16px); }
-.call-controls > span { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; color: var(--color-ink); background: var(--color-control); }
-.call-controls > .call-controls__end { color: var(--color-on-solid); background: var(--color-danger-solid); }
+
+/* Her line: the call chat's mate bubble (dialog-roof 34% over surface, 16px corners, 4px on her side). */
+.call-dialogue { position: absolute; right: var(--call-gutter); bottom: 200px; width: clamp(200px, 21vw, 310px); display: flex; flex-direction: column; align-items: flex-start; gap: 10px; pointer-events: none; }
+.call-bubble { max-width: 100%; padding: 12px 16px; border-radius: 16px 16px 16px 4px; color: var(--color-ink); background: color-mix(in srgb, color-mix(in srgb, var(--color-dialog-roof) 34%, var(--color-surface)) 94%, transparent); backdrop-filter: blur(16px); font-size: 14px; line-height: 22px; word-break: keep-all; overflow-wrap: anywhere; }
+.call-bubble > span { display: block; margin-bottom: 3px; color: var(--color-subtle); font-size: 12px; line-height: 18px; }
+@media (prefers-reduced-motion: no-preference) {
+  .call-bubble { animation: call-bubble-in 320ms var(--ease-out) 300ms backwards; }
+}
+@keyframes call-bubble-in { from { opacity: 0; transform: translateY(6px); } }
+
+/* 「나」 tile: the app's mini desktop window. */
+.call-self {
+  position: absolute; right: var(--call-gutter); bottom: 56px; width: 184px; height: 128px; display: flex; flex-direction: column; overflow: hidden;
+  border: 1px solid rgba(196, 185, 243, 0.16); border-radius: 16px; background: var(--color-surface);
+}
+.call-self__bar { flex: none; display: flex; align-items: center; justify-content: space-between; height: 30px; padding: 0 11px; border-bottom: 1px solid color-mix(in srgb, var(--color-ink) 8%, transparent); background: color-mix(in srgb, var(--color-panel) 92%, transparent); font-size: 11.5px; font-weight: 600; }
+.call-self__state { display: inline-flex; align-items: center; gap: 5px; color: var(--color-subtle); }
+.call-self__state i { width: 6px; height: 6px; border-radius: 999px; background: currentColor; }
+.call-self__body { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; background: color-mix(in srgb, var(--color-surface) 92%, var(--color-canvas)); }
+.call-self__avatar { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 50%; color: var(--color-muted); background: var(--color-canvas); border: 1px solid color-mix(in srgb, var(--color-ink) 10%, transparent); }
+.call-self__body small { color: var(--color-subtle); font-size: 11.5px; }
+
+/* Glass dock (glass-dock.css): lilac-white circles on a glass pill; camera off reads pink, hang up red. */
+.call-dock {
+  position: absolute; bottom: 88px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 6px; padding: 10px; border-radius: 999px;
+  background: linear-gradient(135deg, #ffffff30, #e7e1ff0d), #2625328c; box-shadow: 0 8px 30px #0005, inset 0 1px 0 #ffffff45, inset 0 -1px 0 #ffffff0a;
+  -webkit-backdrop-filter: blur(24px) saturate(140%); backdrop-filter: blur(24px) saturate(140%);
+}
+.call-dock__item { position: relative; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: #f2edffcc; color: #242132; box-shadow: inset 0 1px 0 #ffffff73, 0 2px 8px #00000014; }
+.call-dock__item[data-divider] { margin-left: 13px; }
+.call-dock__item[data-divider]::before { content: ''; position: absolute; left: -10px; top: 12px; width: 1px; height: 20px; background: #ffffff33; }
+.call-dock__item[data-device] { background: #eed7e2b8; color: #89364e; }
+.call-dock__item[data-danger] { background: #f04e66e8; color: #fff; box-shadow: inset 0 1px 0 #ffffff30, 0 2px 8px #9a15292b; }
+
 .call-motion { position: absolute; bottom: 98px; left: 48px; display: inline-flex; gap: 8px; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; padding: 10px 12px; border: 0; border-radius: 12px; background: var(--color-control); color: var(--color-ink); font: 500 13px/20px var(--font-sans); cursor: pointer; }
 .call-motion:hover { background: var(--color-control-hover); }
 .call-scroll { position: absolute; bottom: 18px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 8px 12px; border-radius: 8px; color: var(--color-muted); font-size: 13px; white-space: nowrap; }
 :is(.call-header, .call-hero) :is(button, a):focus-visible { outline: 2px solid var(--color-focus-ring); outline-offset: 4px; }
 
-/* A short landscape split window keeps copy at the lower left and the chat
-   column on the right, leaving the eye/nose/mouth area between them. */
+/* Short landscape split window: copy lower left, the call column right. */
 @media (min-width: 768px) and (max-width: 1023px) and (aspect-ratio > 1/1) {
   .call-header__inner { padding-inline: 32px; }
   .call-meta { top: 8px; }
-  .call-hero__copy { top: auto; bottom: 176px; left: 32px; width: 39%; max-width: 380px; transform: none; }
+  .call-hero__copy { top: auto; bottom: 176px; left: 32px; width: 42%; max-width: 400px; transform: none; }
   .call-hero h1 { font-size: 30px; line-height: 1.25; }
   .call-hero__subtitle { margin-top: 12px; font-size: 15px; line-height: 24px; }
   .call-hero__desktop-break { display: none; }
-  .call-cta--hero { margin-top: 18px; }
+  .call-mates { margin-top: 14px; }
+  .call-cta--hero { margin-top: 16px; }
   .call-hero__beta { margin-top: 12px; font-size: 12px; }
-  .call-dialogue { bottom: 180px; width: 190px; gap: 8px; }
+  .call-dialogue { bottom: 180px; width: 200px; }
   .call-bubble { padding: 10px 12px; font-size: 12px; line-height: 19px; }
-  .call-bubble > span { font-size: 11px; line-height: 16px; }
-  .call-self { bottom: 72px; width: 140px; height: 96px; }
+  .call-self { bottom: 72px; width: 140px; height: 100px; }
+  .call-self__avatar { width: 36px; height: 36px; }
   .call-motion { left: 32px; }
 }
 
-/* Tall tablets use the portrait scene. A single title line gives the face a
-   clear vertical margin while the chat stays in the right-hand call column. */
+/* Tall tablets: the portrait scene, copy under the face. */
 @media (min-width: 768px) and (max-aspect-ratio: 1/1) {
   .call-header__inner { padding-inline: 32px; }
   .call-hero { height: max(900px, 100svh); max-height: none; }
   .call-hero__media { top: 64px; height: calc(100% - 64px); clip-path: inset(0 0 15% 0); mask-image: none; }
-  .call-hero__media video, .call-hero__poster img { object-position: 50% 20%; }
   .call-hero__shade { background: linear-gradient(0deg, var(--color-canvas) 16%, color-mix(in srgb, var(--color-canvas) 98%, var(--color-transparent)) 25%, color-mix(in srgb, var(--color-canvas) 82%, var(--color-transparent)) 40%, var(--color-transparent) 62%); }
   .call-hero__copy { top: auto; bottom: 178px; left: 32px; right: 32px; width: auto; max-width: none; transform: none; }
   .call-hero h1 { font-size: clamp(30px, 4vw, 40px); line-height: 1.25; }
   .call-hero h1 > span { display: inline; }
   .call-hero__subtitle { margin-top: 12px; max-width: 760px; font-size: 15px; line-height: 24px; }
   .call-hero__desktop-break { display: none; }
-  .call-cta--hero { margin-top: 18px; }
+  .call-mates { margin-top: 14px; }
+  .call-cta--hero { margin-top: 16px; }
   .call-hero__beta { margin-top: 12px; }
-  .call-dialogue { bottom: calc(48% + 12px); width: clamp(208px, 24vw, 280px); gap: 8px; }
+  .call-dialogue { bottom: calc(48% + 12px); width: clamp(208px, 24vw, 280px); }
   .call-bubble { padding: 10px 12px; font-size: 13px; line-height: 20px; }
-  .call-bubble > span { font-size: 11px; line-height: 16px; }
-  .call-self { bottom: 72px; width: 140px; height: 96px; }
+  .call-self { bottom: 72px; width: 140px; height: 100px; }
+  .call-self__avatar { width: 36px; height: 36px; }
   .call-motion { left: 32px; }
 }
 @media (min-width: 1024px) and (max-width: 1279px) and (aspect-ratio > 1/1) { .call-meta { top: 16px; } }
@@ -104,34 +135,36 @@
 @media (max-width: 767px) {
   .call-header { height: 64px; }
   .call-header__inner { padding-inline: 20px; }
-  .call-header__inner > img { width: 118px; }
-  .call-hero { height: max(740px, 100svh); max-height: none; }
-  .call-hero__media { top: 64px; height: var(--call-mobile-media-height, 65%); clip-path: none; mask-image: linear-gradient(0deg, var(--color-transparent), var(--color-ink) 18%); }
-  .call-hero__media video, .call-hero__poster img { object-position: 50% 30%; }
-  .call-hero__shade { background: linear-gradient(0deg, var(--color-canvas) 30%, color-mix(in srgb, var(--color-canvas) 90%, var(--color-transparent)) 40%, var(--color-transparent) 57%); }
-  .call-meta { top: 60px; left: 16px; right: 16px; justify-content: space-between; gap: 6px; font-size: 12px; line-height: 18px; }
+  .call-header__brand img { width: 118px; }
+  .call-header__cta { display: none; }
+  .call-hero { height: max(760px, 100svh); max-height: none; }
+  .call-hero__media { top: 64px; height: var(--call-mobile-media-height, 60%); clip-path: none; mask-image: linear-gradient(0deg, var(--color-transparent), var(--color-ink) 18%); }
+  .call-hero__shade { background: linear-gradient(0deg, var(--color-canvas) 32%, color-mix(in srgb, var(--color-canvas) 90%, var(--color-transparent)) 42%, var(--color-transparent) 58%); }
+  .call-meta { top: 72px; left: 16px; right: 16px; justify-content: space-between; gap: 6px; font-size: 12px; line-height: 18px; }
   .call-meta__pill { padding: 5px 10px; }
   .call-meta__connection { gap: 8px; }
   .call-meta__name { gap: 6px; }
-  .call-hero__copy { top: auto; bottom: 65px; left: 24px; right: 24px; width: auto; max-width: none; transform: none; }
-  .call-hero h1 { font-size: clamp(25px, 6.7vw, 32px); line-height: 1.28; letter-spacing: -.045em; }
-  .call-hero__subtitle { margin-top: 10px; max-width: 380px; font-size: 14px; line-height: 21px; }
+  .call-meta__name small { display: none; }
+  .call-hero__copy { top: auto; bottom: 60px; left: 20px; right: 20px; width: auto; max-width: none; transform: none; }
+  .call-hero h1 { font-size: clamp(25px, 6.9vw, 30px); line-height: 1.28; }
+  .call-hero__subtitle { margin-top: 8px; max-width: 380px; font-size: 14px; line-height: 21px; }
   .call-hero__desktop-break { display: none; }
-  .call-cta--hero { margin-top: 18px; }
-  .call-cta > :is(a, button) { width: 100%; min-height: 48px; padding: 12px 20px; }
-  .call-cta__device, .call-cta__status { font-size: 12px; line-height: 18px; }
+  .call-mates { margin-top: 12px; }
+  .call-mate { min-height: 36px; font-size: 13px; }
+  .call-mate img { width: 28px; height: 28px; }
+  .call-cta--hero { margin-top: 14px; }
   .call-cta__status:not(:empty) { padding: 8px 10px; border-radius: 10px; background: var(--color-panel); }
   .call-cta__status a { white-space: nowrap; overflow-x: auto; overflow-wrap: normal; }
-  .call-hero__beta { margin-top: 10px; font-size: 12px; line-height: 18px; }
+  .call-hero__beta { margin-top: 8px; font-size: 12px; line-height: 18px; }
   .call-hero:has(.call-cta__status:not(:empty)) .call-dialogue { visibility: hidden; }
-  .call-controls, .call-self { display: none; }
-  .call-dialogue { top: auto; bottom: calc(81px + var(--call-copy-height, 270px)); left: 20px; right: 20px; width: auto; gap: 6px; }
-  .call-bubble { max-width: 94%; padding: 8px 12px; border-radius: 15px; font-size: 12px; line-height: 18px; }
+  .call-dock, .call-self { display: none; }
+  .call-dialogue { bottom: calc(76px + var(--call-copy-height, 300px)); left: 20px; right: 20px; width: auto; }
+  .call-bubble { max-width: 94%; padding: 8px 12px; font-size: 12px; line-height: 18px; }
   .call-bubble > span { font-size: 11px; line-height: 14px; margin-bottom: 2px; }
-  .call-motion { left: 20px; bottom: 12px; min-width: 44px; padding: 10px; background: var(--color-transparent); }
+  .call-motion { left: 12px; bottom: 8px; min-width: 44px; padding: 10px; background: var(--color-transparent); }
   .call-motion span { display: none; }
-  .call-scroll { bottom: 12px; font-size: 12px; }
+  .call-scroll { bottom: 8px; font-size: 12px; }
 }
-@media (max-width: 359px) { .call-hero__copy { left: 20px; right: 20px; } .call-meta__pill { padding-inline: 8px; } }
+@media (max-width: 359px) { .call-hero__copy { left: 16px; right: 16px; } .call-meta__pill { padding-inline: 8px; } }
 @media (max-width: 767px) and (aspect-ratio > 1/1) { .call-hero { height: max(860px, 100svh); } .call-hero__media { height: var(--call-mobile-media-height, 52%); } }
-@media (prefers-reduced-motion: reduce) { .call-bubble, .call-header, .call-header__cta { animation: none; transition: none; } }
+@media (prefers-reduced-motion: reduce) { .call-header, .call-header__cta, .call-hero__still, .call-hero__live, .call-mate { transition: none; } }

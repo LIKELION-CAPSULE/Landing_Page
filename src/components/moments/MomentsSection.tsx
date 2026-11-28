@@ -61,14 +61,15 @@ function PresenceScene() {
 }
 function wallpaperForHour(hour: number) { return hour >= 5 && hour < 7 ? 'dawn' : hour >= 7 && hour < 11 ? 'morning' : hour >= 11 && hour < 17 ? 'day' : hour >= 17 && hour < 19 ? 'sunset' : 'night' }
 function useDesktopTime() {
-  const [date, setDate] = useState(() => new Date())
+  // null until mounted: the prerendered page cannot know the visitor's clock (the wallpaper only loads once near).
+  const [date, setDate] = useState<Date | null>(null)
   useEffect(() => {
     let timer = 0
     const tick = () => { setDate(new Date()); timer = window.setTimeout(tick, 60_000 - Date.now() % 60_000 + 20) }
-    timer = window.setTimeout(tick, 60_000 - Date.now() % 60_000 + 20)
+    tick()
     return () => clearTimeout(timer)
   }, [])
-  return { wallpaper: wallpaperForHour(date.getHours()), clock: new Intl.DateTimeFormat('ko-KR', { hour: 'numeric', minute: '2-digit', hour12: true }).format(date) }
+  return { wallpaper: wallpaperForHour(date?.getHours() ?? 21), clock: date ? new Intl.DateTimeFormat('ko-KR', { hour: 'numeric', minute: '2-digit', hour12: true }).format(date) : '' }
 }
 // Front_Web desktop window enter easing: cubic-bezier(.22,1,.36,1).
 function desktopEase(progress: number) {
