@@ -1,6 +1,7 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "rewrites": [
+    { "source": "/api/login-mates", "destination": "https://api.capsule.ai.kr/api/login-mates" },
     { "source": "/:path(rooms|preorder|done|survey|test)", "destination": "/index.html" },
     { "source": "/:path(rooms|preorder|done|survey|test)/", "destination": "/index.html" }
   ],
@@ -17,6 +18,12 @@
       "source": "/assets/(.*)",
       "headers": [
         { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
+    },
+    {
+      "source": "/api/login-mates",
+      "headers": [
+        { "key": "X-Robots-Tag", "value": "noindex" }
       ]
     }
   ]
