@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 import type { DemoView } from '../demo/useDemoClips.ts'
+import { REDUCED_MOTION_QUERY, useMedia, useTabVisible } from '../../hooks/useMedia.ts'
 
 export function useMomentScene(duration: number, stillTime: number) {
   const frame = useRef<HTMLDivElement>(null), elapsed = useRef(0)
   const [time, setTime] = useState(0), [visible, setVisible] = useState(false), [near, setNear] = useState(false)
-  const [paused, setPaused] = useState(false), [tabVisible, setTabVisible] = useState(() => !document.hidden)
-  const [reduced, setReduced] = useState(() => matchMedia('(prefers-reduced-motion: reduce)').matches)
+  const [paused, setPaused] = useState(false), tabVisible = useTabVisible()
+  const reduced = useMedia(REDUCED_MOTION_QUERY)
   const active = visible && tabVisible && !paused && !reduced
   useEffect(() => {
     const element = frame.current
@@ -13,9 +14,7 @@ export function useMomentScene(duration: number, stillTime: number) {
     const observer = new IntersectionObserver(([entry]) => setVisible(entry.intersectionRatio >= .5), { threshold: [0, .5, 1] })
     const warm = new IntersectionObserver(([entry]) => { if (entry.isIntersecting) { setNear(true); warm.disconnect() } }, { rootMargin: '600px 0px' })
     observer.observe(element); warm.observe(element)
-    const visibility = () => setTabVisible(!document.hidden), media = matchMedia('(prefers-reduced-motion: reduce)'), motion = () => setReduced(media.matches)
-    document.addEventListener('visibilitychange', visibility); media.addEventListener('change', motion)
-    return () => { observer.disconnect(); warm.disconnect(); document.removeEventListener('visibilitychange', visibility); media.removeEventListener('change', motion) }
+    return () => { observer.disconnect(); warm.disconnect() }
   }, [])
   useEffect(() => {
     if (!active) return

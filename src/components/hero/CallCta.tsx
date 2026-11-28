@@ -1,24 +1,32 @@
-import { useState } from 'react'
-import { appUrl, copyPcLink, type CtaState, type PcLinkResult } from '../../lib/cta.ts'
+import { useState, useSyncExternalStore } from 'react'
+import { APP_READY, APP_TARGET, appUrl, copyPcLink, type CtaState, type PcLinkResult } from '../../lib/cta.ts'
 import { track } from '../../lib/analytics.ts'
+import { MOBILE_QUERY } from '../../lib/cta.ts'
+import { useMedia } from '../../hooks/useMedia.ts'
 
-const LOCKED_LABEL: Record<Exclude<CtaState, 'open'>, string> = {
-  before_open: '12월 1일 오픈',
-  preparing: '오픈 준비 중',
-}
-const MOBILE_NOTE: Record<CtaState, string> = {
-  before_open: '캡슐은 PC에서 만날 수 있어요',
-  preparing: '곧 PC에서 만날 수 있어요',
-  open: '캡슐은 PC에서 만날 수 있어요',
+const subscribeNever = () => () => {}
+
+type Variant = 'open' | 'share' | 'before' | 'preparing'
+
+export const OPEN_LABEL = '지금 시작하기'
+
+function variantOf(state: CtaState, mobile: boolean): Variant {
+  if (mobile) return state === 'before_open' ? 'before' : 'share'
+  return state === 'open' ? 'open' : state === 'before_open' ? 'before' : 'preparing'
 }
 
-export default function CallCta({ placement, state, mobile }: { placement: 'header' | 'hero' | 'final'; state: CtaState; mobile: boolean }) {
+// Every label is rendered in one grid cell; only the active one is visible. The cell is as wide as the
+// widest label, so switching state (at midnight KST, or after hydration) never moves the layout.
+// Before mount (prerendered HTML) the active label is chosen by CSS from <html data-cta-phase>, the phone
+// media query and `data-app-ready` (a build-time fact), so the right label shows on first paint.
+export default function CallCta({ placement, state }: { placement: 'header' | 'hero' | 'final'; state: CtaState | null }) {
+  const mobile = useMedia(MOBILE_QUERY)
   const [result, setResult] = useState<PcLinkResult | null>(null)
   const [pending, setPending] = useState(false)
-  // Defensive: a link renders only with a usable app address (lib/cta.ts keeps 'open' in sync).
-  const href = !mobile && state === 'open' ? appUrl() : null
-  const locked: Exclude<CtaState, 'open'> = state === 'open' ? 'preparing' : state
-  const clicked = () => track('cta_clicked', { cta: placement, state, device: mobile ? 'mobile' : 'desktop' })
+  // Prerender: the bare app address (works before hydration once open). After mount: with utm_*/ref.
+  const href = useSyncExternalStore(subscribeNever, appUrl, () => APP_TARGET)
+  const active: Variant | 'pending' = state ? variantOf(state, mobile) : 'pending'
+  const clicked = () => track('cta_clicked', { cta: placement, state: state ?? 'before_open', device: mobile ? 'mobile' : 'desktop' })
   const send = async () => {
     if (pending) return
     clicked()
@@ -26,15 +34,17 @@ export default function CallCta({ placement, state, mobile }: { placement: 'head
     setPending(true)
     try { setResult(await copyPcLink()) } finally { setPending(false) }
   }
+  const hidden = (variant: Variant) => (active !== 'pending' && active !== variant) || undefined
 
   return (
-    <div className={`call-cta call-cta--${placement}`} data-cta-state={state}>
-      {/* Phones share the landing link, but only from 12/1 on, same as the desktop button. */}
-      {mobile && state !== 'before_open' ? <button type="button" aria-busy={pending} onClick={() => { void send() }}>PC로 링크 보내기</button>
-        : href ? <a href={href} onClick={clicked}>채린이 깨우러 가기</a>
-          // Desktop before opening/while preparing, or a phone before 12/1.
-          : <button type="button" aria-disabled="true" onClick={clicked}>{LOCKED_LABEL[locked]}</button>}
-      {mobile && <p className="call-cta__device">{MOBILE_NOTE[state]}</p>}
+    <div className={`call-cta call-cta--${placement}`} data-cta-state={state ?? 'pending'}>
+      <div className="call-cta__slot" data-active={active} data-app-ready={APP_READY || undefined}>
+        <a data-variant="open" href={active === 'open' || active === 'pending' ? href ?? undefined : undefined} aria-hidden={hidden('open')} tabIndex={hidden('open') && -1} onClick={clicked}>{OPEN_LABEL}</a>
+        <button type="button" data-variant="share" aria-hidden={hidden('share')} tabIndex={hidden('share') && -1} aria-busy={pending} onClick={() => { void send() }}>PC로 링크 보내기</button>
+        <button type="button" data-variant="before" aria-hidden={hidden('before')} tabIndex={hidden('before') && -1} aria-disabled="true" onClick={clicked}>12월 1일 오픈</button>
+        <button type="button" data-variant="preparing" aria-hidden={hidden('preparing')} tabIndex={hidden('preparing') && -1} aria-disabled="true" onClick={clicked}>오픈 준비 중</button>
+      </div>
+      {placement !== 'header' && <p className="call-cta__device">캡슐은 PC에서 만날 수 있어요</p>}
       <div className="call-cta__status" role="status">
         {result?.method === 'clipboard' && '링크를 복사했어요. PC에서 열어 주세요.'}
         {result?.method === 'share' && '링크를 보냈어요.'}
@@ -42,4 +52,9 @@ export default function CallCta({ placement, state, mobile }: { placement: 'head
       </div>
     </div>
   )
+}
+
+/** Copy that depends on the opening date: both are prerendered; CSS shows one (html[data-cta-phase]). */
+export function PhaseText({ before, after }: { before: string; after: string }) {
+  return <><span data-phase-only="before">{before}</span><span data-phase-only="after">{after}</span></>
 }

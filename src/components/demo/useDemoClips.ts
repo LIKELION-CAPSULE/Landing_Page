@@ -22,7 +22,8 @@ export function useDemoClips(options: Options) {
   if (frameView && (!selection || selection.clip !== target || (reduced && target === 'idle' && selection.view !== frameView))) setSelection({ view: frameView, clip: target })
   const view = selection?.view ?? null
   const clip = selection?.clip ?? target
-  const [codec, setCodec] = useState(() => document.createElement('video').canPlayType('video/webm; codecs="vp9"') ? 'webm' : 'mp4')
+  // Prerender has no <video>: assume WebM; nothing is fetched before `near`, which only becomes true after mount.
+  const [codec, setCodec] = useState(() => typeof document === 'undefined' || document.createElement('video').canPlayType('video/webm; codecs="vp9"') ? 'webm' : 'mp4')
   const videos = useRef<(HTMLVideoElement | null)[]>([null, null])
   const [slots, setSlots] = useState<(Slot | null)[]>([null, null])
   const [front, setFront] = useState<number | null>(null)

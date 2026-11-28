@@ -1,8 +1,9 @@
 import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
+import { createRoot, hydrateRoot } from 'react-dom/client'
 import './styles/tokens.css'
 import './styles.css'
 import './font.css'
+import './styles/app-ui.css'
 import App from './App.tsx'
 import './styles/responsive.css'
 import { initAnalytics } from './lib/analytics.ts'
@@ -17,8 +18,8 @@ if (RETIRED_PATHS.has(window.location.pathname.replace(/\/+$/, '') || '/')) {
 
 initAnalytics()
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-)
+const root = document.getElementById('root')!
+const app = <StrictMode><App /></StrictMode>
+// The build prerenders the page into #root (scripts/prerender.mjs); `vite` dev serves it empty.
+if (root.firstElementChild) hydrateRoot(root, app)
+else createRoot(root).render(app)

@@ -21,6 +21,7 @@
   letter-spacing: -0.02em;
   word-break: keep-all;
 }
+.site-footer__ai { margin-bottom: var(--spacing-content); padding: 14px 18px; border-radius: var(--radius-control); background: var(--color-panel); color: var(--color-muted); font-size: 14px; line-height: 22px; word-break: keep-all; }
 .site-footer__details { display: flex; justify-content: space-between; gap: var(--spacing-section); }
 .site-footer__contact { display: flex; flex-direction: column; align-items: flex-start; min-width: 0; }
 .site-footer__logo { width: 160px; height: auto; margin-bottom: var(--spacing-content); }
