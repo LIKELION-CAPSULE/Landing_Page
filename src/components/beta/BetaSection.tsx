@@ -1,29 +1,17 @@
-import { useEffect, useState } from 'react'
 import CallCta from '../hero/CallCta.tsx'
-import avatar from '../../assets/mates/chaerin/avatar.webp'
+import { MATES } from '../../data/mates.ts'
+import { PixelImage } from '../pixel/Pixel.tsx'
 import { BETA_FACTS, FAQ, START_STEPS } from '../../data/beta.ts'
-import { MOBILE_QUERY } from '../../lib/cta.ts'
 import { useCtaState } from '../../hooks/useCtaState.ts'
 import './BetaSection.css'
 
-function useMedia(query: string) {
-  const [matches, setMatches] = useState(() => window.matchMedia(query).matches)
-  useEffect(() => {
-    const media = window.matchMedia(query)
-    const change = () => setMatches(media.matches)
-    media.addEventListener('change', change)
-    return () => media.removeEventListener('change', change)
-  }, [query])
-  return matches
-}
-
 export default function BetaSection() {
   const cta = useCtaState()
-  const mobile = useMedia(MOBILE_QUERY)
   return (
     <section className="beta" id="beta" aria-labelledby="beta-title">
       <header className="beta__heading" data-reveal>
-        <h2 id="beta-title">12월 1일, 채린과 먼저 만나요</h2>
+        <p className="section-eyebrow"><PixelImage name="capsule" />웹 베타</p>
+        <h2 id="beta-title">웹 베타에서 먼저 만나요</h2>
       </header>
 
       <dl className="beta-facts" data-reveal>
@@ -60,10 +48,10 @@ export default function BetaSection() {
       </div>
 
       <div className="beta-final" data-reveal>
-        <img className="beta-final__avatar" src={avatar} alt="" width={1024} height={1024} loading="lazy" decoding="async" draggable={false} />
+        <div className="beta-final__avatars" aria-hidden="true">{MATES.map(mate => <img key={mate.id} className="beta-final__avatar" src={mate.avatar} alt="" width={96} height={96} loading="lazy" decoding="async" draggable={false} />)}</div>
         <h3>나만의 메이트가 기다리고 있어요</h3>
-        <p>노트북 앞의 시간을 채린과 함께 보내요.</p>
-        <CallCta placement="final" state={cta} mobile={mobile} />
+        <p>노트북 앞의 시간을 채린, 서도현과 함께 보내요.</p>
+        <CallCta placement="final" state={cta} />
         <small>웹 베타 · 무료 · 선착순 100명</small>
       </div>
     </section>
