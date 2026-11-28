@@ -9,6 +9,7 @@ import neutralPortraitPoster from '../../assets/mates/chaerin/call-portrait-post
 import landscapePoster from '../../assets/mates/chaerin/contrast-landscape-poster.webp'
 import portraitPoster from '../../assets/mates/chaerin/contrast-portrait-poster.webp'
 import renders from '../../assets/mates/chaerin/renders.json'
+import { REDUCED_MOTION_QUERY, useMedia, useTabVisible } from '../../hooks/useMedia.ts'
 import './ContrastSection.css'
 
 const PORTRAIT_QUERY = '(max-aspect-ratio: 1/1)'
@@ -24,16 +25,6 @@ const END_MS = WAIT_MS + Math.max(REPLY.length * CHARACTER_MS, TALK_MS)
 const STALL_MS = 4000
 type Phase = 'ready' | 'waiting' | 'replying' | 'complete'
 
-function useMedia(query: string) {
-  const [matches, setMatches] = useState(() => window.matchMedia(query).matches)
-  useEffect(() => {
-    const media = window.matchMedia(query)
-    const change = () => setMatches(media.matches)
-    media.addEventListener('change', change)
-    return () => media.removeEventListener('change', change)
-  }, [query])
-  return matches
-}
 
 // Static Lucide-style, 24px/2px icons: these lists describe the demo, not controls.
 function DetailIcon({ children }: { children: ReactNode }) {
@@ -58,9 +49,9 @@ export default function ContrastSection() {
   const needsReload = useRef(false)
   const sourcesFailed = useRef(false)
   const portrait = useMedia(PORTRAIT_QUERY)
-  const reduced = useMedia('(prefers-reduced-motion: reduce)')
+  const reduced = useMedia(REDUCED_MOTION_QUERY)
   const [inView, setInView] = useState(false)
-  const [tabVisible, setTabVisible] = useState(() => !document.hidden)
+  const tabVisible = useTabVisible()
   const [started, setStarted] = useState(false)
   const [phase, setPhase] = useState<Phase>('ready')
   const [letters, setLetters] = useState(0)
@@ -91,9 +82,7 @@ export default function ContrastSection() {
       }
     }, { threshold: Array.from({ length: 101 }, (_, index) => index / 100) })
     observer.observe(element)
-    const visibility = () => setTabVisible(!document.hidden)
-    document.addEventListener('visibilitychange', visibility)
-    return () => { observer.disconnect(); document.removeEventListener('visibilitychange', visibility) }
+    return () => observer.disconnect()
   }, [])
 
   // With <source> children, failures fire `error` on each source (not the video) and
