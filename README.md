@@ -77,6 +77,7 @@ Mixpanel은 페이지 방문, 지정한 버튼·데모 이벤트를 수집합니
 - 통화 배경·바탕화면·로고: CAPSULE 앱의 배경과 브랜드 로고 v2 에셋을 사용합니다. 각 에셋의 권리는 해당 권리자에게 있습니다.
 - Pretendard 기반 Capsule UI: 자체 호스팅 서브셋. 라이선스는 `public/fonts/LICENSE.txt`.
 - Hahmlet 기반 Capsule Story: 포인트 문구용 WOFF2 서브셋으로 별도 이름을 사용합니다. SIL OFL 1.1은 `public/fonts/Hahmlet-OFL.txt`. 원본 TTF는 배포하지 않습니다.
+- 앱 아이콘: `public/favicon.svg`는 로고 v2 심볼(Front_Web `design/brand/capsule-logo-2026-11-22-v2/capsule-symbol-color.svg`와 같은 파일)입니다. `favicon.ico`(16·32·48), `apple-touch-icon.png`(180, iOS가 모서리를 깎으므로 타일 색으로 꽉 채움), `icon-192.png`·`icon-512.png`·`icon-maskable-512.png`와 `site.webmanifest`는 `node scripts/build-icons.mjs`가 설치된 Chrome(headless)으로 이 SVG에서 다시 만듭니다(새 의존성 없음, `CHROME=` 경로 지정 가능).
 - OG 이미지: 히어로 가로 포스터·화이트 로고 v2·페이지 제목을 HTML로 합성한 `public/images/capsule-og.jpg`(1200×630).
 
 글꼴 관련 스크립트는 `scripts/subset-font.py`, `scripts/subset-story-font.py`입니다. 포인트 문구 목록은 `scripts/story-font-text.txt`에서 관리합니다.
