@@ -1,4 +1,6 @@
 import react from '@vitejs/plugin-react'
+import { existsSync, readFileSync } from 'node:fs'
+import { join } from 'node:path'
 import { defineConfig, loadEnv, type Plugin, type ProxyOptions } from 'vite'
 import { OPEN_AT } from './src/lib/open-date.ts'
 
@@ -26,6 +28,27 @@ function siteVerification(google: string | undefined, naver: string | undefined)
   }
 }
 
+// `vite preview` behaves like Vercel for unknown addresses: dist/404.html with status 404 (Vercel serves a
+// root 404.html by itself). Files, `/`, the retired paths (rewritten in vercel.json) and the API proxy pass.
+const PREVIEW_PAGES = new Set(['/', '/index.html', '/rooms', '/preorder', '/done', '/survey', '/test'])
+function previewNotFound(): Plugin {
+  return {
+    name: 'capsule-preview-404',
+    configurePreviewServer(server) {
+      const dist = join(server.config.root, server.config.build.outDir)
+      server.middlewares.use((request, response, next) => {
+        const path = decodeURIComponent((request.url ?? '/').split(/[?#]/)[0]!).replace(/(.)\/+$/, '$1')
+        if (PREVIEW_PAGES.has(path) || path.startsWith('/api/') || existsSync(join(dist, path))) return next()
+        const page = join(dist, '404.html')
+        if (!existsSync(page)) return next()
+        response.statusCode = 404
+        response.setHeader('Content-Type', 'text/html; charset=utf-8')
+        response.end(readFileSync(page))
+      })
+    },
+  }
+}
+
 // The landing's origin is refused by the API's CORS, so the browser calls this same-origin path and the
 // server forwards it (vercel.json in deployments, this proxy in `vite` and `vite preview`). Public GET only.
 const loginMatesProxy: Record<string, ProxyOptions> = {
@@ -50,7 +73,7 @@ export default defineConfig(({ mode, command }) => {
   const env = loadEnv(mode, process.cwd(), 'VITE_')
   const qa = command === 'serve' || env.VITE_VERCEL_ENV === 'preview'
   return {
-    plugins: [react(), ctaPhaseScript(qa), siteVerification(env.VITE_GOOGLE_SITE_VERIFICATION, env.VITE_NAVER_SITE_VERIFICATION)],
+    plugins: [react(), ctaPhaseScript(qa), siteVerification(env.VITE_GOOGLE_SITE_VERIFICATION, env.VITE_NAVER_SITE_VERIFICATION), previewNotFound()],
     // Pixel pictures and avatars repeat across the prerendered page: keep them as cached files instead of
     // inlining the same data URL into the HTML and the JS several times.
     build: { assetsInlineLimit: (file: string) => (/[\\/]assets[\\/](pixel|mates)[\\/]/.test(file) ? false : undefined) },

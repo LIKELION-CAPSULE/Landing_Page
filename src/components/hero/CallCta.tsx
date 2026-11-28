@@ -19,7 +19,7 @@ function variantOf(state: CtaState, mobile: boolean): Variant {
 // widest label, so switching state (at midnight KST, or after hydration) never moves the layout.
 // Before mount (prerendered HTML) the active label is chosen by CSS from <html data-cta-phase>, the phone
 // media query and `data-app-ready` (a build-time fact), so the right label shows on first paint.
-export default function CallCta({ placement, state }: { placement: 'header' | 'hero' | 'final'; state: CtaState | null }) {
+export default function CallCta({ placement, state, openLabel = OPEN_LABEL }: { placement: 'header' | 'hero' | 'final' | 'not_found'; state: CtaState | null; openLabel?: string }) {
   const mobile = useMedia(MOBILE_QUERY)
   const [result, setResult] = useState<PcLinkResult | null>(null)
   const [pending, setPending] = useState(false)
@@ -39,7 +39,7 @@ export default function CallCta({ placement, state }: { placement: 'header' | 'h
   return (
     <div className={`call-cta call-cta--${placement}`} data-cta-state={state ?? 'pending'}>
       <div className="call-cta__slot" data-active={active} data-app-ready={APP_READY || undefined}>
-        <a data-variant="open" href={active === 'open' || active === 'pending' ? href ?? undefined : undefined} aria-hidden={hidden('open')} tabIndex={hidden('open') && -1} onClick={clicked}>{OPEN_LABEL}</a>
+        <a data-variant="open" href={active === 'open' || active === 'pending' ? href ?? undefined : undefined} aria-hidden={hidden('open')} tabIndex={hidden('open') && -1} onClick={clicked}>{openLabel}</a>
         <button type="button" data-variant="share" aria-hidden={hidden('share')} tabIndex={hidden('share') && -1} aria-busy={pending} onClick={() => { void send() }}>PC로 링크 보내기</button>
         <button type="button" data-variant="before" aria-hidden={hidden('before')} tabIndex={hidden('before') && -1} aria-disabled="true" onClick={clicked}>12월 1일 오픈</button>
         <button type="button" data-variant="preparing" aria-hidden={hidden('preparing')} tabIndex={hidden('preparing') && -1} aria-disabled="true" onClick={clicked}>오픈 준비 중</button>

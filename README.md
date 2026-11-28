@@ -19,6 +19,10 @@
 
 메이트 정보는 앱(Front_Web `src/features/mates/catalog.ts`)을 따릅니다(`src/data/mates.ts`). 세계관 이름·배경 그림은 앱 운영 화면에 아직 없어 넣지 않았습니다(2026-11-28 사용자 결정).
 
+### 404 화면
+
+없는 주소는 `dist/404.html`(빌드 때 프리렌더, `noindex`, 탭 제목 「캡슐 CAPSULE · 페이지를 찾을 수 없어요」)로 나가고, Vercel은 이 파일을 404 상태로 돌려줍니다. 옛 주소 rewrite와 `/api/login-mates`는 그대로입니다. 「404」의 0 자리는 로고 v2 캡슐이 금 가 조금씩 벌어진 모습이고, 보라빛 유리 조각이 떠다닙니다(SVG + CSS, 새 의존성 없음, 동작 줄이기·저사양에서는 멈춤). 시각 부분은 `src/components/not-found/`(React와 CSS만, 색은 앱 토큰을 기본값과 함께 사용) 한 폴더에 있어 앱으로 그대로 옮길 수 있습니다. 버튼은 「홈으로」와 대표 버튼(같은 날짜 규칙, 열린 뒤 「CAPSULE 시작하기」)입니다. `vite preview`도 없는 주소에 같은 파일을 404로 돌려주고, `vite` 개발 서버는 경로를 보고 이 화면을 그립니다.
+
 ### 첫 화면 Live2D
 
 - HTML에는 메이트 정지 그림(`chaerin-v2-hero.webp`)이 같은 구도로 들어 있고, 이것이 첫 화면의 LCP입니다. 위치는 `src/lib/live2d/view.ts`의 같은 숫자로 CSS(컨테이너 단위)와 엔진 시점(`setView`)을 함께 정해 정지 그림과 실시간 모델이 겹칩니다.
@@ -78,7 +82,7 @@ Mixpanel은 페이지 방문, 지정한 버튼·데모 이벤트를 수집합니
 - Pretendard 기반 Capsule UI: 자체 호스팅 서브셋. 라이선스는 `public/fonts/LICENSE.txt`.
 - Hahmlet 기반 Capsule Story: 포인트 문구용 WOFF2 서브셋으로 별도 이름을 사용합니다. SIL OFL 1.1은 `public/fonts/Hahmlet-OFL.txt`. 원본 TTF는 배포하지 않습니다.
 - 앱 아이콘: `public/favicon.svg`는 로고 v2 심볼(Front_Web `design/brand/capsule-logo-2026-11-22-v2/capsule-symbol-color.svg`와 같은 파일)입니다. `favicon.ico`(16·32·48), `apple-touch-icon.png`(180, iOS가 모서리를 깎으므로 타일 색으로 꽉 채움), `icon-192.png`·`icon-512.png`·`icon-maskable-512.png`와 `site.webmanifest`는 `node scripts/build-icons.mjs`가 설치된 Chrome(headless)으로 이 SVG에서 다시 만듭니다(새 의존성 없음, `CHROME=` 경로 지정 가능).
-- OG 이미지: 히어로 가로 포스터·화이트 로고 v2·페이지 제목을 HTML로 합성한 `public/images/capsule-og.jpg`(1200×630).
+- OG 이미지: `public/images/capsule-og-v2.jpg`(1200×630). 컬러 로고 v2·첫 화면 제목·채린 통화 화면과 서도현 작은 창을 HTML로 합성하고 `node scripts/build-og.mjs`(설치된 Chrome headless + macOS `sips` JPEG)로 다시 만듭니다. 공유 서비스 캐시 때문에 그림이 바뀌면 파일 이름의 버전을 올립니다.
 
 글꼴 관련 스크립트는 `scripts/subset-font.py`, `scripts/subset-story-font.py`입니다. 포인트 문구 목록은 `scripts/story-font-text.txt`에서 관리합니다.
 
