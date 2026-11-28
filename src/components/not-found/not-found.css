@@ -52,23 +52,14 @@
   stroke-linejoin: round;
 }
 
-/* Violet glass splinters: frosted (blur + lift) over whatever is behind, a faint edge. */
+/* Violet glass splinters: a translucent lilac fill that lightens what is behind it (screen blend), and a faint
+   edge, painted only inside each polygon. No backdrop blur: Chrome/WebKit bled it into the bounding box. */
+.nf-defs { position: absolute; width: 0; height: 0; overflow: hidden; }
 .nf-glass {
   position: absolute;
   transform: rotate(var(--rot));
   translate: calc(var(--mx) * var(--depth) * 0.5px) calc(var(--my) * var(--depth) * 0.5px);
   transition: translate 700ms cubic-bezier(0.23, 1, 0.32, 1);
-}
-.nf-glass__pane {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, color-mix(in srgb, #C4B9F3 30%, transparent), color-mix(in srgb, var(--color-primary, #7E54F6) 14%, transparent) 55%, color-mix(in srgb, var(--color-canvas, #0F0E17) 10%, transparent));
-}
-@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .nf-glass__pane {
-    -webkit-backdrop-filter: blur(3px) brightness(1.35) saturate(1.5);
-    backdrop-filter: blur(3px) brightness(1.35) saturate(1.5);
-  }
 }
 .nf-glass svg {
   position: absolute;
@@ -77,10 +68,11 @@
   height: 100%;
   overflow: visible;
 }
-.nf-glass polygon {
+.nf-glass__fill { mix-blend-mode: screen; }
+.nf-glass__edge {
   fill: none;
   stroke: #E6DEFF;
-  stroke-opacity: 0.5;
+  stroke-opacity: 0.55;
   stroke-width: 1;
   vector-effect: non-scaling-stroke;
 }

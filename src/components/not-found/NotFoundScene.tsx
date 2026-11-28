@@ -7,7 +7,6 @@ import './not-found.css'
 // imports, so the app (Front_Web) can take this folder as is (see the 404 report).
 
 const polygon = (points: readonly Point[]) => points.map(([x, y]) => `${x},${y}`).join(' ')
-const percentPolygon = (points: readonly Point[]) => `polygon(${points.map(([x, y]) => `${x}% ${y}%`).join(', ')})`
 
 /** The logo v2 glyph's paths (capsule-glyph-color.svg, without its translate: these are the symbol's coordinates). */
 function Glyph({ id }: { id: string }) {
@@ -49,6 +48,7 @@ function BrokenCapsule() {
 
 export default function NotFoundScene() {
   const scene = useRef<HTMLDivElement>(null)
+  const glass = useId().replace(/:/g, '')
 
   // Pointer parallax (a few px) and the low-end switch. Nothing moves under reduced motion (CSS).
   useEffect(() => {
@@ -73,6 +73,15 @@ export default function NotFoundScene() {
 
   return (
     <div ref={scene} className="nf-scene" aria-hidden="true">
+      <svg className="nf-defs" width="0" height="0" aria-hidden="true">
+        <defs>
+          <linearGradient id={`${glass}-fill`} x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stopColor="#E6DEFF" stopOpacity="0.5" />
+            <stop offset="0.45" stopColor="#AC95F8" stopOpacity="0.26" />
+            <stop offset="1" stopColor="#7E54F6" stopOpacity="0.1" />
+          </linearGradient>
+        </defs>
+      </svg>
       <div className="nf-number"><span>4</span><BrokenCapsule /><span>4</span></div>
       {GLASS_SHARDS.map((shard, index) => (
         <div
@@ -80,8 +89,11 @@ export default function NotFoundScene() {
           className="nf-glass"
           style={{ left: `${shard.left}%`, top: `${shard.top}%`, width: `${shard.width}%`, aspectRatio: `${1 / shard.aspect}`, '--rot': `${shard.rotate}deg`, '--period': `${shard.period}s`, '--delay': `${shard.delay}s`, '--depth': shard.depth } as CSSProperties}
         >
-          <div className="nf-glass__pane" style={{ clipPath: percentPolygon(shard.points) }} />
-          <svg viewBox="0 0 100 100" preserveAspectRatio="none"><polygon points={polygon(shard.points)} /></svg>
+          {/* Painted only inside the polygon (no backdrop blur: with clip-path it bled into the bounding box). */}
+          <svg viewBox="0 0 100 100" preserveAspectRatio="none">
+            <polygon className="nf-glass__fill" points={polygon(shard.points)} fill={`url(#${glass}-fill)`} />
+            <polygon className="nf-glass__edge" points={polygon(shard.points)} />
+          </svg>
         </div>
       ))}
     </div>
