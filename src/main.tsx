@@ -4,7 +4,7 @@ import './styles/tokens.css'
 import './styles.css'
 import './font.css'
 import './styles/app-ui.css'
-import App from './App.tsx'
+import App, { type Page } from './App.tsx'
 import './styles/responsive.css'
 import { initAnalytics } from './lib/analytics.ts'
 
@@ -19,7 +19,12 @@ if (RETIRED_PATHS.has(window.location.pathname.replace(/\/+$/, '') || '/')) {
 initAnalytics()
 
 const root = document.getElementById('root')!
-const app = <StrictMode><App /></StrictMode>
+// dist/404.html marks its root data-page="not-found" (Vercel serves it with status 404 for unknown addresses).
+// `vite` dev answers every address with index.html, so there the path decides.
+const LANDING_PATHS = new Set(['/', '/index.html', ...RETIRED_PATHS])
+const page: Page = root.dataset.page === 'not-found' || (!root.firstElementChild && !LANDING_PATHS.has(window.location.pathname.replace(/(.)\/+$/, '$1')))
+  ? 'not-found' : 'landing'
+const app = <StrictMode><App page={page} /></StrictMode>
 // The build prerenders the page into #root (scripts/prerender.mjs); `vite` dev serves it empty.
 if (root.firstElementChild) hydrateRoot(root, app)
 else createRoot(root).render(app)

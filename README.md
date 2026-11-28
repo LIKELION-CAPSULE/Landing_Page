@@ -19,6 +19,10 @@
 
 메이트 정보는 앱(Front_Web `src/features/mates/catalog.ts`)을 따릅니다(`src/data/mates.ts`). 세계관 이름·배경 그림은 앱 운영 화면에 아직 없어 넣지 않았습니다(2026-11-28 사용자 결정).
 
+### 404 화면
+
+없는 주소는 `dist/404.html`(빌드 때 프리렌더, `noindex`, 탭 제목 「캡슐 CAPSULE · 페이지를 찾을 수 없어요」)로 나가고, Vercel은 이 파일을 404 상태로 돌려줍니다. 옛 주소 rewrite와 `/api/login-mates`는 그대로입니다. 「404」의 0 자리는 로고 v2 캡슐이 금 가 조금씩 벌어진 모습이고, 보라빛 유리 조각이 떠다닙니다(SVG + CSS, 새 의존성 없음, 동작 줄이기·저사양에서는 멈춤). 시각 부분은 `src/components/not-found/`(React와 CSS만, 색은 앱 토큰을 기본값과 함께 사용) 한 폴더에 있어 앱으로 그대로 옮길 수 있습니다. 버튼은 「홈으로」와 대표 버튼(같은 날짜 규칙, 열린 뒤 「CAPSULE 시작하기」)입니다. `vite preview`도 없는 주소에 같은 파일을 404로 돌려주고, `vite` 개발 서버는 경로를 보고 이 화면을 그립니다.
+
 ### 첫 화면 Live2D
 
 - HTML에는 메이트 정지 그림(`chaerin-v2-hero.webp`)이 같은 구도로 들어 있고, 이것이 첫 화면의 LCP입니다. 위치는 `src/lib/live2d/view.ts`의 같은 숫자로 CSS(컨테이너 단위)와 엔진 시점(`setView`)을 함께 정해 정지 그림과 실시간 모델이 겹칩니다.

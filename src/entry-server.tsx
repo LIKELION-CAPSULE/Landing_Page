@@ -13,6 +13,10 @@ export function render(): string {
   return renderToString(<StrictMode><App /></StrictMode>)
 }
 
+export function renderNotFound(): string {
+  return renderToString(<StrictMode><App page="not-found" /></StrictMode>)
+}
+
 export const facts = {
   faq: FAQ.map(item => ({ q: item.q, a: item.a })),
   beta: BETA_FACTS.map(fact => ({ label: fact.label, value: fact.value })),

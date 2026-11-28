@@ -1,4 +1,4 @@
-// Prerenders `/` into dist/index.html after `vite build` (client) and `vite build --ssr` (dist-ssr/).
+// Prerenders `/` into dist/index.html (and the not-found page into dist/404.html) after `vite build` (client) and `vite build --ssr` (dist-ssr/).
 // The page is the only public route: /rooms, /preorder, /done, /survey and /test are retired addresses
 // that vercel.json rewrites to this same HTML (main.tsx then rewrites the URL to /), so they need no
 // files of their own. Also writes the JSON-LD (Organization, WebSite, WebApplication, FAQPage).
@@ -12,7 +12,7 @@ const dist = process.env.PRERENDER_DIST ?? join(root, 'dist')
 const ssrDir = process.env.PRERENDER_SSR ?? join(root, 'dist-ssr')
 const SITE = 'https://landing.capsule.ai.kr/'
 
-const { render, facts } = await import(pathToFileURL(join(ssrDir, 'entry-server.js')).href)
+const { render, renderNotFound, facts } = await import(pathToFileURL(join(ssrDir, 'entry-server.js')).href)
 const appHtml = render()
 
 const organization = {
@@ -56,11 +56,23 @@ const faqPage = {
 const jsonLd = JSON.stringify({ '@context': 'https://schema.org', '@graph': [organization, website, application, faqPage] }).replace(/</g, '\\u003c')
 
 const file = join(dist, 'index.html')
-let html = await readFile(file, 'utf8')
-if (!html.includes('<!--app-html-->')) throw new Error('dist/index.html has no <!--app-html--> placeholder')
-html = html
+const template = await readFile(file, 'utf8')
+if (!template.includes('<!--app-html-->')) throw new Error('dist/index.html has no <!--app-html--> placeholder')
+const html = template
   .replace('<!--app-html-->', appHtml)
   .replace('<!-- structured-data -->', `<script type="application/ld+json">${jsonLd}</script>`)
 await writeFile(file, html)
+
+// 404.html: Vercel serves it, with status 404, for any address that matches no file or rewrite. Same
+// head (styles, CTA phase script) without the landing's canonical, preloads and structured data; noindex.
+const notFoundTitle = '캡슐 CAPSULE · 페이지를 찾을 수 없어요'
+const notFound = template
+  .replace(/<title>[^<]*<\/title>/, `<title>${notFoundTitle}</title>\n  <meta name="robots" content="noindex" />`)
+  .replace(/\s*<link rel="canonical"[^>]*>/, '')
+  .replace(/\s*<link rel="preload" as="image"[^\n]*?\/>/g, '')
+  .replace('<!-- structured-data -->', '')
+  .replace('<div id="root"><!--app-html--></div>', `<div id="root" data-page="not-found">${renderNotFound()}</div>`)
+if (!notFound.includes('data-page="not-found"') || !notFound.includes('noindex')) throw new Error('404.html was not built')
+await writeFile(join(dist, '404.html'), notFound)
 await rm(ssrDir, { recursive: true, force: true })
-console.log(`prerendered / (${(appHtml.length / 1024).toFixed(1)} kB of HTML)`)
+console.log(`prerendered / (${(appHtml.length / 1024).toFixed(1)} kB of HTML) and 404.html`)
