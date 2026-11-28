@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import CallCta, { PhaseText } from './CallCta.tsx'
 import CallIcon from './CallIcon.tsx'
-import { MOBILE_QUERY, type CtaState } from '../../lib/cta.ts'
+import { isPhone, MOBILE_QUERY, type CtaState } from '../../lib/cta.ts'
 import { track } from '../../lib/analytics.ts'
 import { speakingTime } from '../../data/chaerin-demo.ts'
 import { MATES, mateById, type MateId } from '../../data/mates.ts'
@@ -188,7 +188,7 @@ export default function CallHero({ cta, onHeaderCtaVisibleChange }: { cta: CtaSt
       )}
       <a className="call-scroll" href="#contrast" onClick={event => {
         event.preventDefault()
-        track('cta_clicked', { cta: 'scroll_hint', state: cta ?? 'before_open', device: mobile ? 'mobile' : 'desktop' })
+        track('cta_clicked', { cta: 'scroll_hint', state: cta ?? 'before_open', device: isPhone() ? 'mobile' : 'desktop' })
         document.getElementById('contrast')?.scrollIntoView({ behavior: reduced ? 'instant' : 'smooth' })
       }}><span>스크롤해서 더 알아보기</span><CallIcon name="down" /></a>
     </section>
