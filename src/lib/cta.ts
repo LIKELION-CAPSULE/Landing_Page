@@ -1,9 +1,11 @@
 import { track } from './analytics.ts'
+import { isPhoneDevice, PHONE_POINTER_QUERY, shortSide } from './device.ts'
 import { OPEN_AT, parseAppUrl, phaseAt, stateAt, type CtaPhase, type CtaState } from './open-date.ts'
 
 // The decision is made in the visitor's browser, never at build/prerender time: index.html's inline script
 // marks <html data-cta-phase> before first paint, and useCtaState keeps it current.
 export { OPEN_AT, type CtaPhase, type CtaState }
+/** The phone *layout* breakpoint (CSS 767px). Not the phone/PC decision: that is lib/device.ts. */
 export const MOBILE_QUERY = '(max-width: 767px)'
 
 // QA switches exist only in local dev and Vercel preview builds, never in production.
@@ -61,10 +63,13 @@ export function landingShareUrl(): string {
   return withAttribution(new URL('/', window.location.origin))
 }
 
-export function isMobile(): boolean {
-  // Match the landing's 767px phone layout. Coarse pointers also occur on PC-sized
-  // touch laptops/tablets, so pointer type alone must not hide the desktop app link.
-  return window.matchMedia(MOBILE_QUERY).matches
+/** Phone or PC in this browser now: the app's rule (lib/device.ts), never the layout width. */
+export function isPhone(): boolean {
+  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return false
+  return isPhoneDevice({
+    coarseNoHover: window.matchMedia(PHONE_POINTER_QUERY).matches,
+    shortSidePx: shortSide(window.innerWidth, window.innerHeight, window.screen?.width, window.screen?.height),
+  })
 }
 
 export type PcLinkResult = { method: 'share' | 'clipboard' | 'manual'; url: string } | { method: 'dismissed' }

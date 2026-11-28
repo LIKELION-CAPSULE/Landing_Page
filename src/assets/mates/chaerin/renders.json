@@ -888,7 +888,7 @@
       "timelineAndViewUnchangedFromPhase1": true,
       "edgeRepair": "02b-cause.json; bounded AA-band repair; intentional interior translucency preserved"
     },
-    "usage": "S1 CallHero; source/poster/preload use aspect ratio; mobile CTA still uses 767px width."
+    "usage": "S1 CallHero; source/poster/preload use aspect ratio; the CTA's phone/PC choice uses lib/device.ts (touch-only pointer and short side < 600px), layout uses 767px width."
   },
   "haloFix": {
     "date": "2026-11-24",

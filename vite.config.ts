@@ -2,16 +2,18 @@ import react from '@vitejs/plugin-react'
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { defineConfig, loadEnv, type Plugin, type ProxyOptions } from 'vite'
+import { PHONE_SCRIPT } from './src/lib/device.ts'
 import { OPEN_AT } from './src/lib/open-date.ts'
 
-// Marks <html data-cta-phase="before|after"> from the visitor's clock before first paint, so the prerendered
-// HTML shows the right CTA label and date copy without waiting for React. QA `?cta=` only outside production.
+// Marks <html data-cta-phase="before|after"> from the visitor's clock and <html data-device="phone|pc"> (lib/device.ts)
+// before first paint, so the prerendered HTML shows the right CTA label and date copy without waiting for React.
+// QA `?cta=` only outside production.
 function ctaPhaseScript(qa: boolean): Plugin {
   const qaPart = qa ? `var q=new URLSearchParams(location.search).get('cta');if(q==='before')a=false;else if(q==='open'||q==='preparing')a=true;` : ''
   const code = `(function(){var a=Date.now()>=${OPEN_AT};try{${qaPart}}catch(e){}document.documentElement.setAttribute('data-cta-phase',a?'after':'before')})()`
   return {
     name: 'capsule-cta-phase',
-    transformIndexHtml: { order: 'pre', handler: html => html.replace('<!-- cta-phase -->', `<script>${code}</script>`) },
+    transformIndexHtml: { order: 'pre', handler: html => html.replace('<!-- cta-phase -->', `<script>${code};${PHONE_SCRIPT}</script>`) },
   }
 }
 

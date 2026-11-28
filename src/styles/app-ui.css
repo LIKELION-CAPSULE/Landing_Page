@@ -86,21 +86,22 @@ html[data-cta-phase=after] [data-phase-only=before] { display: none; }
 .call-cta__slot[data-active=share] > [data-variant=share],
 .call-cta__slot[data-active=before] > [data-variant=before],
 .call-cta__slot[data-active=preparing] > [data-variant=preparing] { visibility: visible; }
-/* Before mount: the inline script's phase, the phone query and the build-time app readiness. */
+/* Before mount: the inline script's phase and device (phone/PC, lib/device.ts) and the build-time app readiness.
+   Phone or PC is never the layout width: a narrow PC window keeps the link, a sideways phone gets 「PC로 링크 보내기」. */
 html:not([data-cta-phase=after]) .call-cta__slot[data-active=pending] > [data-variant=before] { visibility: visible; }
-@media (min-width: 768px) {
-  html[data-cta-phase=after] .call-cta__slot[data-active=pending][data-app-ready] > [data-variant=open],
-  html[data-cta-phase=after] .call-cta__slot[data-active=pending]:not([data-app-ready]) > [data-variant=preparing] { visibility: visible; }
-}
+html[data-cta-phase=after]:not([data-device=phone]) .call-cta__slot[data-active=pending][data-app-ready] > [data-variant=open],
+html[data-cta-phase=after]:not([data-device=phone]) .call-cta__slot[data-active=pending]:not([data-app-ready]) > [data-variant=preparing],
+html[data-cta-phase=after][data-device=phone] .call-cta__slot[data-active=pending] > [data-variant=share] { visibility: visible; }
 @media (max-width: 767px) {
-  html[data-cta-phase=after] .call-cta__slot[data-active=pending] > [data-variant=share] { visibility: visible; }
   .call-cta__slot { display: grid; width: 100%; }
   .call-cta__slot > * { min-height: 48px; padding: 12px 20px; }
 }
 .call-cta--header .call-cta__slot > * { min-height: 44px; padding: 10px 20px; font-size: 14px; line-height: 22px; }
 .call-cta__device, .call-cta__status { font-size: 14px; line-height: 22px; color: var(--color-muted); }
 .call-cta__device { display: none; margin-top: 8px; }
-@media (max-width: 767px) { .call-cta__device { display: block; font-size: 12px; line-height: 18px; } }
+/* :where keeps this as light as the rule above, so a page can still hide the note (404). */
+:where(html[data-device=phone]) .call-cta__device { display: block; }
+@media (max-width: 767px) { .call-cta__device { font-size: 12px; line-height: 18px; } }
 .call-cta__status:not(:empty) { margin-top: 8px; }
 .call-cta__status a { display: block; overflow-wrap: anywhere; color: var(--color-text-accent); user-select: text; }
 

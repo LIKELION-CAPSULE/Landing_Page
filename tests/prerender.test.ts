@@ -39,6 +39,12 @@ test('the CTA phase is decided in the browser, not baked into the HTML', { skip:
   assert.match(html, /data-active="pending"/)
 })
 
+test('phone or PC is decided in the browser too (app rule), not baked into the HTML', { skip: !built && 'dist/index.html not built' }, () => {
+  assert.match(html, /setAttribute\('data-device'/)
+  assert.match(html, /\(pointer: coarse\) and \(hover: none\)/)
+  assert.ok(!/<html[^>]*data-device/.test(html))
+})
+
 const notFoundFile = new URL('../dist/404.html', import.meta.url)
 test('404.html: the not-found page, prerendered, noindex, without the landing\'s canonical and structured data', { skip: !existsSync(notFoundFile) && 'dist/404.html not built' }, () => {
   const page = readFileSync(notFoundFile, 'utf8')
@@ -49,6 +55,7 @@ test('404.html: the not-found page, prerendered, noindex, without the landing\'s
   assert.match(page, /href="\/">홈으로<\/a>/)
   assert.match(page, /CAPSULE 시작하기/)
   assert.match(page, /setAttribute\('data-cta-phase'/)
+  assert.match(page, /setAttribute\('data-device'/)
   assert.ok(!page.includes('rel="canonical"'))
   assert.ok(!page.includes('application/ld+json'))
   assert.ok(!/<link rel="preload" as="image"[^>]*fetchpriority/.test(page))

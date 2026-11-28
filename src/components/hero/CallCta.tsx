@@ -1,8 +1,7 @@
 import { useState, useSyncExternalStore } from 'react'
 import { APP_READY, APP_TARGET, appUrl, copyPcLink, type CtaState, type PcLinkResult } from '../../lib/cta.ts'
 import { track } from '../../lib/analytics.ts'
-import { MOBILE_QUERY } from '../../lib/cta.ts'
-import { useMedia } from '../../hooks/useMedia.ts'
+import { usePhone } from '../../hooks/usePhone.ts'
 
 const subscribeNever = () => () => {}
 
@@ -10,23 +9,24 @@ type Variant = 'open' | 'share' | 'before' | 'preparing'
 
 export const OPEN_LABEL = '지금 시작하기'
 
-function variantOf(state: CtaState, mobile: boolean): Variant {
-  if (mobile) return state === 'before_open' ? 'before' : 'share'
+function variantOf(state: CtaState, phone: boolean): Variant {
+  if (phone) return state === 'before_open' ? 'before' : 'share'
   return state === 'open' ? 'open' : state === 'before_open' ? 'before' : 'preparing'
 }
 
 // Every label is rendered in one grid cell; only the active one is visible. The cell is as wide as the
 // widest label, so switching state (at midnight KST, or after hydration) never moves the layout.
-// Before mount (prerendered HTML) the active label is chosen by CSS from <html data-cta-phase>, the phone
-// media query and `data-app-ready` (a build-time fact), so the right label shows on first paint.
+// Before mount (prerendered HTML) the active label is chosen by CSS from <html data-cta-phase>, <html data-device>
+// (both set by index.html's inline script) and `data-app-ready` (a build-time fact), so the right label shows on
+// first paint. Phone or PC is the app's own rule (lib/device.ts), not the 767px layout breakpoint.
 export default function CallCta({ placement, state, openLabel = OPEN_LABEL }: { placement: 'header' | 'hero' | 'final' | 'not_found'; state: CtaState | null; openLabel?: string }) {
-  const mobile = useMedia(MOBILE_QUERY)
+  const phone = usePhone()
   const [result, setResult] = useState<PcLinkResult | null>(null)
   const [pending, setPending] = useState(false)
   // Prerender: the bare app address (works before hydration once open). After mount: with utm_*/ref.
   const href = useSyncExternalStore(subscribeNever, appUrl, () => APP_TARGET)
-  const active: Variant | 'pending' = state ? variantOf(state, mobile) : 'pending'
-  const clicked = () => track('cta_clicked', { cta: placement, state: state ?? 'before_open', device: mobile ? 'mobile' : 'desktop' })
+  const active: Variant | 'pending' = state ? variantOf(state, phone) : 'pending'
+  const clicked = () => track('cta_clicked', { cta: placement, state: state ?? 'before_open', device: phone ? 'mobile' : 'desktop' })
   const send = async () => {
     if (pending) return
     clicked()
