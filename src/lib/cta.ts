@@ -1,40 +1,43 @@
 import { track } from './analytics.ts'
+import { OPEN_AT, parseAppUrl, phaseAt, stateAt, type CtaPhase, type CtaState } from './open-date.ts'
 
-export const OPEN_AT = new Date('2026-12-01T00:00:00+09:00').getTime()
+// The decision is made in the visitor's browser, never at build/prerender time: index.html's inline script
+// marks <html data-cta-phase> before first paint, and useCtaState keeps it current.
+export { OPEN_AT, type CtaPhase, type CtaState }
 export const MOBILE_QUERY = '(max-width: 767px)'
-
-export type CtaState = 'before_open' | 'preparing' | 'open'
 
 // QA switches exist only in local dev and Vercel preview builds, never in production.
 // VITE_VERCEL_ENV comes from Vercel's automatically exposed system variables.
 const QA_BUILD = import.meta.env.DEV || import.meta.env.VITE_VERCEL_ENV === 'preview'
 
-// Only an absolute http(s) URL counts. Anything else (empty, typo, relative path) is treated
-// as missing, so the button stays "오픈 준비 중" instead of linking somewhere broken.
-function parseAppUrl(value: unknown): string | null {
-  if (typeof value !== 'string' || !value.trim()) return null
-  try {
-    const url = new URL(value.trim())
-    return url.protocol === 'https:' || url.protocol === 'http:' ? url.href : null
-  } catch {
-    return null
-  }
-}
-
 const APP_URL = parseAppUrl(import.meta.env.VITE_APP_URL)
 // The hard-coded app address is a QA convenience only; production needs a valid VITE_APP_URL.
-const APP_TARGET = APP_URL ?? (QA_BUILD ? 'https://capsule-front-web.vercel.app/login' : null)
+export const APP_TARGET = APP_URL ?? (QA_BUILD ? 'https://capsule-front-web.vercel.app/login' : null)
+/** Known at build time: a link can open once the date has passed. */
+export const APP_READY = APP_URL !== null
+
+function qaOverride(): string | null {
+  if (!QA_BUILD || typeof window === 'undefined') return null
+  return new URLSearchParams(window.location.search).get('cta')
+}
+
+/** before/after the opening moment (KST). QA: ?cta=before forces before; open/preparing force after. */
+export function ctaPhase(now: Date | number = Date.now()): CtaPhase {
+  const override = qaOverride()
+  if (override === 'before') return 'before'
+  if (override === 'open' || override === 'preparing') return 'after'
+  return phaseAt(Number(now))
+}
 
 // Opens only when the date has passed AND the app URL is valid, so the button never
 // points at a service page that is not ready yet. Set VITE_APP_URL in Vercel and redeploy to open.
 // QA override (dev/preview only): ?cta=before | preparing | open
 export function ctaState(now: Date | number = Date.now()): CtaState {
-  const override = QA_BUILD ? new URLSearchParams(window.location.search).get('cta') : null
+  const override = qaOverride()
   if (override === 'open') return APP_TARGET ? 'open' : 'preparing'
   if (override === 'before') return 'before_open'
   if (override === 'preparing') return 'preparing'
-  if (Number(now) < OPEN_AT) return 'before_open'
-  return APP_URL ? 'open' : 'preparing'
+  return stateAt(Number(now), APP_URL !== null)
 }
 
 // utm_* and ref travel with every link we hand out (app login or landing share).

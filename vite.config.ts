@@ -1,7 +1,60 @@
 import react from '@vitejs/plugin-react'
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv, type Plugin, type ProxyOptions } from 'vite'
+import { OPEN_AT } from './src/lib/open-date.ts'
+
+// Marks <html data-cta-phase="before|after"> from the visitor's clock before first paint, so the prerendered
+// HTML shows the right CTA label and date copy without waiting for React. QA `?cta=` only outside production.
+function ctaPhaseScript(qa: boolean): Plugin {
+  const qaPart = qa ? `var q=new URLSearchParams(location.search).get('cta');if(q==='before')a=false;else if(q==='open'||q==='preparing')a=true;` : ''
+  const code = `(function(){var a=Date.now()>=${OPEN_AT};try{${qaPart}}catch(e){}document.documentElement.setAttribute('data-cta-phase',a?'after':'before')})()`
+  return {
+    name: 'capsule-cta-phase',
+    transformIndexHtml: { order: 'pre', handler: html => html.replace('<!-- cta-phase -->', `<script>${code}</script>`) },
+  }
+}
+
+// Search-console verification tags only when their build variables are set.
+function siteVerification(google: string | undefined, naver: string | undefined): Plugin {
+  const escape = (value: string) => value.replace(/[^A-Za-z0-9_\-.:]/g, '')
+  const tags = [
+    google?.trim() ? `<meta name="google-site-verification" content="${escape(google)}" />` : '',
+    naver?.trim() ? `<meta name="naver-site-verification" content="${escape(naver)}" />` : '',
+  ].filter(Boolean).join('\n  ')
+  return {
+    name: 'capsule-site-verification',
+    transformIndexHtml: html => html.replace('<!-- site-verification -->', tags),
+  }
+}
+
+// The landing's origin is refused by the API's CORS, so the browser calls this same-origin path and the
+// server forwards it (vercel.json in deployments, this proxy in `vite` and `vite preview`). Public GET only.
+const loginMatesProxy: Record<string, ProxyOptions> = {
+  '/api/login-mates': {
+    target: 'https://api.capsule.ai.kr',
+    changeOrigin: true,
+    configure: proxy => {
+      proxy.on('proxyReq', (request, incoming, response) => {
+        request.removeHeader('origin')
+        request.removeHeader('cookie')
+        if (incoming.method !== 'GET' && incoming.method !== 'HEAD') {
+          response.writeHead(405, { Allow: 'GET, HEAD' }).end()
+          request.destroy()
+        }
+      })
+    },
+  },
+}
 
 // https://vite.dev/config/
-export default defineConfig({
-  plugins: [react()],
+export default defineConfig(({ mode, command }) => {
+  const env = loadEnv(mode, process.cwd(), 'VITE_')
+  const qa = command === 'serve' || env.VITE_VERCEL_ENV === 'preview'
+  return {
+    plugins: [react(), ctaPhaseScript(qa), siteVerification(env.VITE_GOOGLE_SITE_VERIFICATION, env.VITE_NAVER_SITE_VERIFICATION)],
+    // Pixel pictures and avatars repeat across the prerendered page: keep them as cached files instead of
+    // inlining the same data URL into the HTML and the JS several times.
+    build: { assetsInlineLimit: (file: string) => (/[\\/]assets[\\/](pixel|mates)[\\/]/.test(file) ? false : undefined) },
+    server: { proxy: loginMatesProxy },
+    preview: { proxy: loginMatesProxy },
+  }
 })
