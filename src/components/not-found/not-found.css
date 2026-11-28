@@ -1,98 +1,56 @@
-/* 404 scene. Self-contained: only the app's colour tokens (with fallbacks) and its sans font are assumed.
-   Moving parts use transform/translate only; nothing moves under reduced motion or on low-end devices. */
+/* 404 scene box: 2.2 : 1 at every width, so the digits (page text), the still image and the 3D canvas line up.
+   Self-contained: only the app's colour tokens (with fallbacks) and its sans font are assumed. */
 .nf-scene {
-  --mx: 0;
-  --my: 0;
   position: relative;
   width: min(880px, 100%);
   aspect-ratio: 2.2;
   margin-inline: auto;
+  container-type: inline-size;
   user-select: none;
   pointer-events: none;
 }
 
-/* 4 · capsule · 4 */
+/* 4 · (the capsule's place) · 4 — sized with the box (34 % of its width), as the scene is. */
 .nf-number {
   position: absolute;
   inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.02em;
   font-family: var(--font-sans, Pretendard, system-ui, sans-serif);
-  font-size: clamp(120px, 26vw, 300px);
+  font-size: 34cqw;
   font-weight: 700;
   line-height: 1;
   letter-spacing: -0.04em;
   color: var(--color-ink, #FAFAFD);
 }
-.nf-number > span {
+.nf-number > span:not(.nf-gap) {
   background: linear-gradient(180deg, #FFFFFF 0%, #D9D5F1 55%, #AC95F8 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
-.nf-capsule {
-  width: 0.98em;
-  height: 0.8em;
-  overflow: visible;
-  filter: drop-shadow(0 0 28px color-mix(in srgb, var(--color-primary, #7E54F6) 55%, transparent));
-}
-.nf-piece {
-  transform-box: view-box;
-  transform: translate(var(--dx), var(--dy)) rotate(var(--rot));
-  translate: calc(var(--mx) * var(--depth) * 0.4px) calc(var(--my) * var(--depth) * 0.4px);
-  transition: translate 600ms cubic-bezier(0.23, 1, 0.32, 1);
-}
-.nf-crack {
-  fill: none;
-  stroke: #FFFFFF;
-  stroke-opacity: 0.85;
-  stroke-width: 2.5;
-  stroke-linejoin: round;
-}
+.nf-gap { display: block; width: 1.02em; }
 
-/* Violet glass splinters: a translucent lilac fill that lightens what is behind it (screen blend), and a faint
-   edge, painted only inside each polygon. No backdrop blur: Chrome/WebKit bled it into the bounding box. */
-.nf-defs { position: absolute; width: 0; height: 0; overflow: hidden; }
-.nf-glass {
+/* The canvas and its still image cover a wider stage around the box (three/broken-capsule-scene.ts STAGE): twice its
+   width, centred, and 35 % of its height more above it, so pieces fly out past the digits. The page clips the sides. */
+.nf-still, .nf-canvas {
   position: absolute;
-  transform: rotate(var(--rot));
-  translate: calc(var(--mx) * var(--depth) * 0.5px) calc(var(--my) * var(--depth) * 0.5px);
-  transition: translate 700ms cubic-bezier(0.23, 1, 0.32, 1);
+  left: -50%;
+  top: -35%;
+  width: 200%;
+  height: 135%;
 }
-.nf-glass svg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-}
-.nf-glass__fill { mix-blend-mode: screen; }
-.nf-glass__edge {
-  fill: none;
-  stroke: #E6DEFF;
-  stroke-opacity: 0.55;
-  stroke-width: 1;
-  vector-effect: non-scaling-stroke;
-}
+.nf-canvas > canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.nf-still { opacity: 1; transition: opacity 400ms cubic-bezier(0.23, 1, 0.32, 1) 120ms; }
+.nf-canvas { opacity: 0; transition: opacity 400ms cubic-bezier(0.23, 1, 0.32, 1); }
+.nf-scene[data-live] .nf-canvas { opacity: 1; }
+.nf-scene[data-live] .nf-still { opacity: 0; }
 
-@media (prefers-reduced-motion: no-preference) {
-  .nf-scene:not([data-lite]) .nf-piece { animation: nf-piece var(--period) ease-in-out var(--delay) infinite alternate; }
-  .nf-scene:not([data-lite]) .nf-glass { animation: nf-glass var(--period) ease-in-out var(--delay) infinite alternate; }
-}
-@keyframes nf-piece {
-  to { transform: translate(calc(var(--dx) * 1.6), calc(var(--dy) * 1.6)) rotate(calc(var(--rot) * 1.8)); }
-}
-@keyframes nf-glass {
-  50% { transform: translate(0, -10px) rotate(calc(var(--rot) + 6deg)); }
-  to { transform: translate(6px, 4px) rotate(calc(var(--rot) - 4deg)); }
-}
+/* Still image generation (development): the box alone, at a fixed size, on a transparent page. */
+.nf-scene[data-capture] { position: fixed; top: 0; left: 0; width: 880px; margin: 0; }
+.nf-scene[data-capture] .nf-number { visibility: hidden; }
+
 @media (prefers-reduced-motion: reduce) {
-  .nf-piece, .nf-glass { transition: none; translate: none; }
-}
-
-@media (max-width: 767px) {
-  .nf-scene { aspect-ratio: 1.5; }
-  .nf-number { font-size: clamp(96px, 30vw, 150px); }
+  .nf-still, .nf-canvas { transition: none; }
 }

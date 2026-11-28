@@ -53,4 +53,6 @@ test('404.html: the not-found page, prerendered, noindex, without the landing\'s
   assert.ok(!page.includes('application/ld+json'))
   assert.ok(!/<link rel="preload" as="image"[^>]*fetchpriority/.test(page))
   assert.ok(!page.includes('<!--app-html-->'))
+  // The 3D scene's still image is in the HTML (shown before JavaScript, and whenever the 3D cannot run).
+  assert.match(page, /<img class="nf-still" src="\/assets\/broken-capsule-[^"]+\.webp" srcSet="[^"]+ 1760w, [^"]+broken-capsule@2x-[^"]+\.webp 3520w"/)
 })

@@ -3,32 +3,7 @@ import type { MateId } from '../../data/mates.ts'
 import { fetchLoginMates, liveModelsFromResponse, type LiveModel } from '../../lib/live2d/source.ts'
 import { pointerGaze, type AlivingView } from '../../lib/live2d/view.ts'
 import type { LiveMateRenderer } from '../../lib/live2d/renderer.ts'
-
-type NetworkInfo = { saveData?: boolean; effectiveType?: string }
-
-/**
- * Whether this visitor gets the live model at all. The still stays (and is the LCP) for reduced motion,
- * data saver, slow connections, low-end devices and no WebGL2. QA: `?live=0` never, `?live=1` skips the
- * device checks (reduced motion still wins).
- */
-function liveAllowed(): boolean {
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return false
-  const query = new URLSearchParams(window.location.search).get('live')
-  if (query === '0') return false
-  if (query !== '1') {
-    const nav = navigator as Navigator & { connection?: NetworkInfo; deviceMemory?: number }
-    if (nav.connection?.saveData) return false
-    if (nav.connection?.effectiveType && ['slow-2g', '2g', '3g'].includes(nav.connection.effectiveType)) return false
-    if ((nav.hardwareConcurrency ?? 8) < 4) return false
-    if (typeof nav.deviceMemory === 'number' && nav.deviceMemory < 4) return false
-  }
-  try {
-    const gl = document.createElement('canvas').getContext('webgl2')
-    if (!gl) return false
-    gl.getExtension('WEBGL_lose_context')?.loseContext()
-  } catch { return false }
-  return true
-}
+import { realtimeAllowed as liveAllowed } from '../../lib/realtime.ts'
 
 /** After the page has loaded and the main thread is idle, so the still stays the first and largest paint. */
 function afterLoadIdle(run: () => void): () => void {
