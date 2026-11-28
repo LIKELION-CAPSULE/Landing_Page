@@ -1,9 +1,10 @@
-// Copied verbatim from Front_Web src/shared/three/capsule-model.ts (three 0.187.0, 2026-11-29): the service's one capsule model.
-// Keep it identical to the app's file; change it there first.
+// Copied from Front_Web src/shared/three/capsule-model.ts (three 0.187.0, 2026-11-29): the service's one capsule model.
+// Identical to the app's file except two Safari fixes (marked LANDING CHANGE: `forAlphaCanvas`'s alpha blend and
+// `radialGlowTexture`): bring the app to the same fixes.
 import {
-  AdditiveBlending, BackSide, BoxGeometry, BufferAttribute, CanvasTexture, Color, CustomBlending, DoubleSide,
-  Group, InstancedBufferAttribute, InstancedMesh, LatheGeometry, Matrix4, Mesh, MeshBasicMaterial, OneFactor,
-  OneMinusSrcAlphaFactor, PlaneGeometry, Scene, ShaderMaterial, SRGBColorSpace, Vector2,
+  AdditiveBlending, BackSide, BoxGeometry, BufferAttribute, Color, CustomBlending, DataTexture, DoubleSide,
+  Group, InstancedBufferAttribute, InstancedMesh, LatheGeometry, LinearFilter, LinearMipmapLinearFilter, Matrix4, Mesh,
+  MeshBasicMaterial, OneFactor, PlaneGeometry, RGBAFormat, Scene, ShaderMaterial, SRGBColorSpace, Vector2,
 } from 'three'
 import type { BufferGeometry } from 'three'
 import { BRAND_CAPSULE_COLORS, CAPSULE_SEAM_X, capsuleProfileSamples, capsuleRadiusAt, type CapsuleColors } from './capsule-shape.ts'
@@ -36,7 +37,13 @@ const ALPHA_CANVAS_OUTPUT = /* glsl */ `
 
 /**
  * Makes one of this module's additive materials composite correctly on a transparent canvas (`alpha: true`): light
- * adds onto what is already drawn, and the canvas alpha grows with it (over-blending), so the page shows through.
+ * adds onto what is already drawn, and the canvas alpha grows with it, so the page shows through.
+ *
+ * LANDING CHANGE (2026-11-29, to be made in the app too): the alpha adds like the colour (One / One). With the app's
+ * One / OneMinusSrcAlpha alpha, overlapping layers summed more colour than alpha — e.g. two layers of 0.5 give colour
+ * 1.0 but alpha 0.75 — and a third of the lit pixels ended up "colour > alpha", an invalid premultiplied pixel. Chrome
+ * composites those quietly; WebKit (Safari) shows them as dark specks and smudges. Each fragment's alpha is its
+ * brightest channel, so summed alphas always cover every summed channel: colour ≤ alpha everywhere.
  */
 export function forAlphaCanvas<T extends ShaderMaterial>(material: T): T {
   material.defines = { ...material.defines, CAPSULE_ALPHA_CANVAS: '' }
@@ -44,7 +51,7 @@ export function forAlphaCanvas<T extends ShaderMaterial>(material: T): T {
   material.blendSrc = OneFactor
   material.blendDst = OneFactor
   material.blendSrcAlpha = OneFactor
-  material.blendDstAlpha = OneMinusSrcAlphaFactor
+  material.blendDstAlpha = OneFactor
   material.needsUpdate = true
   return material
 }
@@ -88,17 +95,40 @@ export function capsuleStudioEnvironment() {
   return environment
 }
 
+/**
+ * A soft radial glow (stops: offset 0…1 from the centre, CSS rgb/rgba colour).
+ *
+ * LANDING CHANGE (2026-11-29, to be made in the app too): computed pixel by pixel into a DataTexture instead of a
+ * 2D-canvas radial gradient. WebKit (Safari) dithers canvas gradients, and uploading the canvas un-premultiplies it,
+ * so where the glow is faint the dither noise is magnified in the colour channels — dark specks and smudges over every
+ * glow card in Safari. Exact pixels have no noise.
+ */
 export function radialGlowTexture(stops: readonly [number, string][]) {
   const size = 128
-  const canvas = document.createElement('canvas')
-  canvas.width = canvas.height = size
-  const context = canvas.getContext('2d')!
-  const gradient = context.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2)
-  for (const [offset, color] of stops) gradient.addColorStop(offset, color)
-  context.fillStyle = gradient
-  context.fillRect(0, 0, size, size)
-  const texture = new CanvasTexture(canvas)
+  const parsed = stops.map(([offset, css]) => {
+    const [r = 255, g = 255, b = 255, a = 1] = (css.match(/[\d.]+/g) ?? []).map(Number)
+    return { offset, color: [r, g, b, a * 255] as const }
+  })
+  const sample = (t: number) => {
+    const after = parsed.findIndex((stop) => stop.offset >= t)
+    if (after <= 0) return (after === 0 ? parsed[0]! : parsed[parsed.length - 1]!).color
+    const from = parsed[after - 1]!, to = parsed[after]!
+    const k = (t - from.offset) / Math.max(1e-6, to.offset - from.offset)
+    return from.color.map((value, channel) => value + (to.color[channel]! - value) * k)
+  }
+  const data = new Uint8Array(size * size * 4)
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      const t = Math.min(1, Math.hypot(x + 0.5 - size / 2, y + 0.5 - size / 2) / (size / 2))
+      data.set(sample(t).map(Math.round), (y * size + x) * 4)
+    }
+  }
+  const texture = new DataTexture(data, size, size, RGBAFormat)
   texture.colorSpace = SRGBColorSpace
+  texture.magFilter = LinearFilter
+  texture.minFilter = LinearMipmapLinearFilter
+  texture.generateMipmaps = true
+  texture.needsUpdate = true
   return texture
 }
 
