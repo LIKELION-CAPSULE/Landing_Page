@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { isAllowedAssetUrl, liveModelsFromResponse } from '../src/lib/live2d/source.ts'
+import { fetchLoginMates, isAllowedAssetUrl, liveModelsFromResponse, LOGIN_MATES_PATH } from '../src/lib/live2d/source.ts'
 import { mateIdForServerName } from '../src/lib/live2d/mate-names.ts'
 import { CLOSE_UP_TALL, CLOSE_UP_WIDE, closeUpK, closeUpStillCss, closeUpView, HERO_RENDER } from '../src/lib/live2d/view.ts'
 
@@ -76,5 +76,23 @@ test('prerendered still and live model land on the same pixels (close-up)', () =
       assert.ok(Math.abs(b.k - closeUpK(cw, ch, framing)) < 1e-9)
       for (const key of ['left', 'top', 'width', 'height'] as const) assert.ok(Math.abs(a[key] - b[key]) < 0.5, `${cw}×${ch} ${key}: css ${a[key]} vs engine ${b[key]}`)
     }
+  }
+})
+
+test('48 is called on the same-origin path with same-origin cookies (protected Vercel previews need theirs)', async () => {
+  const calls: { url: unknown; init: RequestInit | undefined }[] = []
+  const original = globalThis.fetch
+  globalThis.fetch = (async (url: unknown, init?: RequestInit) => {
+    calls.push({ url, init })
+    return new Response(JSON.stringify({ mates: [] }), { status: 200 })
+  }) as typeof fetch
+  try {
+    assert.deepEqual(await fetchLoginMates(), { mates: [] })
+    assert.equal(calls.length, 1)
+    assert.equal(calls[0].url, LOGIN_MATES_PATH)
+    assert.equal(LOGIN_MATES_PATH.startsWith('/'), true)
+    assert.equal(calls[0].init?.credentials, 'same-origin')
+  } finally {
+    globalThis.fetch = original
   }
 })

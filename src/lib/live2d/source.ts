@@ -68,9 +68,13 @@ export function liveModelsFromResponse(body: unknown, ownNames: Readonly<Record<
 }
 
 let request: Promise<unknown> | null = null
-/** One GET per page. A failure is forgotten so a later attempt can retry. */
+/**
+ * One GET per page. A failure is forgotten so a later attempt can retry.
+ * Cookies follow the default (`same-origin`): the path is same-origin only, and a protected Vercel preview
+ * needs its access cookie, or the request is redirected to vercel.com/sso-api and fails CORS.
+ */
 export function fetchLoginMates(): Promise<unknown> {
-  request ??= fetch(LOGIN_MATES_PATH, { headers: { Accept: 'application/json' }, credentials: 'omit' })
+  request ??= fetch(LOGIN_MATES_PATH, { headers: { Accept: 'application/json' }, credentials: 'same-origin' })
     .then(response => { if (!response.ok) throw new Error(`login-mates ${response.status}`); return response.json() as Promise<unknown> })
     .catch(error => { request = null; throw error })
   return request
